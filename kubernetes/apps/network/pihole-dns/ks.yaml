@@ -2,10 +2,10 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: k8s-gateway
+  name: pihole-dns
 spec:
   interval: 1h
-  path: ./kubernetes/apps/network/k8s-gateway/app
+  path: ./kubernetes/apps/network/pihole-dns/app
   postBuild:
     substituteFrom:
       - name: cluster-secrets
@@ -16,4 +16,4 @@ spec:
     name: flux-system
     namespace: flux-system
   targetNamespace: network
-  wait: false
+  wait: true

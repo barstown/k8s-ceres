@@ -1,0 +1,37 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app pihole-dns
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: pihole-dns
+  interval: 1h
+  values:
+    fullnameOverride: *app
+    provider: pihole
+    env:
+      - name: EXTERNAL_DNS_PIHOLE_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: &secret pihole-dns-secret
+            key: pihole_password
+      - name: EXTERNAL_DNS_PIHOLE_SERVER
+        valueFrom:
+          secretKeyRef:
+            name: *secret
+            key: pihole_server
+    extraArgs:
+      - --gateway-name=envoy-internal
+      - --pihole-api-version=6
+      - --pihole-tls-skip-verify
+    triggerLoopOnEvent: true
+    policy: sync
+    sources: ["gateway-httproute"]
+    domainFilters: ["${SECRET_DOMAIN}"]
+    registry: noop
+    serviceMonitor:
+      enabled: true
+    podAnnotations:
+      secret.reloader.stakater.com/reload: *secret
