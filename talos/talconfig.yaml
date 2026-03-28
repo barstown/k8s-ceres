@@ -1,0 +1,143 @@
+---
+clusterName: kubernetes
+
+talosVersion: "${talosVersion}"
+kubernetesVersion: "${kubernetesVersion}"
+
+endpoint: https://10.0.50.2:6443
+additionalApiServerCertSans: &sans
+  - "127.0.0.1"
+  - "10.0.50.2"
+  - "ceres.asteroids.sh"
+additionalMachineCertSans: *sans
+
+clusterPodNets: ["10.42.0.0/16"]
+clusterSvcNets: ["10.43.0.0/16"]
+
+# Disable built-in CNI to use Cilium
+cniConfig:
+  name: none
+
+nodes:
+  - hostname: "ceres-cp1"
+    ipAddress: "10.0.50.19"
+    installDisk: "/dev/sda"
+    machineSpec:
+      secureboot: true
+    talosImageURL: factory.talos.dev/installer-secureboot/2adeac3e1e3ae2ad6fce75b56d3b166b31e0c438ca6bba8619286e4eafb594c1
+    controlPlane: true
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "bc:24:11:98:5d:af"
+        dhcp: false
+        addresses:
+          - "10.0.50.19/24"
+        routes:
+          - gateway: "10.0.50.1"
+            network: 0.0.0.0/0
+        mtu: 1500
+        vip:
+          ip: "10.0.50.2"
+  - hostname: "ceres-cp2"
+    ipAddress: "10.0.50.10"
+    installDisk: "/dev/sda"
+    machineSpec:
+      secureboot: true
+    talosImageURL: factory.talos.dev/installer-secureboot/2adeac3e1e3ae2ad6fce75b56d3b166b31e0c438ca6bba8619286e4eafb594c1
+    controlPlane: true
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "bc:24:11:fb:1f:54"
+        dhcp: false
+        addresses:
+          - "10.0.50.10/24"
+        routes:
+          - gateway: "10.0.50.1"
+            network: 0.0.0.0/0
+        mtu: 1500
+        vip:
+          ip: "10.0.50.2"
+  - hostname: "ceres-cp3"
+    ipAddress: "10.0.50.17"
+    installDisk: "/dev/sda"
+    machineSpec:
+      secureboot: true
+    talosImageURL: factory.talos.dev/installer-secureboot/2adeac3e1e3ae2ad6fce75b56d3b166b31e0c438ca6bba8619286e4eafb594c1
+    controlPlane: true
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "bc:24:11:93:cb:99"
+        dhcp: false
+        addresses:
+          - "10.0.50.17/24"
+        routes:
+          - gateway: "10.0.50.1"
+            network: 0.0.0.0/0
+        mtu: 1500
+        vip:
+          ip: "10.0.50.2"
+  - hostname: "ceres-w1"
+    ipAddress: "10.0.50.16"
+    installDisk: "/dev/sda"
+    machineSpec:
+      secureboot: true
+    talosImageURL: factory.talos.dev/installer-secureboot/2adeac3e1e3ae2ad6fce75b56d3b166b31e0c438ca6bba8619286e4eafb594c1
+    controlPlane: false
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "bc:24:11:79:9e:02"
+        dhcp: false
+        addresses:
+          - "10.0.50.16/24"
+        routes:
+          - gateway: "10.0.50.1"
+            network: 0.0.0.0/0
+        mtu: 1500
+  - hostname: "ceres-w2"
+    ipAddress: "10.0.50.20"
+    installDisk: "/dev/sda"
+    machineSpec:
+      secureboot: true
+    talosImageURL: factory.talos.dev/installer-secureboot/2adeac3e1e3ae2ad6fce75b56d3b166b31e0c438ca6bba8619286e4eafb594c1
+    controlPlane: false
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "bc:24:11:12:b5:f3"
+        dhcp: false
+        addresses:
+          - "10.0.50.20/24"
+        routes:
+          - gateway: "10.0.50.1"
+            network: 0.0.0.0/0
+        mtu: 1500
+  - hostname: "ceres-w3"
+    ipAddress: "10.0.50.18"
+    installDisk: "/dev/sda"
+    machineSpec:
+      secureboot: true
+    talosImageURL: factory.talos.dev/installer-secureboot/2adeac3e1e3ae2ad6fce75b56d3b166b31e0c438ca6bba8619286e4eafb594c1
+    controlPlane: false
+    networkInterfaces:
+      - deviceSelector:
+          hardwareAddr: "bc:24:11:77:95:0a"
+        dhcp: false
+        addresses:
+          - "10.0.50.18/24"
+        routes:
+          - gateway: "10.0.50.1"
+            network: 0.0.0.0/0
+        mtu: 1500
+
+# Global patches
+patches:
+  - "@./patches/global/machine-files.yaml"
+  - "@./patches/global/machine-kubelet.yaml"
+  - "@./patches/global/machine-network.yaml"
+  - "@./patches/global/machine-sysctls.yaml"
+  - "@./patches/global/machine-time.yaml"
+
+# Controller patches
+controlPlane:
+  patches:
+    - "@./patches/controller/cluster.yaml"
+
