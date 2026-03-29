@@ -1,0 +1,39 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: freenas-api-nfs
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: freenas-api-nfs
+  interval: 1h
+  values:
+    csiDriver:
+      name: freenas-api-nfs
+    controller:
+      driver:
+        image:
+          registry: ghcr.io/democratic-csi/democratic-csi
+          tag: latest
+    driver:
+      existingConfigSecret: freenas-api-nfs-driver-config
+      config:
+        driver: freenas-api-nfs
+    storageClasses:
+      - name: freenas-api-nfs
+        defaultClass: false
+        reclaimPolicy: Retain
+        volumeBindingMode: Immediate
+        allowVolumeExpansion: true
+        parameters:
+          fsType: nfs
+          detachedVolumesFromSnapshots: 'false'
+        mountOptions:
+          - nfsvers=3
+          - noatime
+          - nolock
+    volumeSnapshotClasses:
+      - name: freenas-api-nfs
+        parameters:
+          detachedSnapshots: 'true'
