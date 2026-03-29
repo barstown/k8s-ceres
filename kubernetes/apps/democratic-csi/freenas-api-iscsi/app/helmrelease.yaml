@@ -1,0 +1,45 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: freenas-api-iscsi
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: freenas-api-iscsi
+  interval: 1h
+  values:
+    csiDriver:
+      name: freenas-api-iscsi
+    controller:
+      driver:
+        image:
+          registry: ghcr.io/democratic-csi/democratic-csi
+          tag: latest
+    driver:
+      existingConfigSecret: freenas-api-iscsi-driver-config
+      config:
+        driver: freenas-api-iscsi
+    node:
+      driver:
+        extraEnv:
+          - name: ISCSIADM_HOST_STRATEGY
+            value: nsenter
+          - name: ISCSIADM_HOST_PATH
+            value: /usr/local/sbin/iscsiadm
+        iscsiDirHostPath: /var/iscsi
+        iscsiDirHostPathType: ''
+      hostPID: true
+    storageClasses:
+      - name: freenas-api-iscsi
+        allowVolumeExpansion: true
+        defaultClass: true
+        parameters:
+          fsType: xfs
+          detachedVolumesFromSnapshots: 'false'
+        reclaimPolicy: Retain
+        volumeBindingMode: Immediate
+    volumeSnapshotClasses:
+      - name: freenas-api-iscsi
+        parameters:
+          detachedSnapshots: 'true'

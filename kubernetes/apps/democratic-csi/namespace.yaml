@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: cert-manager
+  name: democratic-csi
   annotations:
     kustomize.toolkit.fluxcd.io/prune: disabled
   labels:
