@@ -1,0 +1,49 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: renovate
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: renovate
+  interval: 1h
+  values:
+    env:
+      LOG_LEVEL: INFO
+      RENOVATE_AUTODISCOVER_FILTER: "barstown/*"
+      RENOVATE_AUTODISCOVER: "true"
+      RENOVATE_DRY_RUN: "null"
+      RENOVATE_REPORT_TYPE: logging
+      RENOVATE_X_GITHUB_HOST_RULES: "true"
+      # RENOVATE_PRINT_CONFIG: "true" # debugging
+    envFrom:
+      - secretRef:
+          name: renovate-secrets
+    cronjob:
+      schedule: "0 */3 * * *"
+      timeZone: America/New_York
+      successfulJobsHistoryLimit: 4
+      failedJobsHistoryLimit: 2
+      concurrencyPolicy: Replace
+      ttlSecondsAfterFinished: 43200
+    renovate:
+      config: |
+        {
+          "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+          "extends": [
+            "config:best-practices",
+            "security:openssf-scorecard"
+          ]
+        }
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities: { drop: ["ALL"] }
+        readOnlyRootFilesystem: true
+        runAsNonRoot: true
+        seccompProfile: { type: RuntimeDefault }
+      persistence:
+        cache:
+          enabled: true
+          storageClass: "freenas-api-iscsi"
+          storageSize: "10Gi"
