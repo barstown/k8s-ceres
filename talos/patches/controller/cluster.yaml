@@ -2,7 +2,12 @@ cluster:
   allowSchedulingOnControlPlanes: false
   apiServer:
     admissionControl:
-      $$patch: delete
+      - name: PodSecurity
+        configuration:
+          defaults:
+            audit: restricted
+            enforce: restricted
+            warn: restricted
     extraArgs:
       # https://kubernetes.io/docs/tasks/extend-kubernetes/configure-aggregation-layer/
       enable-aggregator-routing: true
