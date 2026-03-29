@@ -1,0 +1,47 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nebula-sync
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: nebula-sync
+  interval: 1h
+  values:
+    controllers:
+      nebula-sync:
+        type: cronjob
+        cronjob:
+          concurrencyPolicy: Replace
+          failedJobsHistory: 2
+          schedule: "*/30 * * * *"
+          successfulJobsHistory: 4
+          timeZone: America/New_York
+          ttlSecondsAfterFinished: 9000
+        containers:
+          main:
+            image:
+              repository: ghcr.io/lovelaze/nebula-sync
+              tag: v0.11.1
+            envFrom:
+              - secretRef:
+                  name: nebula-sync-env-secret
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities: { drop: ["ALL"] }
+              readOnlyRootFilesystem: true
+              runAsNonRoot: true
+              seccompProfile: { type: RuntimeDefault }
+            resources:
+              requests:
+                cpu: 10m
+                memory: 32Mi
+              limits:
+                cpu: 100m
+                memory: 64Mi
+    defaultPodOptions:
+      securityContext:
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
