@@ -5,7 +5,7 @@ metadata:
   name: freenas-api-nfs
 spec:
   interval: 1h
-  path: ./kubernetes/apps/default/freenas-api-nfs/app
+  path: ./kubernetes/apps/democratic-csi/freenas-api-nfs/app
   postBuild:
     substituteFrom:
       - name: cluster-secrets
@@ -15,5 +15,5 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  targetNamespace: default
+  targetNamespace: democratic-csi
   wait: false
