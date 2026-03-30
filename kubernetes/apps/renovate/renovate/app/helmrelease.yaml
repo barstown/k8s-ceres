@@ -28,14 +28,15 @@ spec:
       concurrencyPolicy: Replace
       ttlSecondsAfterFinished: 43200
     renovate:
-      config: |
-        {
-          "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-          "extends": [
-            "config:best-practices",
-            "security:openssf-scorecard"
-          ]
-        }
+      config: {}
+      # config: |
+      #   {
+      #     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+      #     "extends": [
+      #       "config:best-practices",
+      #       "security:openssf-scorecard"
+      #     ]
+      #   }
       securityContext:
         allowPrivilegeEscalation: false
         capabilities: { drop: ["ALL"] }
