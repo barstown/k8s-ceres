@@ -13,6 +13,16 @@ tasks:
       - test -f {{.SOPS_AGE_KEY_FILE}}
       - which talhelper
 
+  generate-kubeconfig:
+    desc: Generate Talos kubeconfig
+    dir: '{{.TALOS_DIR}}'
+    cmd: talhelper gencommand kubeconfig --extra-flags="{{.ROOT_DIR}} --force" | bash
+    preconditions:
+      - test -f {{.TALOS_DIR}}/talconfig.yaml
+      - test -f {{.ROOT_DIR}}/.sops.yaml
+      - test -f {{.SOPS_AGE_KEY_FILE}}
+      - which talhelper
+
   apply-node:
     desc: Apply Talos config to a node [IP=required]
     dir: '{{.TALOS_DIR}}'
