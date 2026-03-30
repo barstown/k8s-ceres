@@ -35,6 +35,17 @@ spec:
           "extends": [
             "config:best-practices",
             "security:openssf-scorecard"
+          ],
+          "dependencyDashboardOSVVulnerabilitySummary": "all",
+          "osvVulnerabilityAlerts": true,
+          "packageRules": [
+            {
+              "description": "Disable digest pinning for Flux OCIRepository resources",
+              "matchManagers": ["flux"],
+              "matchDatasources": ["docker"],
+              "matchDepTypes": ["OCIRepository"],
+              "pinDigests": false
+            }
           ]
         }
       securityContext:
