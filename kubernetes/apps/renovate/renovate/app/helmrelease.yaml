@@ -15,6 +15,7 @@ spec:
       RENOVATE_AUTODISCOVER: "true"
       RENOVATE_DRY_RUN: "null"
       RENOVATE_REPORT_TYPE: logging
+      RENOVATE_TIMEZONE: "America/New_York"
       RENOVATE_X_GITHUB_HOST_RULES: "true"
       # RENOVATE_PRINT_CONFIG: "true" # debugging
     envFrom:
@@ -28,15 +29,14 @@ spec:
       concurrencyPolicy: Replace
       ttlSecondsAfterFinished: 43200
     renovate:
-      config: {}
-      # config: |
-      #   {
-      #     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-      #     "extends": [
-      #       "config:best-practices",
-      #       "security:openssf-scorecard"
-      #     ]
-      #   }
+      config: |
+        {
+          "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+          "extends": [
+            "config:best-practices",
+            "security:openssf-scorecard"
+          ]
+        }
       securityContext:
         allowPrivilegeEscalation: false
         capabilities: { drop: ["ALL"] }
