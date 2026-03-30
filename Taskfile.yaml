@@ -11,10 +11,12 @@ vars:
   TALOS_DIR: '{{.ROOT_DIR}}/talos'
   PRIVATE_DIR: '{{.ROOT_DIR}}/.private'
   TALOSCONFIG: '{{.ROOT_DIR}}/talos/clusterconfig/talosconfig'
+  AGE_DIR: '{{env "HOME"}}/.config/sops/age'
+  SOPS_AGE_KEY_FILE: '{{.AGE_DIR}}/keys.txt'
 
 env:
   KUBECONFIG: '{{.ROOT_DIR}}/kubeconfig'
-  SOPS_AGE_KEY_FILE: '{{.ROOT_DIR}}/age.key'
+  SOPS_AGE_KEY_FILE: '{{.AGE_DIR}}/keys.txt'
   TALOSCONFIG: '{{.TALOSCONFIG}}'
 
 includes:
