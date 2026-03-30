@@ -14,6 +14,7 @@ spec:
       RENOVATE_AUTODISCOVER_FILTER: "barstown/*"
       RENOVATE_AUTODISCOVER: "true"
       RENOVATE_DRY_RUN: "null"
+      RENOVATE_GIT_AUTHOR: "Renovate Bot <30529916+barstown@users.noreply.github.com>"
       RENOVATE_REPORT_TYPE: logging
       RENOVATE_TIMEZONE: "America/New_York"
       RENOVATE_X_GITHUB_HOST_RULES: "true"

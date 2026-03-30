@@ -39,7 +39,7 @@
       "description": "Disable digest pinning for Flux OCIRepository resources",
       "matchManagers": ["flux"],
       "matchDatasources": ["docker"],
-      "matchDepTypes": ["OCIRepository"],
+      "matchPackagePatterns": ["^oci://"],
       "pinDigests": false
     },
     {
