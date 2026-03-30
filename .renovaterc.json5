@@ -36,6 +36,13 @@
       overrideDepName: "{{packageName}}",
     },
     {
+      "description": "Disable digest pinning for Flux OCIRepository resources",
+      "matchManagers": ["flux"],
+      "matchDatasources": ["docker"],
+      "matchDepTypes": ["OCIRepository"],
+      "pinDigests": false
+    },
+    {
       description: "Flux Operator Group",
       groupName: "flux-operator",
       matchDatasources: ["docker"],
