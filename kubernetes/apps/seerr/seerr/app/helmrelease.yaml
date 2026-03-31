@@ -54,7 +54,6 @@ spec:
                 cpu: 10m
                 memory: 100Mi
               limits:
-                cpu: 100m
                 memory: 2Gi
     defaultPodOptions:
       securityContext:
