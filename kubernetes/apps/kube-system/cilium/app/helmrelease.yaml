@@ -45,6 +45,7 @@ spec:
     loadBalancer:
       algorithm: maglev
       mode: "dsr"
+      dsrDispatch: "geneve"
     localRedirectPolicies:
       enabled: true
     operator:
