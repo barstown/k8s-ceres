@@ -19,15 +19,10 @@ spec:
         runAsNonRoot: true
         runAsUser: 65534
         seccompProfile: { type: RuntimeDefault }
-
     authentik:
       enabled: true
-      ## WARNING: when set, authentik.* secret values are ignored
-      existingSecret:
-        secretName: "authentik-secret"
       error_reporting:
         enabled: false
-
     server:
       env:
         - name: AUTHENTIK_LOG_LEVEL
@@ -54,7 +49,6 @@ spec:
             - backendRefs:
                 - identifier: app
                   port: *port
-
     worker:
       resources: *resources
       containerSecurityContext: {}
@@ -64,6 +58,26 @@ spec:
         # allowPrivilegeEscalation: false
         # seccompProfile: { type: RuntimeDefault }
         # capabilities: { drop: ["ALL"] }
-
     postgresql:
       enabled: false
+  valuesFrom:
+    - kind: Secret
+      name: authentik-app-secret
+      valuesKey: AUTHENTIK_SECRET_KEY
+      targetPath: authentik.secret_key
+    - kind: Secret
+      name: &db-secret authentik-db-secret
+      valuesKey: host
+      targetPath: authentik.postgresql.host
+    - kind: Secret
+      name: *db-secret
+      valuesKey: username
+      targetPath: authentik.postgresql.user
+    - kind: Secret
+      name: *db-secret
+      valuesKey: password
+      targetPath: authentik.postgresql.password
+    - kind: Secret
+      name: *db-secret
+      valuesKey: database
+      targetPath: authentik.postgresql.name
