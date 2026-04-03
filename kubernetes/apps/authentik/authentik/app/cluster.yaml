@@ -12,7 +12,7 @@ spec:
       database: authentik
       owner: authentik
       secret:
-        name: authentik-postgres-secret
+        name: authentik-db-secret
   storage:
     size: 10Gi
     storageClass: freenas-api-iscsi
