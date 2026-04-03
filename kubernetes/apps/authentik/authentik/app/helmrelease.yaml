@@ -11,19 +11,18 @@ spec:
   values:
     global:
       securityContext:
-        allowPrivilegeEscalation: false
-        capabilities: { drop: ["ALL"] }
         fsGroup: 65534
-        fsGroupChangePolicy: OnRootMismatch
         runAsGroup: 65534
-        runAsNonRoot: true
         runAsUser: 65534
-        seccompProfile: { type: RuntimeDefault }
     authentik:
       enabled: true
       error_reporting:
         enabled: false
     server:
+      containerPorts:
+        http: &port 9000
+        https: 9443
+        metrics: 9300
       env:
         - name: AUTHENTIK_LOG_LEVEL
           value: info
@@ -33,10 +32,6 @@ spec:
           memory: 512Mi
         limits:
           memory: 1Gi
-      containerPorts:
-        http: &port 9000
-        https: 9443
-        metrics: 9300
       route:
         internal:
           enabled: true
@@ -49,15 +44,15 @@ spec:
             - backendRefs:
                 - identifier: app
                   port: *port
+      containerSecurityContext: &securityContext
+        runAsNonRoot: true
+        readOnlyRootFilesystem: true
+        allowPrivilegeEscalation: false
+        seccompProfile: { type: RuntimeDefault }
+        capabilities: { drop: ["ALL"] }
     worker:
       resources: *resources
-      containerSecurityContext: {}
-        # Not all of the following has been tested. Use at your own risk.
-        # runAsNonRoot: true
-        # readOnlyRootFilesystem: true
-        # allowPrivilegeEscalation: false
-        # seccompProfile: { type: RuntimeDefault }
-        # capabilities: { drop: ["ALL"] }
+      containerSecurityContext: *securityContext
     postgresql:
       enabled: false
   valuesFrom:
