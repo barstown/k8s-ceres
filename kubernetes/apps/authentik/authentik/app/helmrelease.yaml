@@ -1,0 +1,69 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: authentik
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: authentik
+  interval: 1h
+  values:
+    global:
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities: { drop: ["ALL"] }
+        fsGroup: 65534
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile: { type: RuntimeDefault }
+
+    authentik:
+      enabled: true
+      ## WARNING: when set, authentik.* secret values are ignored
+      existingSecret:
+        secretName: "authentik-secret"
+      error_reporting:
+        enabled: false
+
+    server:
+      env:
+        - name: AUTHENTIK_LOG_LEVEL
+          value: info
+      resources: &resources
+        requests:
+          cpu: 100m
+          memory: 512Mi
+        limits:
+          memory: 1Gi
+      containerPorts:
+        http: &port 9000
+        https: 9443
+        metrics: 9300
+      route:
+        internal:
+          enabled: true
+          hostnames: ["{{ .Release.Name }}.${SECRET_DOMAIN}"]
+          parentRefs:
+            - name: envoy-internal
+              namespace: network
+              sectionName: https
+          rules:
+            - backendRefs:
+                - identifier: app
+                  port: *port
+
+    worker:
+      resources: *resources
+      containerSecurityContext: {}
+        # Not all of the following has been tested. Use at your own risk.
+        # runAsNonRoot: true
+        # readOnlyRootFilesystem: true
+        # allowPrivilegeEscalation: false
+        # seccompProfile: { type: RuntimeDefault }
+        # capabilities: { drop: ["ALL"] }
+
+    postgresql:
+      enabled: false
