@@ -95,7 +95,5 @@ spec:
         accessMode: ReadWriteOnce
         size: 5Gi
         storageClass: freenas-api-iscsi
-        globalMounts:
-          - path: /config
       tmp:
         type: emptyDir
