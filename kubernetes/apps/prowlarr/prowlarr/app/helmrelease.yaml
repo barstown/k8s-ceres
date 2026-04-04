@@ -96,6 +96,6 @@ spec:
         size: 5Gi
         storageClass: freenas-api-iscsi
         globalMounts:
-          - path: /app/config
+          - path: /config
       tmp:
         type: emptyDir
