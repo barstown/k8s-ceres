@@ -26,10 +26,10 @@ spec:
       env:
         - name: AUTHENTIK_LOG_LEVEL
           value: info
-      resources: &resources
+      resources:
         requests:
           cpu: 100m
-          memory: 512Mi
+          memory: 700Mi
         limits:
           memory: 1Gi
       route:
@@ -51,7 +51,12 @@ spec:
         seccompProfile: { type: RuntimeDefault }
         capabilities: { drop: ["ALL"] }
     worker:
-      resources: *resources
+      resources:
+        requests:
+          cpu: 100m
+          memory: 850Mi
+        limits:
+          memory: 1536Mi
       containerSecurityContext: *securityContext
     postgresql:
       enabled: false
