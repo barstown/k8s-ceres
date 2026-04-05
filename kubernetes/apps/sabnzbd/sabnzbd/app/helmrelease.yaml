@@ -1,0 +1,116 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: sabnzbd
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: sabnzbd
+  interval: 1h
+  values:
+    controllers:
+      sabnzbd:
+        containers:
+          app:
+            image:
+              repository: ghcr.io/home-operations/sabnzbd
+              tag: 4.5.5@sha256:f5570c0a370596ab656db6d3baa830b90a6fd9952b71ae805d022a2dcb3db12f
+            env:
+              SABNZBD__PORT: &port 80
+              SABNZBD__HOST_WHITELIST_ENTRIES: "https://{{ .Release.Name }}.${SECRET_DOMAIN}, {{ .Release.Name }}"
+              TZ: America/New_York
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+            probes:
+              liveness:
+                enabled: true
+                spec:
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api?mode=version
+                    port: *port
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities: { drop: ["ALL"] }
+              readOnlyRootFilesystem: true
+              seccompProfile: { type: RuntimeDefault }
+            resources:
+              requests:
+                cpu: 100m
+                memory: 100Mi
+              limits:
+                cpu: 1000m
+                memory: 4Gi
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 2001
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 2001
+        runAsNonRoot: true
+        runAsUser: 2014
+        # supplementalGroups: [2001]
+    service:
+      app:
+        ports:
+          http:
+            port: *port
+    route:
+      internal:
+        hostnames: ["{{ .Release.Name }}.${SECRET_DOMAIN}"]
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
+    persistence:
+      config:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        storageClass: freenas-api-iscsi
+      comics:
+        type: nfs
+        server: 10.0.10.50
+        path: /mnt/storage/media/comics
+      tv:
+        type: nfs
+        server: 10.0.10.50
+        path: /mnt/storage/media/tv
+      movies:
+        type: nfs
+        server: 10.0.10.50
+        path: /mnt/storage/media/movies
+      music:
+        type: nfs
+        server: 10.0.10.50
+        path: /mnt/storage/media/music
+      downloads:
+        type: nfs
+        server: 10.0.10.50
+        path: /mnt/storage/media/downloads/complete
+      incomplete:
+        type: nfs
+        server: 10.0.10.50
+        path: /mnt/storage/media/downloads/incomplete
+      tmp:
+        type: emptyDir
