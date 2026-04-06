@@ -60,7 +60,7 @@ spec:
                 memory: 4Gi
     defaultPodOptions:
       securityContext:
-        fsGroup: 2001 # media-rw
+        fsGroup: 2002 # media-ro
         fsGroupChangePolicy: OnRootMismatch
         runAsGroup: 65534
         runAsNonRoot: true
