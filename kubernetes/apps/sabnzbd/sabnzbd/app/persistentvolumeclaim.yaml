@@ -2,12 +2,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: nfs-test
+  name: "{{ .Release.Name }}-media"
   namespace: sabnzbd
 spec:
   storageClassName: ""
   accessModes: ["ReadWriteMany"]
   resources:
     requests:
-      storage: 100Gi
-  volumeName: nfs-test
+      storage: 2Ti
+  volumeName: "{{ .Release.Name }}-media"

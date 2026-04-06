@@ -92,8 +92,12 @@ spec:
       #   type: nfs
       #   server: 10.0.10.50
       #   path: /mnt/storage/media/comics
-      test:
-        existingClaim: nfs-test
+      media:
+        type: persistentVolumeClaim
+        existingClaim: "{{ .Release.Name }}-media"
+        globalMounts:
+          - path: /test
+            subPath: test
       # tv:
       #   type: nfs
       #   server: 10.0.10.50
