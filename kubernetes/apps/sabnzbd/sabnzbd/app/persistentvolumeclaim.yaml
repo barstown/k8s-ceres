@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: "{{ .Release.Name }}-media"
+  name: sabnzbd-media
   namespace: sabnzbd
 spec:
   storageClassName: ""
@@ -10,4 +10,4 @@ spec:
   resources:
     requests:
       storage: 2Ti
-  volumeName: "{{ .Release.Name }}-media"
+  volumeName: sabnzbd-media
