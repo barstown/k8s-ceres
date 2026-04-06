@@ -95,9 +95,9 @@ spec:
       media:
         type: persistentVolumeClaim
         existingClaim: "{{ .Release.Name }}-media"
-        globalMounts:
-          - path: /test
-            subPath: test
+        # globalMounts:
+        #   - path: /test
+        #     subPath: test
       # tv:
       #   type: nfs
       #   server: 10.0.10.50

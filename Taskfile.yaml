@@ -33,3 +33,10 @@ tasks:
     preconditions:
       - test -f {{.KUBECONFIG}}
       - which flux
+
+  reconcile-apps:
+    desc: Force Flux to reconcile cluster apps
+    cmd: flux --namespace flux-system reconcile kustomization cluster-apps --with-source
+    preconditions:
+      - test -f {{.KUBECONFIG}}
+      - which flux
