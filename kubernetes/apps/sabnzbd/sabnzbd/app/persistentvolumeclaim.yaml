@@ -9,5 +9,5 @@ spec:
   accessModes: ["ReadWriteMany"]
   resources:
     requests:
-      storage: 2Ti
+      storage: 10Ti
   volumeName: sabnzbd-media

@@ -60,11 +60,11 @@ spec:
                 memory: 4Gi
     defaultPodOptions:
       securityContext:
-        fsGroup: 2002 # media-ro
+        fsGroup: 2001 # media-rw
         fsGroupChangePolicy: OnRootMismatch
-        runAsGroup: 65534
+        runAsGroup: 2014 # sabnzbd
         runAsNonRoot: true
-        runAsUser: 65534
+        runAsUser: 2014 # sabnzbd
         # supplementalGroups: [2001]
     service:
       app:

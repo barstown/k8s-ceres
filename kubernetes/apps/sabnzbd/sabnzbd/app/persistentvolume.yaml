@@ -5,7 +5,7 @@ metadata:
   name: sabnzbd-media
 spec:
   capacity:
-    storage: 2Ti
+    storage: 10Ti
   accessModes: ["ReadWriteMany"]
   persistentVolumeReclaimPolicy: Retain
   storageClassName: ""
