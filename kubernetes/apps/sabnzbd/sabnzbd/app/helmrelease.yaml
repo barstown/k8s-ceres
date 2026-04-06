@@ -88,29 +88,31 @@ spec:
         accessMode: ReadWriteOnce
         size: 5Gi
         storageClass: freenas-api-iscsi
-      comics:
-        type: nfs
-        server: 10.0.10.50
-        path: /mnt/storage/media/comics
-      tv:
-        type: nfs
-        server: 10.0.10.50
-        path: /mnt/storage/media/tv
-      movies:
-        type: nfs
-        server: 10.0.10.50
-        path: /mnt/storage/media/movies
-      music:
-        type: nfs
-        server: 10.0.10.50
-        path: /mnt/storage/media/music
-      downloads:
-        type: nfs
-        server: 10.0.10.50
-        path: /mnt/storage/media/downloads/complete
-      incomplete:
-        type: nfs
-        server: 10.0.10.50
-        path: /mnt/storage/media/downloads/incomplete
+      # comics:
+      #   type: nfs
+      #   server: 10.0.10.50
+      #   path: /mnt/storage/media/comics
+      test:
+        existingClaim: nfs-test
+      # tv:
+      #   type: nfs
+      #   server: 10.0.10.50
+      #   path: /mnt/storage/media/tv
+      # movies:
+      #   type: nfs
+      #   server: 10.0.10.50
+      #   path: /mnt/storage/media/movies
+      # music:
+      #   type: nfs
+      #   server: 10.0.10.50
+      #   path: /mnt/storage/media/music
+      # downloads:
+      #   type: nfs
+      #   server: 10.0.10.50
+      #   path: /mnt/storage/media/downloads/complete
+      # incomplete:
+      #   type: nfs
+      #   server: 10.0.10.50
+      #   path: /mnt/storage/media/downloads/incomplete
       tmp:
         type: emptyDir
