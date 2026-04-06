@@ -60,9 +60,9 @@ spec:
                 memory: 4Gi
     defaultPodOptions:
       securityContext:
-        fsGroup: 2001
+        fsGroup: 2014
         fsGroupChangePolicy: OnRootMismatch
-        runAsGroup: 2001
+        runAsGroup: 2014
         runAsNonRoot: true
         runAsUser: 2014
         # supplementalGroups: [2001]
