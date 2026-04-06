@@ -11,4 +11,4 @@ spec:
   storageClassName: ""
   nfs:
     server: 10.0.10.50
-    path: /mnt/storage/media
+    path: /mnt/storage/media/test
