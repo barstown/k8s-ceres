@@ -88,35 +88,21 @@ spec:
         accessMode: ReadWriteOnce
         size: 5Gi
         storageClass: freenas-api-iscsi
-      # comics:
-      #   type: nfs
-      #   server: 10.0.10.50
-      #   path: /mnt/storage/media/comics
       media:
         type: persistentVolumeClaim
         existingClaim: "{{ .Release.Name }}-media"
         globalMounts:
-          - path: /test
-            subPath: test
-      # tv:
-      #   type: nfs
-      #   server: 10.0.10.50
-      #   path: /mnt/storage/media/tv
-      # movies:
-      #   type: nfs
-      #   server: 10.0.10.50
-      #   path: /mnt/storage/media/movies
-      # music:
-      #   type: nfs
-      #   server: 10.0.10.50
-      #   path: /mnt/storage/media/music
-      # downloads:
-      #   type: nfs
-      #   server: 10.0.10.50
-      #   path: /mnt/storage/media/downloads/complete
-      # incomplete:
-      #   type: nfs
-      #   server: 10.0.10.50
-      #   path: /mnt/storage/media/downloads/incomplete
+          - path: /comics
+            subPath: comics
+          - path: /downloads
+            subPath: downloads/complete
+          - path: /incomplete
+            subPath: downloads/incomplete
+          - path: /movies
+            subPath: movies
+          - path: /music
+            subPath: music
+          - path: /tv
+            subPath: tv
       tmp:
         type: emptyDir
