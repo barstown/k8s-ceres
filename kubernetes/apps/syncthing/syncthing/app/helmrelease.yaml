@@ -124,6 +124,8 @@ spec:
         accessMode: ReadWriteOnce
         size: 5Gi
         storageClass: freenas-api-iscsi
+        globalMounts:
+          - path: /var/syncthing/config
       media:
         type: persistentVolumeClaim
         existingClaim: "{{ .Release.Name }}-media"
