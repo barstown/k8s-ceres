@@ -23,5 +23,5 @@ spec:
   accessModes: ["ReadWriteMany"]
   resources:
     requests:
-      storage: 10Ti
+      storage: 500Gi
   volumeName: syncthing-backups-kyle
