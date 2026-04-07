@@ -134,7 +134,7 @@ spec:
             subPath: pictures/kyle-syncthing
           - path: /haleys_photos
             subPath: pictures/haley-syncthing
-      kyles_backups:
+      backups-kyle:
         type: persistentVolumeClaim
         existingClaim: "{{ .Release.Name }}-backups-kyle"
       tmp:
