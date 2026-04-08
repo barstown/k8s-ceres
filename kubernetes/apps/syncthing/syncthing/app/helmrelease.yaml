@@ -69,17 +69,17 @@ spec:
         ports:
           http:
             port: *port
-      sync:
-        ports:
-          sync-tcp:
-            protocol: TCP
-            port: &sync 22000
-          sync-udp:
-            protocol: UDP
-            port: *sync
-          discovery-udp:
-            protocol: UDP
-            port: &discovery 21027
+      # sync:
+      #   ports:
+      #     sync-tcp:
+      #       protocol: TCP
+      #       port: &sync 22000
+      #     sync-udp:
+      #       protocol: UDP
+      #       port: *sync
+      #     discovery-udp:
+      #       protocol: UDP
+      #       port: &discovery 21027
     route:
       internal:
         hostnames: ["{{ .Release.Name }}.${SECRET_DOMAIN}"]
@@ -91,36 +91,36 @@ spec:
           - backendRefs:
               - identifier: app
                 port: *port
-      sync-tcp:
-        kind: TCPRoute
-        parentRefs:
-          - name: envoy-syncthing
-            namespace: network
-            sectionName: syncthing-sync-tcp
-        rules:
-          - backendRefs:
-              - identifier: sync
-                port: *sync
-      sync-udp:
-        kind: UDPRoute
-        parentRefs:
-          - name: envoy-syncthing
-            namespace: network
-            sectionName: syncthing-sync-udp
-        rules:
-          - backendRefs:
-              - identifier: sync
-                port: *sync
-      discovery-udp:
-        kind: UDPRoute
-        parentRefs:
-          - name: envoy-syncthing
-            namespace: network
-            sectionName: syncthing-discovery-udp
-        rules:
-          - backendRefs:
-              - identifier: sync
-                port: *discovery
+      # sync-tcp:
+      #   kind: TCPRoute
+      #   parentRefs:
+      #     - name: envoy-syncthing
+      #       namespace: network
+      #       sectionName: syncthing-sync-tcp
+      #   rules:
+      #     - backendRefs:
+      #         - identifier: sync
+      #           port: *sync
+      # sync-udp:
+      #   kind: UDPRoute
+      #   parentRefs:
+      #     - name: envoy-syncthing
+      #       namespace: network
+      #       sectionName: syncthing-sync-udp
+      #   rules:
+      #     - backendRefs:
+      #         - identifier: sync
+      #           port: *sync
+      # discovery-udp:
+      #   kind: UDPRoute
+      #   parentRefs:
+      #     - name: envoy-syncthing
+      #       namespace: network
+      #       sectionName: syncthing-discovery-udp
+      #   rules:
+      #     - backendRefs:
+      #         - identifier: sync
+      #           port: *discovery
     persistence:
       syncthing-env:
         type: persistentVolumeClaim
