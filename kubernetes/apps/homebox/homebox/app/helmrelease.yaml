@@ -1,0 +1,121 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: homebox
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: homebox
+  interval: 1h
+  values:
+    controllers:
+      homebox:
+        containers:
+          app:
+            image:
+              repository: ghcr.io/sysadminsmedia/homebox
+              tag: 0.24.2-rootless@sha256:22a7246fd304ae65df25abbc531b36bb231f36916cc9504f909877d03ae40839
+            env:
+              HBOX_DATABASE_DRIVER: postgres
+              HBOX_LOG_LEVEL: info
+              HBOX_MODE: production
+              HBOX_OPTIONS_ALLOW_ANALYTICS: false
+              HBOX_OPTIONS_GITHUB_RELEASE_CHECK: false
+              HBOX_WEB_MAX_UPLOAD_SIZE: 20
+              HBOX_WEB_PORT: &port 80
+              HBOX_DATABASE_HOST:
+                valueFrom:
+                  secretKeyRef:
+                    name: &secret homebox-db-secret
+                    key: host
+              HBOX_DATABASE_PORT:
+                valueFrom:
+                  secretKeyRef:
+                    name: *secret
+                    key: port
+              HBOX_DATABASE_DATABASE:
+                valueFrom:
+                  secretKeyRef:
+                    name: *secret
+                    key: database
+              HBOX_DATABASE_USERNAME:
+                valueFrom:
+                  secretKeyRef:
+                    name: *secret
+                    key: username
+              HBOX_DATABASE_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: *secret
+                    key: password
+              TZ: America/New_York
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+            probes:
+              liveness:
+                enabled: true
+                spec:
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/v1/status
+                    port: *port
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities: { drop: ["ALL"] }
+              readOnlyRootFilesystem: true
+              seccompProfile: { type: RuntimeDefault }
+            resources:
+              requests:
+                cpu: 10m
+                memory: 20Mi
+              limits:
+                cpu: 100m
+                memory: 100Mi
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 65534
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+    service:
+      app:
+        ports:
+          http:
+            port: *port
+    route:
+      internal:
+        hostnames: ["{{ .Release.Name }}.${SECRET_DOMAIN}"]
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
+    persistence:
+      data:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 15Gi
+        storageClass: freenas-api-iscsi
+      tmp:
+        type: emptyDir
