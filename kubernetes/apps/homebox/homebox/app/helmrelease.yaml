@@ -51,9 +51,6 @@ spec:
                     name: *secret
                     key: password
               TZ: America/New_York
-            envFrom:
-              - secretRef:
-                  name: "{{ .Release.Name }}-secret"
             probes:
               liveness:
                 enabled: true
