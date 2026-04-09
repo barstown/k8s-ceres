@@ -22,6 +22,7 @@ spec:
               HBOX_LOG_LEVEL: info
               HBOX_MODE: production
               HBOX_OPTIONS_ALLOW_ANALYTICS: false
+              HBOX_OPTIONS_ALLOW_REGISTRATION: false
               HBOX_OPTIONS_GITHUB_RELEASE_CHECK: false
               HBOX_WEB_MAX_UPLOAD_SIZE: 20
               HBOX_WEB_PORT: &port 7745
