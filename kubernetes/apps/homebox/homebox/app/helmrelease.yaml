@@ -24,7 +24,7 @@ spec:
               HBOX_OPTIONS_ALLOW_ANALYTICS: false
               HBOX_OPTIONS_GITHUB_RELEASE_CHECK: false
               HBOX_WEB_MAX_UPLOAD_SIZE: 20
-              HBOX_WEB_PORT: &port 80
+              HBOX_WEB_PORT: &port 7745
               HBOX_DATABASE_HOST:
                 valueFrom:
                   secretKeyRef:
