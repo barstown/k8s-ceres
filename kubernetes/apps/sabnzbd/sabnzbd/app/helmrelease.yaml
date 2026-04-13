@@ -114,7 +114,6 @@ spec:
               limits:
                 cpu: 250m
                 memory: 256Mi
-                squat.ai/tun: "1"
     defaultPodOptions:
       securityContext:
         fsGroup: 2001 # media-rw
@@ -165,3 +164,11 @@ spec:
                 subPath: tv
       tmp:
         type: emptyDir
+      tun:
+        type: hostPath
+        hostPath: /dev/net/tun
+        hostPathType: CharDevice
+        advancedMounts:
+          sabnzbd:
+            gluetun:
+              - path: /dev/net/tun
