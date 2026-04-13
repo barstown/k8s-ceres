@@ -76,32 +76,40 @@ spec:
                   name: "{{ .Release.Name }}-gluetun-secret"
             securityContext:
               allowPrivilegeEscalation: false
-              capabilities:
-                add: ["NET_ADMIN"]
-                drop: ["ALL"]
+              capabilities: { add: ["NET_ADMIN"], drop: ["ALL"] }
               readOnlyRootFilesystem: true
               seccompProfile: { type: RuntimeDefault }
               # runAsGroup: 0
               # runAsNonRoot: false
               # runAsUser: 0
             probes:
-              liveness:
-                enabled: true
-                spec:
-                  periodSeconds: 30
-                  timeoutSeconds: 5
-                  failureThreshold: 5
-              readiness:
-                enabled: true
-                spec:
-                  periodSeconds: 10
-                  timeoutSeconds: 5
-                  failureThreshold: 5
               startup:
                 enabled: true
+                custom: true
                 spec:
-                  failureThreshold: 30
+                  exec:
+                    command: ["/gluetun-entrypoint", "healthcheck"]
+                  periodSeconds: 5
+                  timeoutSeconds: 5
+                  failureThreshold: 24
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command: ["/gluetun-entrypoint", "healthcheck"]
                   periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 1
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command: ["/gluetun-entrypoint", "healthcheck"]
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 3
             resources:
               requests:
                 cpu: 25m
@@ -109,6 +117,7 @@ spec:
               limits:
                 cpu: 250m
                 memory: 256Mi
+                squat.ai/tun: "1"
     defaultPodOptions:
       securityContext:
         fsGroup: 2001 # media-rw
@@ -157,11 +166,3 @@ spec:
             subPath: tv
       tmp:
         type: emptyDir
-      tun:
-        type: hostPath
-        hostPath: /dev/net/tun
-        hostPathType: CharDevice
-        advancedMounts:
-          sabnzbd:
-            gluetun:
-              - path: /dev/net/tun
