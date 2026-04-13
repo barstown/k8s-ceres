@@ -13,7 +13,7 @@ spec:
       create: true
     web:
       enabled: true
-      hostnames: ["{{ .Release.Name }}.${SECRET_DOMAIN}"]
+      hostnames: ["flux.${SECRET_DOMAIN}"]
       httpRoute:
         enabled: true
         parentRefs:
