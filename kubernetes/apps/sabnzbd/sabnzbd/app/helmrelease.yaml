@@ -79,9 +79,6 @@ spec:
               capabilities: { add: ["NET_ADMIN"], drop: ["ALL"] }
               readOnlyRootFilesystem: true
               seccompProfile: { type: RuntimeDefault }
-              # runAsGroup: 0
-              # runAsNonRoot: false
-              # runAsUser: 0
             probes:
               startup:
                 enabled: true
