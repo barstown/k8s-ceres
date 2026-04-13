@@ -151,18 +151,20 @@ spec:
       media:
         type: persistentVolumeClaim
         existingClaim: "{{ .Release.Name }}-media"
-        globalMounts:
-          - path: /comics
-            subPath: comics
-          - path: /downloads
-            subPath: downloads/complete
-          - path: /incomplete
-            subPath: downloads/incomplete
-          - path: /movies
-            subPath: movies
-          - path: /music
-            subPath: music
-          - path: /tv
-            subPath: tv
+        advancedMounts:
+          sabnzbd:
+            app:
+              - path: /comics
+                subPath: comics
+              - path: /downloads
+                subPath: downloads/complete
+              - path: /incomplete
+                subPath: downloads/incomplete
+              - path: /movies
+                subPath: movies
+              - path: /music
+                subPath: music
+              - path: /tv
+                subPath: tv
       tmp:
         type: emptyDir
