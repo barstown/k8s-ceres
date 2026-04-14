@@ -78,9 +78,9 @@ spec:
               allowPrivilegeEscalation: false
               capabilities: { add: ["NET_ADMIN"], drop: ["ALL"] }
               readOnlyRootFilesystem: false
-              # runAsGroup: 0
-              # runAsNonRoot: false
-              # runAsUser: 0
+              runAsGroup: 0
+              runAsNonRoot: false
+              runAsUser: 0
               seccompProfile: { type: RuntimeDefault }
             probes:
               startup:
