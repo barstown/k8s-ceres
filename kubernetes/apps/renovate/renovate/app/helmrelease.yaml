@@ -11,7 +11,7 @@ spec:
   values:
     env:
       LOG_LEVEL: INFO
-      RENOVATE_AUTODISCOVER_FILTER: "barstown/*"
+      RENOVATE_AUTODISCOVER_FILTER: "barstown/*, !barstown/kubernetes-rke2, !barstown/kubernetes2"
       RENOVATE_AUTODISCOVER: "true"
       RENOVATE_DRY_RUN: "null"
       RENOVATE_GIT_AUTHOR: "Renovate Bot <30529916+barstown@users.noreply.github.com>"
