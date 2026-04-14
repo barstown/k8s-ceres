@@ -65,10 +65,10 @@ spec:
             env:
               FIREWALL_INPUT_PORTS: *port
               # PORT_FORWARD_ONLY: "on"
-              SECURE_CORE_ONLY: "on"
-              SERVER_COUNTRIES: "Netherlands"
+              # SECURE_CORE_ONLY: "on"
+              SERVER_COUNTRIES: "Netherlands,Switzerland"
               TZ: America/New_York
-              VPN_PORT_FORWARDING: "on"
+              # VPN_PORT_FORWARDING: "on"
               VPN_SERVICE_PROVIDER: protonvpn
               VPN_TYPE: wireguard
             envFrom:
