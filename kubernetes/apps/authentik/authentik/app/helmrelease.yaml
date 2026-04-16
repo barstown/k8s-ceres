@@ -25,7 +25,7 @@ spec:
         metrics: 9300
       env:
         - name: AUTHENTIK_LOG_LEVEL
-          value: info
+          value: error
       resources:
         requests:
           cpu: 100m
