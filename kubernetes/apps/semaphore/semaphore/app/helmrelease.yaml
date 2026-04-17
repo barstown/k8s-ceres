@@ -20,7 +20,11 @@ spec:
               repository: semaphoreui/semaphore
               tag: v2.17.36@sha256:95b76923b4682a7397592fd755d7a3e1dc75fe73c1435b8c305d1ebcbbb9e531
             env:
+              ANSIBLE_HOME: /tmp/semaphore/.ansible
               ANSIBLE_HOST_KEY_CHECKING: false
+              ANSIBLE_LOCAL_TEMP: /tmp/semaphore/.ansible/tmp
+              ANSIBLE_PERSISTENT_CONTROL_PATH_DIR: /tmp/semaphore/.ansible/pc
+              HOME: /tmp/semaphore
               SEMAPHORE_ADMIN_EMAIL: admin@localhost
               SEMAPHORE_ADMIN_NAME: "Admin"
               SEMAPHORE_ADMIN: admin
