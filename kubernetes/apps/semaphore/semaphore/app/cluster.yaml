@@ -1,0 +1,22 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: semaphore-postgres
+spec:
+  # https://github.com/cloudnative-pg/postgres-containers/pkgs/container/postgresql/versions?filters%5Bversion_type%5D=tagged
+  instances: 3
+  affinity:
+    enablePodAntiAffinity: true
+    podAntiAffinityType: required
+    topologyKey: kubernetes.io/hostname
+  imageName: ghcr.io/cloudnative-pg/postgresql:18-system-trixie@sha256:006b7801eacd9706d6fb557520a414a7d938e4e71333da98695f6f03b20e4cee
+  bootstrap:
+    initdb:
+      database: semaphore
+      owner: semaphore
+      secret:
+        name: semaphore-db-secret
+  storage:
+    size: 10Gi
+    storageClass: freenas-api-iscsi
