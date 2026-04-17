@@ -28,7 +28,7 @@ spec:
               SEMAPHORE_MAX_TASKS_PER_TEMPLATE: 10
               SEMAPHORE_PORT: &port 3000
               SEMAPHORE_SCHEDULE_TIMEZONE: America/New_York
-              SEMAPHORE_WEB_ROOT: "{{ .Release.Name }}.${SECRET_DOMAIN}"
+              SEMAPHORE_WEB_ROOT: "https://{{ .Release.Name }}.${SECRET_DOMAIN}"
               SEMAPHORE_DB_HOST:
                 valueFrom:
                   secretKeyRef:
