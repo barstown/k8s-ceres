@@ -10,67 +10,119 @@ spec:
     name: semaphore
   interval: 1h
   values:
-    replicaCount: 1
-    config:
-      # -- List of environment variables to forward into the application environment.
-      # Modify this list if additional environment variables need to be accessible.
-      forwarded_env_vars: []
-    annotations:
-      reloader.stakater.com/auto: "true"
-    securityContext:
-      allowPrivilegeEscalation: false
-      capabilities: { drop: ["ALL"] }
-      readOnlyRootFilesystem: true
-      seccompProfile: { type: RuntimeDefault }
-    podSecurityContext:
-      fsGroup: 65534
-      fsGroupChangePolicy: OnRootMismatch
-      runAsGroup: 65534
-      runAsNonRoot: true
-      runAsUser: 65534
-    extraVolumes:
-      - name: tmp
-        emptyDir: {}
-    extraVolumeMounts:
-      - name: tmp
-        mountPath: /tmp
-        readOnly: false
-    general:
-      host: "{{ .Release.Name }}.${SECRET_DOMAIN}"
+    controllers:
+      semaphore:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: semaphoreui/semaphore
+              tag: v2.17.36@sha256:95b76923b4682a7397592fd755d7a3e1dc75fe73c1435b8c305d1ebcbbb9e531
+            env:
+              ANSIBLE_HOST_KEY_CHECKING: false
+              SEMAPHORE_ADMIN_EMAIL: admin@localhost
+              SEMAPHORE_ADMIN_NAME: "Admin"
+              SEMAPHORE_ADMIN: admin
+              SEMAPHORE_DB_DIALECT: postgres
+              SEMAPHORE_MAX_TASKS_PER_TEMPLATE: 10
+              SEMAPHORE_PORT: &port 3000
+              SEMAPHORE_SCHEDULE_TIMEZONE: America/New_York
+              SEMAPHORE_WEB_ROOT: "{{ .Release.Name }}.${SECRET_DOMAIN}"
+              SEMAPHORE_DB_HOST:
+                valueFrom:
+                  secretKeyRef:
+                    name: &secret "{{ .Release.Name }}-db-secret"
+                    key: host
+              SEMAPHORE_DB_NAME:
+                valueFrom:
+                  secretKeyRef:
+                    name: *secret
+                    key: database
+              SEMAPHORE_DB_USER:
+                valueFrom:
+                  secretKeyRef:
+                    name: *secret
+                    key: username
+              SEMAPHORE_DB_PASS:
+                valueFrom:
+                  secretKeyRef:
+                    name: *secret
+                    key: password
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+            probes:
+              liveness:
+                enabled: true
+                spec:
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness:
+                enabled: true
+                spec:
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities: { drop: ["ALL"] }
+              readOnlyRootFilesystem: true
+              seccompProfile: { type: RuntimeDefault }
+            resources:
+              requests:
+                cpu: 100m
+                memory: 64Mi
+              limits:
+                cpu: 2000m
+                memory: 500Mi
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 65534
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
     service:
-      port: 3000
-    ingress:
-      enabled: false # default, use httproute, upcoming release will officially support both
+      app:
+        ports:
+          http:
+            port: *port
+    route:
+      internal:
+        hostnames: ["{{ .Release.Name }}.${SECRET_DOMAIN}"]
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
     persistence:
-      enabled: true
-      size: 10G
-      storageClass: freenas-api-iscsi
-    database:
-      type: postgres
-      existingSecret: "{{ .Release.Name }}-db-secret"
-      host: semaphore-postgres-rw
-      name: semaphore
-      passwordKey: password
-      port: 5432
-      usernameFromSecret: true
-      usernameKey: username
-    runner:
-      existingSecret: "{{ .Release.Name }}-secret"
-      tokenKey: runner_token
-    admin:
-      create: true
-      emailKey: admin_email
-      existingSecret: "{{ .Release.Name }}-secret"
-      fullnameKey: admin_fullname
-      passwordKey: admin_password
-      usernameKey: admin_username
-    resources:
-      limits:
-        cpu: 2000m
-        memory: 2Gi
-      requests:
-        cpu: 100m
-        memory: 64Mi
-    envFromSecrets: []
-    extraEnvVariables: {}
-    extraEnvSecrets: {}
+      data:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 10Gi
+        storageClass: freenas-api-iscsi
+        advancedMounts:
+          semaphore:
+            app:
+              - path: /var/lib/semaphore
+      config:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        storageClass: freenas-api-iscsi
+        advancedMounts:
+          semaphore:
+            app:
+              - path: /etc/semaphore
+      tmp:
+        type: emptyDir
