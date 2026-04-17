@@ -171,14 +171,18 @@ spec:
                 subPath: music
               - path: /tv
                 subPath: tv
-      tmp:
+      tmp-sabnzbd:
         type: emptyDir
-      # tmp-gluetun:
-      #   type: emptyDir
-      #   advancedMounts:
-      #     sabnzbd:
-      #       gluetun:
-      #         - path: /tmp
+        advancedMounts:
+          sabnzbd:
+            app:
+              - path: /tmp
+      tmp-gluetun:
+        type: emptyDir
+        advancedMounts:
+          sabnzbd:
+            gluetun:
+              - path: /tmp/gluetun
       tun:
         type: hostPath
         hostPath: /dev/net/tun
