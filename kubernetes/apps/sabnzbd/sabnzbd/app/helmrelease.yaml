@@ -82,7 +82,7 @@ spec:
                   command: ["/bin/sh", "-c", "(ip rule del table 51820; ip -6 rule del table 51820) || true"]
             securityContext:
               allowPrivilegeEscalation: false
-              capabilities: { add: ["NET_ADMIN"], drop: ["ALL"] }
+              capabilities: { add: ["NET_ADMIN", "CHOWN"], drop: ["ALL"] }
               readOnlyRootFilesystem: false
               runAsGroup: 0
               runAsNonRoot: false
