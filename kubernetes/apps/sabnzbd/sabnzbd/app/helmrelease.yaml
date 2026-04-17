@@ -76,6 +76,10 @@ spec:
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-gluetun-secret"
+            lifecycle:
+              postStart:
+                exec:
+                  command: ["/bin/sh", "-c", "(ip rule del table 51820; ip -6 rule del table 51820) || true"]
             securityContext:
               allowPrivilegeEscalation: false
               capabilities: { add: ["NET_ADMIN"], drop: ["ALL"] }
@@ -169,6 +173,12 @@ spec:
                 subPath: tv
       tmp:
         type: emptyDir
+      tmp-gluetun:
+        type: emptyDir
+        advancedMounts:
+          sabnzbd:
+            gluetun:
+              - path: /tmp
       tun:
         type: hostPath
         hostPath: /dev/net/tun
