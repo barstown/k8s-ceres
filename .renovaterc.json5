@@ -43,6 +43,13 @@
       "pinDigests": false
     },
     {
+      "description": "Disable digest pinning in Helmfile bootstrap resources",
+      "matchManagers": ["helmfile"],
+      "matchDatasources": ["docker"],
+      "matchFileNames": ["/(^|/)0[01]-(apps|crds)\\.ya?ml(?:\\.j2)?$/"],
+      "pinDigests": false
+    },
+    {
       description: "Flux Operator Group",
       groupName: "flux-operator",
       matchDatasources: ["docker"],
