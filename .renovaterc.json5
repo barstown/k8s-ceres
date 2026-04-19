@@ -50,6 +50,13 @@
       "pinDigests": false
     },
     {
+      "description": "Disable digest pinning for talenv.yaml",
+      "matchManagers": ["regex"],
+      "matchDatasources": ["docker"],
+      "matchFileNames": ["/(^|/)talenv\\.ya?ml(?:\\.j2)?$/"],
+      "pinDigests": false
+    },
+    {
       description: "Flux Operator Group",
       groupName: "flux-operator",
       matchDatasources: ["docker"],
