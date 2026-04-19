@@ -10,7 +10,7 @@ spec:
   interval: 1h
   values:
     env:
-      LOG_LEVEL: INFO
+      LOG_LEVEL: DEBUG
       RENOVATE_AUTODISCOVER_FILTER: "barstown/*, !barstown/kubernetes-rke2, !barstown/kubernetes2"
       RENOVATE_AUTODISCOVER: "true"
       RENOVATE_DRY_RUN: "null"
