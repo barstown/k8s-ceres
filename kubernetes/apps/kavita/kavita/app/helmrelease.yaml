@@ -1,0 +1,95 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kavita
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: kavita
+  interval: 1h
+  values:
+    controllers:
+      kavita:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/kareadita/kavita
+              tag: 0.8.9@sha256:1f2acae7466d022f037ea09f7989eb7c487f916b881174c7a6de33dbfa8acb39
+            env:
+              TZ: America/New_York
+            probes:
+              liveness:
+                enabled: true
+                spec:
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness:
+                enabled: true
+                spec:
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities: { drop: ["ALL"] }
+              readOnlyRootFilesystem: true
+              seccompProfile: { type: RuntimeDefault }
+            resources:
+              requests:
+                cpu: 500m
+                memory: 500Mi
+              limits:
+                cpu: 2000m
+                memory: 1Gi
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 2001 # media-rw
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 2007 # kavita
+        runAsNonRoot: true
+        runAsUser: 2007 # kavita
+        # supplementalGroups: [2001]
+    service:
+      app:
+        ports:
+          http:
+            port: &port 5000
+    route:
+      internal:
+        hostnames: ["{{ .Release.Name }}.${SECRET_DOMAIN}"]
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
+    persistence:
+      config:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 2Gi
+        storageClass: freenas-api-iscsi
+        globalMounts:
+          - path: /kavita/config
+      media:
+        type: persistentVolumeClaim
+        existingClaim: "{{ .Release.Name }}-media"
+        globalMounts:
+          - path: /books
+            subPath: books
+          - path: /comics
+            subPath: comics
+      tmp:
+        type: emptyDir
