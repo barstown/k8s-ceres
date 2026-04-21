@@ -91,5 +91,5 @@ spec:
             subPath: books
           - path: /comics
             subPath: comics
-      tmp:
-        type: emptyDir
+      # tmp:
+      #   type: emptyDir
