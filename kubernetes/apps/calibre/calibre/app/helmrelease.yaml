@@ -48,7 +48,7 @@ spec:
                   periodSeconds: 10
             securityContext:
               allowPrivilegeEscalation: false
-              capabilities: { drop: ["ALL"] }
+              capabilities: { add: ["CHOWN"], drop: ["ALL"] }
               readOnlyRootFilesystem: false
               seccompProfile: { type: RuntimeDefault }
             resources:
@@ -62,9 +62,9 @@ spec:
       securityContext:
         fsGroup: 2001 # media-rw
         fsGroupChangePolicy: OnRootMismatch
-        runAsGroup: 0
+        runAsGroup: 1000
         runAsNonRoot: true
-        runAsUser: 0
+        runAsUser: 1000
     service:
       app:
         ports:
