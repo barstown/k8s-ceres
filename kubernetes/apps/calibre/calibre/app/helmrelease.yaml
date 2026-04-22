@@ -22,8 +22,8 @@ spec:
             env:
               CWA_PORT_OVERRIDE: &port 8083
               NETWORK_SHARE_MODE: true
-              PGID: 2004
-              PUID: 2004
+              # PGID: 2004
+              # PUID: 2004
               S6_READ_ONLY_ROOT: "1"
               S6_YES_I_WANT_A_WORLD_WRITABLE_RUN_BECAUSE_KUBERNETES: "1"
               TZ: America/New_York
