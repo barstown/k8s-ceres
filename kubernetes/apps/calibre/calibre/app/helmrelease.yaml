@@ -30,6 +30,10 @@ spec:
             envFrom:
               - secretRef:
                   name: "{{ .Release.Name }}-secret"
+            lifecycle:
+              postStart:
+                exec:
+                  command: [ "rm /bin/chown ; ln -s /bin/true /bin/chown" ]
             probes:
               liveness:
                 enabled: true
