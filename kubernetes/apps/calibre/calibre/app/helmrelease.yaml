@@ -62,9 +62,9 @@ spec:
       securityContext:
         fsGroup: 2001 # media-rw
         fsGroupChangePolicy: OnRootMismatch
-        runAsGroup: 1000
+        runAsGroup: 0
         runAsNonRoot: true
-        runAsUser: 1000
+        runAsUser: 0
     service:
       app:
         ports:
