@@ -64,9 +64,9 @@ spec:
       securityContext:
         fsGroup: 2001 # media-rw
         fsGroupChangePolicy: OnRootMismatch
-        runAsGroup: 1000 # 2004 # calibre
+        runAsGroup: 911 # 2004 # calibre
         runAsNonRoot: true
-        runAsUser: 1000 # 2004 # calibre
+        runAsUser: 911 # 2004 # calibre
     service:
       app:
         ports:
