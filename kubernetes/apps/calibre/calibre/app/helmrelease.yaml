@@ -24,6 +24,7 @@ spec:
               NETWORK_SHARE_MODE: true
               PGID: 2004
               PUID: 2004
+              S6_READ_ONLY_ROOT: "1"
               TZ: America/New_York
             envFrom:
               - secretRef:
@@ -97,5 +98,7 @@ spec:
             subPath: books
           - path: /cwa-book-ingest
             subPath: downloads/complete/servarr/books
+      run:
+        type: emptyDir
       tmp:
         type: emptyDir
