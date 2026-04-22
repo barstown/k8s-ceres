@@ -22,8 +22,8 @@ spec:
             env:
               CWA_PORT_OVERRIDE: &port 8083
               NETWORK_SHARE_MODE: true
-              # PGID: 1000
-              # PUID: 1000
+              PGID: 2004
+              PUID: 2004
               S6_YES_I_WANT_A_WORLD_WRITABLE_RUN_BECAUSE_KUBERNETES: "1"
               TZ: America/New_York
             envFrom:
@@ -63,9 +63,9 @@ spec:
       securityContext:
         fsGroup: 2001 # media-rw
         fsGroupChangePolicy: OnRootMismatch
-        runAsGroup: 911 # linuxserver.io default
-        runAsNonRoot: true
-        runAsUser: 911 # linuxserver.io default
+        runAsGroup: 2004 # calibre
+        runAsNonRoot: false
+        runAsUser: 2004 # calibre
     service:
       app:
         ports:
