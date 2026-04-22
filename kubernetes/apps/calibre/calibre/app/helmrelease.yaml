@@ -63,9 +63,9 @@ spec:
       securityContext:
         fsGroup: 2001 # media-rw
         fsGroupChangePolicy: OnRootMismatch
-        runAsGroup: 2004 # calibre
+        runAsGroup: 911 # linuxserver.io default
         runAsNonRoot: true
-        runAsUser: 2004 # calibre
+        runAsUser: 911 # linuxserver.io default
     service:
       app:
         ports:
