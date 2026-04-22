@@ -24,6 +24,7 @@ spec:
               NETWORK_SHARE_MODE: true
               PGID: 1000
               PUID: 1000
+              S6_YES_I_WANT_A_WORLD_WRITABLE_RUN_BECAUSE_KUBERNETES: "1"
               TZ: America/New_York
             envFrom:
               - secretRef:
@@ -97,7 +98,7 @@ spec:
             subPath: books
           - path: /cwa-book-ingest
             subPath: downloads/complete/servarr/books
-      # run:
-      #   type: emptyDir
+      run:
+        type: emptyDir
       tmp:
         type: emptyDir
