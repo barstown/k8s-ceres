@@ -97,7 +97,7 @@ spec:
             subPath: books
           - path: /cwa-book-ingest
             subPath: downloads/complete/servarr/books
-      run:
-        type: emptyDir
+      # run:
+      #   type: emptyDir
       tmp:
         type: emptyDir
