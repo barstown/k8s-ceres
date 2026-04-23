@@ -20,8 +20,8 @@ spec:
               repository: docker.io/mrcas/kapowarr
               tag: v1.3.1@sha256:d455797e4f2c5b1a8ccc5ce05c427f1af2179451bb1af195ca3fa8c3e928623b
             env:
-              PGID: 2009
-              PUID: 2009
+              PGID: 0
+              PUID: 0
               TZ: America/New_York
             probes:
               liveness:
@@ -57,9 +57,9 @@ spec:
       securityContext:
         fsGroup: 2001 # media-rw
         fsGroupChangePolicy: OnRootMismatch
-        runAsGroup: 2009 # mylar
-        runAsNonRoot: true
-        runAsUser: 2009 # mylar
+        runAsGroup: 0
+        runAsNonRoot: false
+        runAsUser: 0
     service:
       app:
         ports:
@@ -85,7 +85,7 @@ spec:
         advancedMounts:
           kapowarr:
             app:
-              - path: /app/db
+              - path: /app
       media:
         type: persistentVolumeClaim
         existingClaim: "{{ .Release.Name }}-media"
