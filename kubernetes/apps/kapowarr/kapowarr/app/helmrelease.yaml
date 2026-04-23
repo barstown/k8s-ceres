@@ -77,7 +77,7 @@ spec:
               - identifier: app
                 port: *port
     persistence:
-      app:
+      db:
         type: persistentVolumeClaim
         accessMode: ReadWriteOnce
         size: 5Gi
@@ -85,7 +85,16 @@ spec:
         advancedMounts:
           kapowarr:
             app:
-              - path: /app
+              - path: /app/db
+      logs:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        storageClass: freenas-api-iscsi
+        advancedMounts:
+          kapowarr:
+            app:
+              - path: /app/logs
       media:
         type: persistentVolumeClaim
         existingClaim: "{{ .Release.Name }}-media"
