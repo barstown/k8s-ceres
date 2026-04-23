@@ -23,9 +23,6 @@ spec:
               GUID: 2009
               PUID: 2009
               TZ: America/New_York
-            envFrom:
-              - secretRef:
-                  name: "{{ .Release.Name }}-secret"
             probes:
               liveness:
                 enabled: true
