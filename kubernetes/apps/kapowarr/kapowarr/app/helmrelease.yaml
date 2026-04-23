@@ -77,7 +77,7 @@ spec:
               - identifier: app
                 port: *port
     persistence:
-      database:
+      app:
         type: persistentVolumeClaim
         accessMode: ReadWriteOnce
         size: 5Gi
