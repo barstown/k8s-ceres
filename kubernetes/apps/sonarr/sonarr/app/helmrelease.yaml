@@ -97,12 +97,11 @@ spec:
         accessMode: ReadWriteOnce
         size: 5Gi
         storageClass: freenas-api-iscsi
-
       media:
         type: persistentVolumeClaim
         existingClaim: "{{ .Release.Name }}-media"
         advancedMounts:
-          sabnzbd:
+          sonarr:
             app:
               - path: /downloads
                 subPath: downloads/complete
