@@ -8,4 +8,4 @@ components:
 
 resources:
   - ./namespace.yaml
-  - ./system-upgrade/ks.yaml
+  - ./tuppr/ks.yaml
