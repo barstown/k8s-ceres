@@ -12,10 +12,10 @@ spec:
   policy:
     rebootMode: powercycle  # Optional, default|powercycle
     stage: false            # Optional, stage upgrade
-  healthChecks:
-    - apiVersion: v1
-      kind: Node
-      expr: status.conditions.exists(c, c.type == "Ready" && c.status == "True")
+  # healthChecks:
+  #   - apiVersion: v1
+  #     kind: Node
+  #     expr: status.conditions.exists(c, c.type == "Ready" && c.status == "True")
   # maintenance:
   #   windows:
   #     - start: "0 2 * * 0"
