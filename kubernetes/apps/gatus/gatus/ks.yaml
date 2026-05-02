@@ -6,11 +6,15 @@ metadata:
   name: gatus
 spec:
   interval: 1h
-  path: ./kubernetes/apps/o11y/gatus/app
+  path: ./kubernetes/apps/gatus/gatus/app
+  postBuild:
+    substituteFrom:
+      - name: cluster-secrets
+        kind: Secret
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  targetNamespace: o11y
+  targetNamespace: gatus
   wait: false

@@ -27,8 +27,15 @@ spec:
             resources:
               requests:
                 cpu: 10m
+                memory: 16Mi
               limits:
+                cpu: 250m
                 memory: 64Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities: { drop: ["ALL"] }
+              readOnlyRootFilesystem: true
+              seccompProfile: { type: RuntimeDefault }
             restartPolicy: Always
         containers:
           app:
@@ -63,6 +70,7 @@ spec:
                 cpu: 100m
                 memory: 64Mi
               limits:
+                cpu: 1000m
                 memory: 256Mi
         statefulset:
           volumeClaimTemplates:
@@ -92,7 +100,7 @@ spec:
           gatus.home-operations.com/enabled: "false"
         hostnames: ["{{ .Release.Name }}.${SECRET_DOMAIN}"]
         parentRefs:
-          - name: envoy-internal
+          - name: envoy-external
             namespace: network
             sectionName: https
     rbac:

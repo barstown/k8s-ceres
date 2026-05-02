@@ -39,8 +39,9 @@ spec:
               readiness: *probes
             securityContext:
               allowPrivilegeEscalation: false
+              capabilities: { drop: ["ALL"] }
               readOnlyRootFilesystem: true
-              capabilities: {drop: ["ALL"]}
+              seccompProfile: { type: RuntimeDefault }
             resources:
               requests:
                 cpu: 10m
@@ -48,9 +49,11 @@ spec:
                 memory: 64Mi
     defaultPodOptions:
       securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 1000
         runAsNonRoot: true
         runAsUser: 1000
-        runAsGroup: 1000
     service:
       app:
         ports:
@@ -63,8 +66,7 @@ spec:
         annotations:
           gatus.home-operations.com/endpoint: |-
             conditions: ["[STATUS] == 200"]
-        hostnames:
-          - "{{ .Release.Name }}.turbo.ac"
+        hostnames: ["{{ .Release.Name }}.${SECRET_DOMAIN}"]
         parentRefs:
           - name: envoy-external
             namespace: network
