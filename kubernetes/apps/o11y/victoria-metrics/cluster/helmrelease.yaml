@@ -24,12 +24,6 @@ spec:
             - receiver: blackhole
               matchers:
                 - alertname = InfoInhibitor
-            - receiver: buddy-heartbeat
-              matchers:
-                - alertname = "Watchdog"
-              group_interval: 2m
-              group_wait: 0s
-              repeat_interval: 2m30s
           group_by:
             - alertname
             - cluster
@@ -46,59 +40,14 @@ spec:
               - severity = "warning"
         receivers:
           - name: blackhole
-          - name: buddy-heartbeat
-            webhook_configs:
-              - http_config:
-                  bearer_token_secret:
-                    name: vmalertmanager-secret
-                    key: BUDDY_HEARTBEAT_TOKEN
-                url_secret:
-                  name: vmalertmanager-secret
-                  key: BUDDY_HEARTBEAT_URL
-          - name: pushover
-            pushover_configs:
-              - html: true
-                message: |-
-                  {{- range .Alerts }}
-                    {{- if ne .Annotations.description "" }}
-                      {{ .Annotations.description }}
-                    {{- else if ne .Annotations.summary "" }}
-                      {{ .Annotations.summary }}
-                    {{- else if ne .Annotations.message "" }}
-                      {{ .Annotations.message }}
-                    {{- else }}
-                      Alert description not available
-                    {{- end }}
-                    {{- if gt (len .Labels.SortedPairs) 0 }}
-                      <small>
-                        {{- range .Labels.SortedPairs }}
-                          <b>{{ .Name }}:</b> {{ .Value }}
-                        {{- end }}
-                      </small>
-                    {{- end }}
-                  {{- end }}
-                priority: |-
-                  {{ if eq .Status "firing" }}1{{ else }}0{{ end }}
-                send_resolved: true
-                sound: gamelan
-                title: >-
-                  [{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}
-                token:
-                  name: vmalertmanager-secret
-                  key: ALERTMANAGER_PUSHOVER_TOKEN
-                url_title: View in Alertmanager
-                user_key:
-                  name: vmalertmanager-secret
-                  key: PUSHOVER_USER_KEY
       route:
         enabled: true
-        hostnames:
-          - vmalertmanager.turbo.ac
+        hostnames: ["vmalertmanager.${SECRET_DOMAIN}"]
         parentRefs:
           - name: envoy-internal
             namespace: network
       spec:
-        externalURL: https://vmalertmanager.turbo.ac
+        externalURL: https://vmalertmanager.${SECRET_DOMAIN}
         image:
           repository: quay.io/prometheus/alertmanager
         securityContext:
@@ -109,7 +58,7 @@ spec:
         storage:
           volumeClaimTemplate:
             spec:
-              storageClassName: ceph-block
+              storageClassName: freenas-api-iscsi
               resources:
                 requests:
                   storage: 1Gi
@@ -217,13 +166,12 @@ spec:
     vmalert:
       spec:
         extraArgs:
-          external.url: https://vmalert.turbo.ac
+          external.url: https://vmalert.${SECRET_DOMAIN}
         datasource:
           url: http://vmauth-victoria-metrics-cluster.o11y.svc.cluster.local:8427
       route:
         enabled: true
-        hostnames:
-          - vmalert.turbo.ac
+        hostnames: ["vmalert.${SECRET_DOMAIN}"]
         parentRefs:
           - name: envoy-internal
             namespace: network
@@ -244,8 +192,7 @@ spec:
     vmsingle:
       route:
         enabled: true
-        hostnames:
-          - vmsingle.turbo.ac
+        hostnames: ["vmsingle.${SECRET_DOMAIN}"]
         parentRefs:
           - name: envoy-internal
             namespace: network
@@ -279,16 +226,5 @@ spec:
                 annotations:
                   summary: Container {{ $labels.container }} in pod {{ $labels.namespace }}/{{ $labels.pod }} has been OOMKilled {{ $value }} times in the last 10 minutes.
                 expr: (kube_pod_container_status_restarts_total - kube_pod_container_status_restarts_total offset 10m >= 1) and ignoring (reason) min_over_time(kube_pod_container_status_last_terminated_reason{reason="OOMKilled"}[10m]) == 1
-                labels:
-                  severity: critical
-      zfs-rules:
-        create: true
-        groups:
-          - name: zfs
-            rules:
-              - alert: ZfsUnexpectedPoolState
-                annotations:
-                  summary: ZFS pool {{$labels.zpool}} on {{$labels.instance}} is in a unexpected state {{$labels.state}}
-                expr: node_zfs_zpool_state{state!="online"} > 0
                 labels:
                   severity: critical

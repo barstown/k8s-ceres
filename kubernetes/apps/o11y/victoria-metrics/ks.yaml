@@ -23,10 +23,12 @@ metadata:
 spec:
   dependsOn:
     - name: victoria-metrics
-    - name: rook-ceph-cluster
-      namespace: rook-ceph
   interval: 1h
   path: ./kubernetes/apps/o11y/victoria-metrics/cluster
+  postBuild:
+    substituteFrom:
+      - name: cluster-secrets
+        kind: Secret
   prune: true
   sourceRef:
     kind: GitRepository
