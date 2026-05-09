@@ -1,0 +1,90 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/observability.giantswarm.io/silence_v1alpha2.json
+apiVersion: observability.giantswarm.io/v1alpha2
+kind: Silence
+metadata:
+  name: ceph-node-nfsmount-diskspace-warning
+spec:
+  matchers:
+    - name: alertname
+      value: CephNodeDiskspaceWarning
+    - name: mountpoint
+      value: /etc/nfsmount.conf
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/observability.giantswarm.io/silence_v1alpha2.json
+apiVersion: observability.giantswarm.io/v1alpha2
+kind: Silence
+metadata:
+  name: ceph-node-local-diskspace-warning
+spec:
+  matchers:
+    - name: alertname
+      value: CephNodeDiskspaceWarning
+    - name: device
+      value: /dev/sd.*
+      matchType: "=~"
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/observability.giantswarm.io/silence_v1alpha2.json
+apiVersion: observability.giantswarm.io/v1alpha2
+kind: Silence
+metadata:
+  name: ceph-node-network-packet-drops
+spec:
+  matchers:
+    - name: alertname
+      value: CephNodeNetworkPacketDrops
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/observability.giantswarm.io/silence_v1alpha2.json
+apiVersion: observability.giantswarm.io/v1alpha2
+kind: Silence
+metadata:
+  name: nas-memory-high-utilization
+spec:
+  matchers:
+    - name: alertname
+      value: NodeMemoryHighUtilization
+    - name: instance
+      value: expanse.internal:9100
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/observability.giantswarm.io/silence_v1alpha2.json
+apiVersion: observability.giantswarm.io/v1alpha2
+kind: Silence
+metadata:
+  name: hpa-maxed-out
+spec:
+  matchers:
+    - name: alertname
+      value: KubeHpaMaxedOut
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/observability.giantswarm.io/silence_v1alpha2.json
+apiVersion: observability.giantswarm.io/v1alpha2
+kind: Silence
+metadata:
+  name: victoria-metrics-kube-scheduler
+spec:
+  matchers:
+    - name: alertname
+      value: RecordingRulesNoData
+    - name: recording
+      value: cluster_quantile:scheduler_.*
+      matchType: "=~"
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/observability.giantswarm.io/silence_v1alpha2.json
+apiVersion: observability.giantswarm.io/v1alpha2
+kind: Silence
+metadata:
+  name: etcd-high-commit-durations
+spec:
+  matchers:
+    - name: alertname
+      value: etcdHighCommitDurations
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/observability.giantswarm.io/silence_v1alpha2.json
+apiVersion: observability.giantswarm.io/v1alpha2
+kind: Silence
+metadata:
+  name: etcd-member-communication-slow
+spec:
+  matchers:
+    - name: alertname
+      value: etcdMemberCommunicationSlow
