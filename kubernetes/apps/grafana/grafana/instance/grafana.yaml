@@ -37,9 +37,17 @@ spec:
         spec:
           containers:
             - name: grafana
-              envFrom:
-                - secretRef:
-                    name: "grafana-secret"
+              env:
+                - name: GF_SECURITY_ADMIN_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: grafana-secret
+                      key: GF_SECURITY_ADMIN_PASSWORD
+                - name: GF_SECURITY_ADMIN_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: grafana-secret
+                      key: GF_SECURITY_ADMIN_USER
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities: { drop: ["ALL"] }
