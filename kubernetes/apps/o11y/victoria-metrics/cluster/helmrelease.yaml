@@ -204,7 +204,7 @@ spec:
           resources:
             requests:
               storage: 50Gi
-          storageClassName: ceph-block
+          storageClassName: freenas-api-iscsi
     additionalVictoriaMetricsMap:
       dockerhub-rules:
         create: true
