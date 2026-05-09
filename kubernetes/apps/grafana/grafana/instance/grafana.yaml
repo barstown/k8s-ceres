@@ -54,7 +54,7 @@ spec:
           volumes:
             - name: grafana-data
               persistentVolumeClaim:
-                claimName: grafana-data
+                claimName: grafana-pvc
   httpRoute:
     spec:
       hostnames: ["grafana.${SECRET_DOMAIN}"]
