@@ -168,22 +168,23 @@ spec:
           external.url: https://vmalert.${SECRET_DOMAIN}
         datasource:
           url: http://vmauth-victoria-metrics.victoria-metrics.svc.cluster.local:8427
+        useStrictSecurity: true
       route:
         enabled: true
         hostnames: ["vmalert.${SECRET_DOMAIN}"]
         parentRefs:
           - name: envoy-internal
             namespace: network
-      securityContext:
-        allowPrivilegeEscalation: false
-        capabilities: { drop: ["ALL"] }
-        readOnlyRootFilesystem: true
-        seccompProfile: { type: RuntimeDefault }
-      podSecurityContext:
-        fsGroup: 65534
-        runAsGroup: 65534
-        runAsNonRoot: true
-        runAsUser: 65534
+      # securityContext:
+      #   allowPrivilegeEscalation: false
+      #   capabilities: { drop: ["ALL"] }
+      #   readOnlyRootFilesystem: true
+      #   seccompProfile: { type: RuntimeDefault }
+      # podSecurityContext:
+      #   fsGroup: 65534
+      #   runAsGroup: 65534
+      #   runAsNonRoot: true
+      #   runAsUser: 65534
     vmauth:
       enabled: true
       spec:
