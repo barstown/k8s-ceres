@@ -15,7 +15,7 @@ spec:
       enabled: true
       crds:
         enabled: true
-        plain: false
+        plain: true
         cleanup:
           enabled: false
       global:

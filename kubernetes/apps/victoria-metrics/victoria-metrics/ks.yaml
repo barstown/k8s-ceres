@@ -5,6 +5,9 @@ kind: Kustomization
 metadata:
   name: victoria-metrics
 spec:
+  dependsOn:
+    - name: grafana
+      namespace: grafana
   interval: 1h
   path: ./kubernetes/apps/victoria-metrics/victoria-metrics/app
   postBuild:
