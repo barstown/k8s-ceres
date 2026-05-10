@@ -151,6 +151,7 @@ spec:
           promscrape.dropOriginalLabels: "true"
           promscrape.maxScrapeSize: 50MiB
           promscrape.streamParse: "true"
+        useStrictSecurity: true
       securityContext:
         allowPrivilegeEscalation: false
         capabilities: { drop: ["ALL"] }
