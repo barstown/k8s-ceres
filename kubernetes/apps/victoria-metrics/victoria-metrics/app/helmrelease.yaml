@@ -85,17 +85,8 @@ spec:
               resources:
                 requests:
                   storage: 1Gi
+        useStrictSecurity: true
       useManagedConfig: true
-      securityContext:
-        allowPrivilegeEscalation: false
-        capabilities: { drop: ["ALL"] }
-        readOnlyRootFilesystem: true
-        seccompProfile: { type: RuntimeDefault }
-      podSecurityContext:
-        fsGroup: 65534
-        runAsGroup: 65534
-        runAsNonRoot: true
-        runAsUser: 65534
     defaultDashboards:
       grafanaOperator:
         enabled: true
@@ -152,16 +143,6 @@ spec:
           promscrape.maxScrapeSize: 50MiB
           promscrape.streamParse: "true"
         useStrictSecurity: true
-      # securityContext:
-      #   allowPrivilegeEscalation: false
-      #   capabilities: { drop: ["ALL"] }
-      #   readOnlyRootFilesystem: true
-      #   seccompProfile: { type: RuntimeDefault }
-      # podSecurityContext:
-      #   fsGroup: 65534
-      #   runAsGroup: 65534
-      #   runAsNonRoot: true
-      #   runAsUser: 65534
     vmalert:
       spec:
         extraArgs:
@@ -175,16 +156,6 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-      # securityContext:
-      #   allowPrivilegeEscalation: false
-      #   capabilities: { drop: ["ALL"] }
-      #   readOnlyRootFilesystem: true
-      #   seccompProfile: { type: RuntimeDefault }
-      # podSecurityContext:
-      #   fsGroup: 65534
-      #   runAsGroup: 65534
-      #   runAsNonRoot: true
-      #   runAsUser: 65534
     vmauth:
       enabled: true
       spec:
@@ -199,16 +170,7 @@ spec:
             - src_paths:
                 - /select/logsql/.*
               url_prefix: http://victoria-logs.victoria-logs.svc.cluster.local:9428
-      securityContext:
-        allowPrivilegeEscalation: false
-        capabilities: { drop: ["ALL"] }
-        readOnlyRootFilesystem: true
-        seccompProfile: { type: RuntimeDefault }
-      podSecurityContext:
-        fsGroup: 65534
-        runAsGroup: 65534
-        runAsNonRoot: true
-        runAsUser: 65534
+        useStrictSecurity: true
     vmsingle:
       route:
         enabled: true
@@ -225,16 +187,7 @@ spec:
             requests:
               storage: 50Gi
           storageClassName: freenas-api-iscsi
-      securityContext:
-        allowPrivilegeEscalation: false
-        capabilities: { drop: ["ALL"] }
-        readOnlyRootFilesystem: true
-        seccompProfile: { type: RuntimeDefault }
-      podSecurityContext:
-        fsGroup: 65534
-        runAsGroup: 65534
-        runAsNonRoot: true
-        runAsUser: 65534
+        useStrictSecurity: true
     additionalVictoriaMetricsMap:
       dockerhub-rules:
         create: true
