@@ -9,21 +9,15 @@ spec:
     kind: OCIRepository
     name: victoria-metrics-k8s-stack
   interval: 1h
-  valuesFrom:
-    - kind: ConfigMap
-      name: flux-metrics-configmap
-      valuesKey: flux-metrics.yaml
   values:
+    fullnameOverride: victoria-metrics
     victoria-metrics-operator:
       enabled: true
       crds:
         enabled: true
         plain: false
         cleanup:
-          enabled: true
-          image:
-            repository: registry.k8s.io/kubectl
-            pullPolicy: IfNotPresent
+          enabled: false
       global:
         image:
           registry: "quay.io"
@@ -41,10 +35,14 @@ spec:
         runAsGroup: 65534
         runAsNonRoot: true
         runAsUser: 65534
+    global:
+      image:
+        registry: quay.io
     alertmanager:
+      enabled: true
       config:
         route:
-          receiver: pushover
+          receiver: ntfy-alerts
           repeat_interval: 12h
           routes:
             - receiver: blackhole
@@ -66,6 +64,10 @@ spec:
               - severity = "warning"
         receivers:
           - name: blackhole
+          - name: ntfy-alerts
+            webhook_configs:
+              - send_resolved: true
+                url: http://grafana-to-ntfy.grafana-to-ntfy.svc.cluster.local:8080
       route:
         enabled: true
         hostnames: ["vmalertmanager.${SECRET_DOMAIN}"]
@@ -76,11 +78,6 @@ spec:
         externalURL: https://vmalertmanager.${SECRET_DOMAIN}
         image:
           repository: quay.io/prometheus/alertmanager
-        securityContext:
-          runAsGroup: 2000
-          runAsNonRoot: true
-          runAsUser: 1000
-          fsGroup: 2000
         storage:
           volumeClaimTemplate:
             spec:
@@ -99,25 +96,15 @@ spec:
         enabled: true
         spec:
           allowCrossNamespaceImport: true
+    defaultRules:
+      rules:
+        etcdMemberCommunicationSlow:
+          create: false
     grafana:
       enabled: false
       forceDeployDatasource: true
     kube-state-metrics:
-      fullnameOverride: kube-state-metrics
-    kubeApiServer:
-      vmScrape:
-        spec:
-          metricRelabelConfigs:
-            - # Drop high cardinality labels
-              action: drop
-              sourceLabels:
-                - __name__
-              regex: (apiserver|etcd|rest_client)_request(|_sli|_slo)_duration_seconds_bucket
-            - # Drop high cardinality labels
-              action: drop
-              sourceLabels:
-                - __name__
-              regex: (apiserver_response_sizes_bucket|apiserver_watch_events_sizes_bucket)
+      enabled: false
     kubeControllerManager:
       vmScrape:
         spec:
@@ -146,41 +133,8 @@ spec:
               scheme: https
               tlsConfig:
                 insecureSkipVerify: true
-    kubelet:
-      vmScrape:
-        spec:
-          metricRelabelConfigs:
-            - # Drop high-cardinality labels
-              action: labeldrop
-              regex: (uid|id|name)
-            - # Drop high-cardinality labels
-              action: drop
-              sourceLabels:
-                - __name__
-              regex: (rest_client_request_duration_seconds_bucket|rest_client_request_duration_seconds_sum|rest_client_request_duration_seconds_count)
-            - # Drop cgroup metrics with no pod
-              action: drop
-              sourceLabels:
-                - id
-                - pod
-              regex: .+;
-            - # Drop less useful container blkio metrics
-              action: drop
-              sourceLabels:
-                - __name__
-              regex: container_blkio_device_usage_total
-            - # Drop less useful container filesystem io metrics
-              action: drop
-              sourceLabels:
-                - __name__
-              regex: "container_fs_(io_current|io_time_seconds_total|io_time_weighted_seconds_total|reads_merged_total|sector_reads_total|sector_writes_total|writes_merged_total)"
-            - # Drop less useful container process metrics
-              action: drop
-              sourceLabels:
-                - __name__
-              regex: container_(tasks_state|threads_max)
     prometheus-node-exporter:
-      fullnameOverride: node-exporter
+      enabled: false
     vmagent:
       spec:
         extraArgs:
@@ -192,7 +146,7 @@ spec:
         extraArgs:
           external.url: https://vmalert.${SECRET_DOMAIN}
         datasource:
-          url: http://vmauth-victoria-metrics-cluster.victoria-metrics.svc.cluster.local:8427
+          url: http://vmauth-victoria-metrics.victoria-metrics.svc.cluster.local:8427
       route:
         enabled: true
         hostnames: ["vmalert.${SECRET_DOMAIN}"]
@@ -209,10 +163,10 @@ spec:
             - src_paths:
                 - /api/v1/query.*
                 - /api/v1/label/.*
-              url_prefix: http://vmsingle-victoria-metrics-cluster.victoria-metrics.svc.cluster.local:8428
+              url_prefix: http://vmsingle-victoria-metrics.victoria-metrics.svc.cluster.local:8428
             - src_paths:
                 - /select/logsql/.*
-              url_prefix: http://victoria-logs.victoria-metrics.svc.cluster.local:9428
+              url_prefix: http://victoria-logs.victoria-logs.svc.cluster.local:9428
     vmsingle:
       route:
         enabled: true
@@ -250,5 +204,16 @@ spec:
                 annotations:
                   summary: Container {{ $labels.container }} in pod {{ $labels.namespace }}/{{ $labels.pod }} has been OOMKilled {{ $value }} times in the last 10 minutes.
                 expr: (kube_pod_container_status_restarts_total - kube_pod_container_status_restarts_total offset 10m >= 1) and ignoring (reason) min_over_time(kube_pod_container_status_last_terminated_reason{reason="OOMKilled"}[10m]) == 1
+                labels:
+                  severity: critical
+      zfs-rules:
+        create: true
+        groups:
+          - name: zfs
+            rules:
+              - alert: ZfsUnexpectedPoolState
+                annotations:
+                  summary: ZFS pool {{$labels.zpool}} on {{$labels.instance}} is in a unexpected state {{$labels.state}}
+                expr: node_zfs_zpool_state{state!="online"} > 0
                 labels:
                   severity: critical
