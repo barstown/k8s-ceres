@@ -13,7 +13,7 @@
   dependencyDashboard: true,
   dependencyDashboardTitle: "Renovate Dashboard :robot:",
   ignorePaths: ["**/*.sops.*"],
-  schedule: ["every weekend"],
+  // schedule: ["every weekend"],
   flux: {
     managerFilePatterns: ["/(^|/)kubernetes/.+\\.ya?ml(?:\\.j2)?$/"],
   },
