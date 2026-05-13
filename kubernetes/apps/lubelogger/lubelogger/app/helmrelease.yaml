@@ -14,7 +14,7 @@ spec:
       lubelogger:
         annotations:
           reloader.stakater.com/auto: "true"
-        strategy: RollingUpdate
+        strategy: Recreate
         containers:
           app:
             image:
