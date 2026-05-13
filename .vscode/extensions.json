@@ -1,9 +1,15 @@
 {
   "recommendations": [
     "blueglassblock.better-json5",
+    "editorconfig.editorconfig",
+    "gruntfuggly.todo-tree",
+    "hverlin.mise-vscode",
     "irongeek.vscode-env",
+    "nefrob.vscode-just-syntax",
+    "redhat.vscode-yaml",
     "redhat.vscode-yaml",
     "signageos.signageos-vscode-sops",
-    "hverlin.mise-vscode"
+    "tamasfe.even-better-toml",
+    "vscode-icons-team.vscode-icons"
   ]
 }
