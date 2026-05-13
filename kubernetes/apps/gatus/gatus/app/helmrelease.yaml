@@ -79,6 +79,7 @@ spec:
               size: 5Gi
               storageClass: freenas-api-iscsi
     defaultPodOptions:
+      automountServiceAccountToken: true
       securityContext:
         fsGroup: 1000
         fsGroupChangePolicy: OnRootMismatch
@@ -132,8 +133,6 @@ spec:
             identifier: gatus
           subjects:
             - identifier: gatus
-    serviceAccount:
-      gatus: {}
     persistence:
       config-file:
         type: configMap
