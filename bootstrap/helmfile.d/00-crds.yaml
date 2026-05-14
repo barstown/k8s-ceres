@@ -37,4 +37,4 @@ releases:
   - name: prometheus-operator-crds
     namespace: prometheus-operator-crds
     chart: oci://ghcr.io/prometheus-community/charts/prometheus-operator-crds
-    version: 28.0.1
+    version: 29.0.0
