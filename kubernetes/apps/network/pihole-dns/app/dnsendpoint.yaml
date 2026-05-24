@@ -1,0 +1,13 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/externaldns.k8s.io/dnsendpoint_v1alpha1.json
+apiVersion: externaldns.k8s.io/v1alpha1
+kind: DNSEndpoint
+metadata:
+  name: ceres-vip
+  namespace: network
+spec:
+  endpoints:
+    - dnsName: ceres.asteroids.sh
+      recordType: A
+      targets:
+        - 10.0.50.2
