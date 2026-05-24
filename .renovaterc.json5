@@ -205,5 +205,13 @@
       ],
       datasourceTemplate: "docker",
     },
+    {
+      customType: "regex",
+      datasourceTemplate: "docker",
+      description: "Process imageName dependencies",
+      managerFilePatterns: ["/(^|/)kubernetes/.+\\.ya?ml(?:\\.j2)?$/"],
+      matchStrings: ["imageName:\\s+(?<depName>[^:@\\s]+(?:/[^:@\\s]+)+):(?<currentValue>[^@\\s]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?"],
+      // versioningTemplate: "regex:^(?<major>\\d+)(?:\\.(?<minor>\\d+))?(?:\\.(?<patch>\\d+))?(?:-(?<build>\\d+))?(?:-(?<compatibility>[a-z0-9][a-z0-9.-]*))?$",
+    },
   ],
 }
