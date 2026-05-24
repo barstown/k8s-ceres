@@ -7,7 +7,7 @@ metadata:
   namespace: network
 spec:
   endpoints:
-    - dnsName: ceres.asteroids.sh
+    - dnsName: "ceres.${SECRET_DOMAIN}"
       recordType: A
       targets:
         - 10.0.50.2
