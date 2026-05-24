@@ -5,6 +5,8 @@ kind: DNSEndpoint
 metadata:
   name: ceres-vip
   namespace: network
+  labels:
+    externaldns.scope: internal
 spec:
   endpoints:
     - dnsName: "ceres.${SECRET_DOMAIN}"

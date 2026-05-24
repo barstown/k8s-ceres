@@ -29,6 +29,7 @@ spec:
     txtPrefix: k8s.
     txtOwnerId: default
     domainFilters: ["${SECRET_DOMAIN}"]
+    labelFilters: ["externaldns.scope!=internal"]
     serviceMonitor:
       enabled: true
     podAnnotations:

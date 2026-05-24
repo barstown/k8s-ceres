@@ -29,9 +29,10 @@ spec:
       - --pihole-tls-skip-verify
     triggerLoopOnEvent: true
     policy: sync
-    # sources: ["gateway-httproute", "service", "crd"]
-    sources: ["gateway-httproute", "service"]
+    sources: ["gateway-httproute", "service", "crd"]
+    # sources: ["gateway-httproute", "service"]
     domainFilters: ["${SECRET_DOMAIN}"]
+    labelFilters: ["externaldns.scope!=external"]
     registry: noop
     serviceMonitor:
       enabled: true
