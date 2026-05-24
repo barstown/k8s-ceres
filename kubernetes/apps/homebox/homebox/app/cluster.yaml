@@ -11,7 +11,7 @@ spec:
     enablePodAntiAffinity: true
     podAntiAffinityType: preferred
     topologyKey: kubernetes.io/hostname
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-system-trixie@sha256:006b7801eacd9706d6fb557520a414a7d938e4e71333da98695f6f03b20e4cee
+  imageName: ghcr.io/cloudnative-pg/postgresql:18-system-trixie@sha256:b0949a3f70641d5c56a05e18df8d69a16fba66af479d0ac6b74ede71f6d4e84f
   bootstrap:
     initdb:
       database: homebox
