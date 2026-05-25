@@ -25,14 +25,16 @@ spec:
             key: pihole_server
     extraArgs:
       - --gateway-name=envoy-internal
+      - --crd-source-apiversion=externaldns.k8s.io/v1alpha1
+      - --crd-source-kind=DNSEndpoint
       - --pihole-api-version=6
       - --pihole-tls-skip-verify
+      - --label-filter=externaldns.scope!=external
     triggerLoopOnEvent: true
     policy: sync
     sources: ["gateway-httproute", "service", "crd"]
     # sources: ["gateway-httproute", "service"]
     domainFilters: ["${SECRET_DOMAIN}"]
-    labelFilters: ["externaldns.scope!=external"]
     registry: noop
     serviceMonitor:
       enabled: true
