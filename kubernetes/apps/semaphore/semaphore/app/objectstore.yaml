@@ -7,10 +7,10 @@ metadata:
 spec:
   configuration:
     destinationPath: s3://k8s-ceres/semaphore/semaphore-postgres
-    endpointCA:
-      name: rustfs-secrets
-      key: TRUENAS_CA
-    endpointURL: https://10.0.10.50:30292
+    # endpointCA:
+    #   name: rustfs-secrets
+    #   key: TRUENAS_CA
+    endpointURL: http://10.0.10.50:30292
     s3Credentials:
       accessKeyId:
         name: rustfs-secrets
