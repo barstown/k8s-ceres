@@ -11,13 +11,18 @@ spec:
     enablePodAntiAffinity: true
     podAntiAffinityType: preferred
     topologyKey: kubernetes.io/hostname
-  imageName: ghcr.io/cloudnative-pg/postgresql:18-system-trixie@sha256:b0949a3f70641d5c56a05e18df8d69a16fba66af479d0ac6b74ede71f6d4e84f
+  imageName: ghcr.io/cloudnative-pg/postgresql:18-standard-trixie@sha256:1e9b7f86a108b8eb472f52b59fc085aafee4cb3841484727ad67c020a8935a86
   bootstrap:
     initdb:
       database: semaphore
       owner: semaphore
       secret:
         name: semaphore-db-secret
+  # plugins:
+  #   - name: barman-cloud.cloudnative-pg.io
+  #     isWALArchiver: true
+  #     parameters:
+  #       barmanObjectName: rustfs-s3
   storage:
     size: 10Gi
     storageClass: freenas-api-iscsi
