@@ -18,11 +18,11 @@ spec:
       owner: semaphore
       secret:
         name: semaphore-db-secret
-  # plugins:
-  #   - name: barman-cloud.cloudnative-pg.io
-  #     isWALArchiver: true
-  #     parameters:
-  #       barmanObjectName: rustfs-s3
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: rustfs-s3
   storage:
     size: 10Gi
     storageClass: freenas-api-iscsi
