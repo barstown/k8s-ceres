@@ -18,6 +18,11 @@ spec:
       owner: authentik
       secret:
         name: authentik-db-secret
+  # plugins:
+  #   - name: barman-cloud.cloudnative-pg.io
+  #     isWALArchiver: true
+  #     parameters:
+  #       barmanObjectName: rustfs-s3
   storage:
     size: 10Gi
     storageClass: freenas-api-iscsi
