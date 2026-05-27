@@ -5,10 +5,11 @@ kind: ScheduledBackup
 metadata:
   name: semaphore-postgres-backup
 spec:
-  schedule: "0 0 1 * * 0" # Sunday at 1:00 AM
   backupOwnerReference: self
   cluster:
     name: semaphore-postgres
+  immediate: true
   method: plugin
   pluginConfiguration:
     name: barman-cloud.cloudnative-pg.io
+  schedule: "0 0 1 * * 0" # Sunday at 1:00 AM
