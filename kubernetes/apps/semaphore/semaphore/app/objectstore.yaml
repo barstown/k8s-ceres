@@ -6,7 +6,7 @@ metadata:
   name: rustfs-s3
 spec:
   configuration:
-    destinationPath: s3://k8s-ceres/semaphore/semaphore-postgres
+    destinationPath: s3://k8s-ceres/semaphore
     # endpointCA:
     #   name: rustfs-secrets
     #   key: TRUENAS_CA
@@ -20,3 +20,4 @@ spec:
         key: RUSTFS_ACCESS_SECRET_KEY
     # wal:
     #   compression: zstd
+  retentionPolicy: 4w
