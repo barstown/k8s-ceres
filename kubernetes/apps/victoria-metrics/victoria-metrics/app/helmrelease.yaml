@@ -125,7 +125,7 @@ spec:
     defaultRules:
       rules:
         etcdMemberCommunicationSlow:
-          create: false
+          enabled: false
     grafana:
       enabled: false
       forceDeployDatasource: true
@@ -213,9 +213,10 @@ spec:
               storage: 50Gi
           storageClassName: freenas-api-iscsi
         useStrictSecurity: true
-    additionalVictoriaMetricsMap:
+    extraRules:
+    # additionalVictoriaMetricsMap:
       dockerhub-rules:
-        create: true
+        enabled: true
         groups:
           - name: dockerhub
             rules:
@@ -226,7 +227,7 @@ spec:
                 labels:
                   severity: critical
       oom-rules:
-        create: true
+        enabled: true
         groups:
           - name: oom
             rules:
@@ -237,7 +238,7 @@ spec:
                 labels:
                   severity: critical
       zfs-rules:
-        create: true
+        enabled: true
         groups:
           - name: zfs
             rules:
