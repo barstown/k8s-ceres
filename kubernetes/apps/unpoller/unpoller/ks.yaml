@@ -6,7 +6,7 @@ metadata:
   name: unpoller
 spec:
   interval: 1h
-  path: ./kubernetes/apps/o11y/unpoller/app
+  path: ./kubernetes/apps/unpoller/unpoller/app
   postBuild:
     substituteFrom:
       - name: cluster-secrets
@@ -16,5 +16,5 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  targetNamespace: o11y
+  targetNamespace: unpoller
   wait: false
