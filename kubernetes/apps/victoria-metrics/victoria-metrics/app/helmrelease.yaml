@@ -161,6 +161,16 @@ spec:
                 insecureSkipVerify: true
     prometheus-node-exporter:
       enabled: true
+      securityContext:
+        fsGroup: 65534
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+      containerSecurityContext:
+        readOnlyRootFilesystem: true
+        allowPrivilegeEscalation: false
+        capabilities: { drop: ["ALL"], add: ["SYS_TIME"] }
+        seccompProfile: { type: RuntimeDefault }
     vmagent:
       spec:
         extraArgs:
