@@ -160,7 +160,7 @@ spec:
               tlsConfig:
                 insecureSkipVerify: true
     prometheus-node-exporter:
-      enabled: false
+      enabled: true
     vmagent:
       spec:
         extraArgs:
