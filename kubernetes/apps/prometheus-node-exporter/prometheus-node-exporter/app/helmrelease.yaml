@@ -24,10 +24,10 @@ spec:
         jobLabel: jobLabel
     resources:
       limits:
-        cpu: 200m
+        cpu: 300m
         memory: 50Mi
       requests:
-        cpu: 100m
+        cpu: 105m
         memory: 30Mi
     securityContext:
       fsGroup: 65534
