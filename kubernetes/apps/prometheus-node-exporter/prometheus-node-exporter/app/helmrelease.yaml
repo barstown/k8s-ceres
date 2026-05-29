@@ -24,7 +24,7 @@ spec:
         jobLabel: jobLabel
     resources:
       limits:
-        cpu: 500m
+        cpu: 750m
         memory: 50Mi
       requests:
         cpu: 250m
