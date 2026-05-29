@@ -3,40 +3,32 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: grafana
+  name: silence-operator
 spec:
   interval: 1h
-  path: ./kubernetes/apps/o11y/grafana/app
-  postBuild:
-    substituteFrom:
-      - name: cluster-secrets
-        kind: Secret
+  path: ./kubernetes/apps/silence-operator/silence-operator/app
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  targetNamespace: o11y
+  targetNamespace: silence-operator
   wait: true
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: grafana-instance
+  name: silence-operator-silences
 spec:
   dependsOn:
-    - name: grafana
+    - name: silence-operator
   interval: 1h
-  path: ./kubernetes/apps/o11y/grafana/instance
-  postBuild:
-    substituteFrom:
-      - name: cluster-secrets
-        kind: Secret
+  path: ./kubernetes/apps/silence-operator/silence-operator/silences
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  targetNamespace: o11y
+  targetNamespace: silence-operator
   wait: false
