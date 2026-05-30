@@ -20,8 +20,8 @@ spec:
             env:
               TZ: America/New_York
               PIHOLE_HOSTNAME: 10.0.10.22,10.0.10.20
-              PIHOLE_PROTOCOL: https
-              SKIP_TLS_VERIFICATION: true
+              # PIHOLE_PROTOCOL: https
+              # SKIP_TLS_VERIFICATION: true
               INTERVAL: 30s
               PORT: &port 9617
             envFrom:
