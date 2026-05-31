@@ -152,20 +152,25 @@ radarr:
     base_url: http://radarr:80
     api_key: !env_var RADARR__AUTH__APIKEY
 
-    include:
-      # Comment out any of the following includes to disable them
-      - template: radarr-quality-definition-movie
-      # - template: radarr-quality-profile-hd-bluray-web # overridden below
-      - template: radarr-custom-formats-hd-bluray-web
+    quality_definition:
+      type: movie
+
+    # v7 style
+    # include:
+    #   # Comment out any of the following includes to disable them
+    #   - template: radarr-quality-definition-movie
+    #   # - template: radarr-quality-profile-hd-bluray-web # overridden below
+    #   - template: radarr-custom-formats-hd-bluray-web
 
     quality_profiles:
-      - name: HD Bluray + WEB
+      - trash_id: d1d67249d3890e49bc12e275d989a7e9  # HD Bluray + WEB
+        name: HD Bluray + WEB
         reset_unmatched_scores:
           enabled: true
         upgrade:
           allowed: true
           until_quality: WEB 1080p
-          until_score: 0 # 1600
+          until_score: 0 # 10000
         min_format_score: 0
         quality_sort: top
         qualities:
@@ -202,16 +207,15 @@ radarr:
           - name: HD Bluray + WEB
 
       - trash_ids:
-          # Uncomment the next six lines to allow x265 HD releases with HDR/DV
           - dc98083864ea246d05a42df0d05f81cc # x265 (HD)
         assign_scores_to:
           - name: HD Bluray + WEB
             score: 0
-      - trash_ids:
-          - 839bea857ed2c0a8e084f3cbdbd65ecb # x265 (no HDR/DV)
-        assign_scores_to:
-          - name: HD Bluray + WEB
-            score: 0
+      # - trash_ids:
+      #     - 839bea857ed2c0a8e084f3cbdbd65ecb # x265 (no HDR/DV)
+      #   assign_scores_to:
+      #     - name: HD Bluray + WEB
+      #       score: 0
 
     # See: https://recyclarr.dev/wiki/yaml/config-reference/media-naming/
     media_naming:
