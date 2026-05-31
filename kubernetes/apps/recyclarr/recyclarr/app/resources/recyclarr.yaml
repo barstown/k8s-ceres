@@ -30,7 +30,7 @@
 # Instance Definition: https://recyclarr.dev/reference/configuration/basic/
 sonarr:
   tv:
-    base_url: http://sonarr:80
+    base_url: http://sonarr.sonarr.svc.cluster.local:80
     api_key: !env_var SONARR__AUTH__APIKEY
 
     quality_definition:
@@ -154,7 +154,7 @@ sonarr:
 radarr:
   movies:
     # Set the URL/API Key to your actual instance
-    base_url: http://radarr:80
+    base_url: http://radarr.radarr.svc.cluster.local:80
     api_key: !env_var RADARR__AUTH__APIKEY
 
     quality_definition:
