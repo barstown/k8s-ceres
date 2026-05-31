@@ -84,7 +84,8 @@ sonarr:
               - WEBDL-720p
               - WEBRip-720p
           - name: HDTV-720p
-      - name: WEB-720p
+      - trash_id: 72dae194fc92bf828f32cde7744e51a1  # WEB-1080p alternative, forced to 720p
+        name: WEB-720p
         reset_unmatched_scores:
           enabled: true
         upgrade:
