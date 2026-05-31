@@ -1,0 +1,17 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ./secret.sops.yaml
+  - ./helmrelease.yaml
+  - ./ocirepository.yaml
+configMapGenerator:
+  - name: recyclarr-configmap
+    files:
+      - recyclarr.yaml=./resources/recyclarr.yaml
+  - name: sonarr-v4-custom-formats-web-1080p-720p-configmap
+    files:
+      - sonarr-v4-custom-formats-web-1080p-720p.yaml=./resources/sonarr-v4-custom-formats-web-1080p-720p.yaml
+generatorOptions:
+  disableNameSuffixHash: true
