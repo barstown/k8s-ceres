@@ -24,7 +24,7 @@ spec:
                   defaultDisabled:
                     - FailedBarePods
                     - PodsWithLocalStorage
-                    - SystemCriticalPods
+                    # - SystemCriticalPods
             - name: LowNodeUtilization
               args:
                 metricsUtilization:
