@@ -109,6 +109,7 @@
         "ghcr.io/siderolabs/installer",
         "ghcr.io/siderolabs/kubelet"
       ],
+      "pinDigests": false,
       "separateMajorMinor": true,
       "separateMinorPatch": true
     },
