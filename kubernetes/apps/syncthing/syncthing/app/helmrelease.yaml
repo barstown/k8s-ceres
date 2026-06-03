@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: ghcr.io/11notes/syncthing
-              tag: 2.1.0@sha256:b627bb8c7993b9f70e0f107f81321a9266a9c28cb1a3e5996db0bd3f88ad40e9
+              tag: 2.1.1@sha256:d9fb0a84af1c101d09953f7939dee31a9ed8365aad5a699f63ea6d1feff33286
             env:
               TZ: America/New_York
             envFrom:
