@@ -25,7 +25,7 @@ JUST_UNSTABLE = "1"
 "aqua:kubernetes/kubernetes/kubectl" = "1.36.1"
 "aqua:mikefarah/yq" = "4.53.2"
 "aqua:siderolabs/talos" = "1.13.3"
-"aqua:yannh/kubeconform" = "0.7.0"
+"aqua:yannh/kubeconform" = "0.8.0"
 
 [settings]
 python.uv_venv_auto = true
