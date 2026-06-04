@@ -66,8 +66,8 @@ spec:
                 cpu: 100m
                 memory: 250Mi
               limits:
-                cpu: 1000m
-                memory: 2Gi
+                cpu: 2000m
+                memory: 3Gi
     defaultPodOptions:
       securityContext:
         fsGroup: 2001 # media-rw
