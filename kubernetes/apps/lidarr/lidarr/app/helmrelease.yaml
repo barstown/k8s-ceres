@@ -95,7 +95,7 @@ spec:
       config:
         type: persistentVolumeClaim
         accessMode: ReadWriteOnce
-        size: 5Gi
+        size: 10Gi
         storageClass: freenas-api-iscsi
       media:
         type: persistentVolumeClaim
