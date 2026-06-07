@@ -39,7 +39,7 @@ spec:
         parameters:
           fsType: xfs
           detachedVolumesFromSnapshots: 'false'
-          datasetProperties: "volblocksize=16K"
+          # datasetProperties: "volblocksize=16K"
         reclaimPolicy: Retain
         volumeBindingMode: Immediate
       - name: freenas-api-iscsi-sqlite
