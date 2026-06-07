@@ -34,11 +34,37 @@ spec:
       - name: freenas-api-iscsi
         allowVolumeExpansion: true
         defaultClass: true
+        mountOptions:
+          - noatime
         parameters:
           fsType: xfs
           detachedVolumesFromSnapshots: 'false'
+          datasetProperties: "volblocksize=16K"
         reclaimPolicy: Retain
         volumeBindingMode: Immediate
+      - name: freenas-api-iscsi-sqlite
+        allowVolumeExpansion: true
+        defaultClass: false
+        mountOptions:
+          - noatime
+        parameters:
+          fsType: xfs
+          detachedVolumesFromSnapshots: 'false'
+          datasetProperties: "volblocksize=4K"
+        reclaimPolicy: Retain
+        volumeBindingMode: Immediate
+      - name: freenas-api-iscsi-postgresql
+        allowVolumeExpansion: true
+        defaultClass: false
+        mountOptions:
+          - noatime
+        parameters:
+          fsType: xfs
+          detachedVolumesFromSnapshots: 'false'
+          datasetProperties: "volblocksize=8K"
+        reclaimPolicy: Retain
+        volumeBindingMode: Immediate
+
     volumeSnapshotClasses:
       - name: freenas-api-iscsi
         parameters:

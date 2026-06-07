@@ -9,6 +9,8 @@ spec:
   accessModes: ["ReadWriteMany"]
   persistentVolumeReclaimPolicy: Retain
   storageClassName: ""
+  mountOptions:
+    - noatime
   nfs:
     server: 10.0.10.50
     path: /mnt/storage/media
