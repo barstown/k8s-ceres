@@ -96,7 +96,7 @@ spec:
         type: persistentVolumeClaim
         accessMode: ReadWriteOnce
         size: 10Gi
-        storageClass: freenas-api-iscsi
+        storageClass: freenas-api-iscsi-sqlite
       media:
         type: persistentVolumeClaim
         existingClaim: "{{ .Release.Name }}-media"
