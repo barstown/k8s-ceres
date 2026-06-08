@@ -10,7 +10,7 @@ spec:
   interval: 1h
   values:
     csiDriver:
-      name: freenas-api-iscsi
+      name: freenas-api-iscsi-postgresql
     controller:
       driver:
         image:
@@ -39,7 +39,6 @@ spec:
         parameters:
           fsType: xfs
           detachedVolumesFromSnapshots: 'false'
-          democratic-csi.org/config: '{"zfs":{"zvolBlocksize":"8K"}}'
         reclaimPolicy: Retain
         volumeBindingMode: Immediate
     volumeSnapshotClasses:
