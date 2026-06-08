@@ -39,6 +39,7 @@ spec:
         parameters:
           fsType: xfs
           detachedVolumesFromSnapshots: 'false'
+          democratic-csi.org/config: '{"zfs":{"zvolBlocksize":"8K"}}'
         reclaimPolicy: Retain
         volumeBindingMode: Immediate
     volumeSnapshotClasses:
