@@ -15,7 +15,7 @@ spec:
       driver:
         image:
           registry: ghcr.io/democratic-csi/democratic-csi
-          tag: latest
+          tag: v1.9.5
     driver:
       existingConfigSecret: freenas-api-iscsi-driver-config
       config:
