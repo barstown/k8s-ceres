@@ -61,7 +61,9 @@ spec:
         parameters:
           fsType: xfs
           detachedVolumesFromSnapshots: 'false'
-          datasetProperties: "volblocksize=8K"
+          config: |
+            zfs:
+              zvolBlocksize: 16K
         reclaimPolicy: Retain
         volumeBindingMode: Immediate
 
