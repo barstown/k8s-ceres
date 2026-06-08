@@ -2,7 +2,7 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
-  name: freenas-api-iscsi-sqlite
+  name: freenas-api-iscsi-sqlite-test
 spec:
   interval: 15m
   layerSelector:
