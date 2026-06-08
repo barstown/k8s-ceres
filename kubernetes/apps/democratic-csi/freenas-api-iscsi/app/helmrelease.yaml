@@ -63,7 +63,7 @@ spec:
           detachedVolumesFromSnapshots: 'false'
           config: |
             zfs:
-              zvolBlocksize: 16K
+              zvolBlocksize: 8K
         reclaimPolicy: Retain
         volumeBindingMode: Immediate
 
