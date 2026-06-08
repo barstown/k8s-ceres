@@ -41,6 +41,28 @@ spec:
           detachedVolumesFromSnapshots: 'false'
         reclaimPolicy: Retain
         volumeBindingMode: Immediate
+      - name: freenas-api-iscsi-sqlite
+        allowVolumeExpansion: true
+        defaultClass: false
+        mountOptions:
+          - noatime
+        parameters:
+          fsType: xfs
+          detachedVolumesFromSnapshots: 'false'
+          democratic-csi.org/config: '{"zfs":{"zvolBlocksize":"4K"}}'
+        reclaimPolicy: Retain
+        volumeBindingMode: Immediate
+      - name: freenas-api-iscsi-postgresql
+        allowVolumeExpansion: true
+        defaultClass: false
+        mountOptions:
+          - noatime
+        parameters:
+          fsType: xfs
+          detachedVolumesFromSnapshots: 'false'
+          democratic-csi.org/config: '{"zfs":{"zvolBlocksize":"8K"}}'
+        reclaimPolicy: Retain
+        volumeBindingMode: Immediate
     volumeSnapshotClasses:
       - name: freenas-api-iscsi
         parameters:
