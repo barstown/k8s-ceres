@@ -2,11 +2,11 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: freenas-api-iscsi
+  name: freenas-api-iscsi-postgresql
 spec:
   chartRef:
     kind: OCIRepository
-    name: freenas-api-iscsi
+    name: freenas-api-iscsi-postgresql
   interval: 1h
   values:
     csiDriver:
@@ -15,9 +15,9 @@ spec:
       driver:
         image:
           registry: ghcr.io/democratic-csi/democratic-csi
-          tag: latest
+          tag: v1.9.5
     driver:
-      existingConfigSecret: freenas-api-iscsi-driver-config
+      existingConfigSecret: freenas-api-iscsi-postgresql-driver-config
       config:
         driver: freenas-api-iscsi
     node:
@@ -31,9 +31,9 @@ spec:
         iscsiDirHostPathType: ''
       hostPID: true
     storageClasses:
-      - name: freenas-api-iscsi
+      - name: freenas-api-iscsi-postgresql
         allowVolumeExpansion: true
-        defaultClass: true
+        defaultClass: false
         mountOptions:
           - noatime
         parameters:
@@ -42,6 +42,6 @@ spec:
         reclaimPolicy: Retain
         volumeBindingMode: Immediate
     volumeSnapshotClasses:
-      - name: freenas-api-iscsi
+      - name: freenas-api-iscsi-postgresql
         parameters:
           detachedSnapshots: 'true'
