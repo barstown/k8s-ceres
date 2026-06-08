@@ -10,7 +10,7 @@ spec:
   interval: 1h
   values:
     csiDriver:
-      name: freenas-api-iscsi
+      name: iscsi-sqlite-test
     controller:
       driver:
         image:
