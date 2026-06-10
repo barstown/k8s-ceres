@@ -9,6 +9,16 @@ spec:
     kind: OCIRepository
     name: homebox
   interval: 1h
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Deployment
+              version: v1
+            patch: |
+              - op: add
+                path: "/metadata/labels/app.ceres.io~1depends-on-postgresql"
+                value: true
   values:
     controllers:
       homebox:
