@@ -74,10 +74,19 @@ List all PostgreSQL-dependent Deployments:
 kubectl get deploy -A -l app.ceres.io/depends-on-postgresql=true
 ```
 
+Generate scale commands for all PostgreSQL-dependent Deployments (dry run):
+
+```bash
+kubectl get deploy -A -l app.ceres.io/depends-on-postgresql=true -o json \
+| jq -r '.items[] | "kubectl -n \(.metadata.namespace) scale deploy \(.metadata.name) --replicas=0"'
+```
+
 Scale all PostgreSQL-dependent Deployments to zero:
 
 ```bash
-kubectl scale deploy -A -l app.ceres.io/depends-on-postgresql=true --replicas=0
+kubectl get deploy -A -l app.ceres.io/depends-on-postgresql=true -o json \
+| jq -r '.items[] | "kubectl -n \(.metadata.namespace) scale deploy \(.metadata.name) --replicas=0"' \
+| sh
 ```
 
 ### Annotations vs Labels
