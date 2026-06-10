@@ -37,14 +37,14 @@ Do not perform PostgreSQL image updates while clusters are hibernated.
 
 ```bash
 kubectl get deploy -A -l app.ceres.io/depends-on-postgresql=true -o json \
-| jq -r '.items[] | "kubectl -n \(.metadata.namespace) scale deploy \(.metadata.name) --replicas=0"'
+| yq -r '.items[] | "kubectl -n " + .metadata.namespace + " scale deploy " + .metadata.name + " --replicas=0"'
 ```
 
 2. Execute the generated scale-down commands.
 
 ```bash
 kubectl get deploy -A -l app.ceres.io/depends-on-postgresql=true -o json \
-| jq -r '.items[] | "kubectl -n \(.metadata.namespace) scale deploy \(.metadata.name) --replicas=0"' \
+| yq -r '.items[] | "kubectl -n " + .metadata.namespace + " scale deploy " + .metadata.name + " --replicas=0"' \
 | sh
 ```
 
@@ -75,14 +75,14 @@ Current default for these apps is one instance each.
 
 ```bash
 kubectl get deploy -A -l app.ceres.io/depends-on-postgresql=true -o json \
-| jq -r '.items[] | "kubectl -n \(.metadata.namespace) scale deploy \(.metadata.name) --replicas=1"'
+| yq -r '.items[] | "kubectl -n " + .metadata.namespace + " scale deploy " + .metadata.name + " --replicas=1"'
 ```
 
 2. Execute the generated scale-up commands.
 
 ```bash
 kubectl get deploy -A -l app.ceres.io/depends-on-postgresql=true -o json \
-| jq -r '.items[] | "kubectl -n \(.metadata.namespace) scale deploy \(.metadata.name) --replicas=1"' \
+| yq -r '.items[] | "kubectl -n " + .metadata.namespace + " scale deploy " + .metadata.name + " --replicas=1"' \
 | sh
 ```
 
@@ -113,14 +113,14 @@ Recommended sequence:
 
 ```bash
 kubectl get clusters.postgresql.cnpg.io -A -o json \
-| jq -r '.items[] | "kubectl -n \(.metadata.namespace) annotate cluster.postgresql.cnpg.io \(.metadata.name) --overwrite cnpg.io/hibernation=on"'
+| yq -r '.items[] | "kubectl -n " + .metadata.namespace + " annotate cluster.postgresql.cnpg.io " + .metadata.name + " --overwrite cnpg.io/hibernation=on"'
 ```
 
 2. Execute hibernation.
 
 ```bash
 kubectl get clusters.postgresql.cnpg.io -A -o json \
-| jq -r '.items[] | "kubectl -n \(.metadata.namespace) annotate cluster.postgresql.cnpg.io \(.metadata.name) --overwrite cnpg.io/hibernation=on"' \
+| yq -r '.items[] | "kubectl -n " + .metadata.namespace + " annotate cluster.postgresql.cnpg.io " + .metadata.name + " --overwrite cnpg.io/hibernation=on"' \
 | sh
 ```
 
@@ -137,14 +137,14 @@ kubectl get clusters.postgresql.cnpg.io -A \
 
 ```bash
 kubectl get clusters.postgresql.cnpg.io -A -o json \
-| jq -r '.items[] | "kubectl -n \(.metadata.namespace) annotate cluster.postgresql.cnpg.io \(.metadata.name) --overwrite cnpg.io/hibernation=off"'
+| yq -r '.items[] | "kubectl -n " + .metadata.namespace + " annotate cluster.postgresql.cnpg.io " + .metadata.name + " --overwrite cnpg.io/hibernation=off"'
 ```
 
 2. Execute unhibernate.
 
 ```bash
 kubectl get clusters.postgresql.cnpg.io -A -o json \
-| jq -r '.items[] | "kubectl -n \(.metadata.namespace) annotate cluster.postgresql.cnpg.io \(.metadata.name) --overwrite cnpg.io/hibernation=off"' \
+| yq -r '.items[] | "kubectl -n " + .metadata.namespace + " annotate cluster.postgresql.cnpg.io " + .metadata.name + " --overwrite cnpg.io/hibernation=off"' \
 | sh
 ```
 
