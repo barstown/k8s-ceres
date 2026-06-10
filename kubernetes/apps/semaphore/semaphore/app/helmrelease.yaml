@@ -18,7 +18,7 @@ spec:
             patch: |
               - op: add
                 path: "/metadata/labels/app.ceres.io~1depends-on-postgresql"
-                value: true
+                value: "true"
   values:
     controllers:
       semaphore:

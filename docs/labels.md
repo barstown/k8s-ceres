@@ -63,6 +63,7 @@ postRenderers:
 Notes:
 
 - Use JSON patch escaping for `/` in label keys (`~1`).
+- Label values must be strings; use `"true"` and `"false"`, not bare booleans.
 - Apply the same key/value to `metadata.labels` and pod template labels when possible.
 
 ### Operational Queries
