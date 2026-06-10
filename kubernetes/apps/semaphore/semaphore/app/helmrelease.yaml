@@ -9,6 +9,16 @@ spec:
     kind: OCIRepository
     name: semaphore
   interval: 1h
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Deployment
+              version: v1
+            patch: |
+              - op: add
+                path: "/metadata/labels/app.kubernetes.io~1depends-on"
+                value: postgresql
   values:
     controllers:
       semaphore:
