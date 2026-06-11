@@ -99,32 +99,45 @@ Expected result: `REPLICAS=1` and `READY=1` (or equal to desired replicas) for e
 
 Use this when you intentionally want all CNPG database Pods stopped.
 
+Because `cnpg.io/hibernation` is now defined in Git (default `off`), Flux reconciliation must be suspended for the owning Kustomizations before applying manual hibernation annotations.
+
 Recommended sequence:
 
 1. Scale down PostgreSQL-dependent apps.
-2. Hibernate CNPG clusters.
-3. Perform maintenance that does not require running PostgreSQL Pods.
-4. Unhibernate clusters and verify health.
-5. Scale applications back up.
+2. Suspend Flux reconciliation for CNPG cluster owners.
+3. Hibernate CNPG clusters.
+4. Perform maintenance that does not require running PostgreSQL Pods.
+5. Unhibernate clusters and verify health.
+6. Resume Flux reconciliation for CNPG cluster owners.
+7. Scale applications back up.
 
 #### B1) Hibernate All CNPG Clusters
 
-1. Dry run: print hibernation commands (no changes made).
+1. Suspend Flux reconciliation for Kustomizations that own CNPG clusters.
 
 ```bash
 kubectl get clusters.postgresql.cnpg.io -A -o json \
-| yq -r '.items[] | "kubectl -n " + .metadata.namespace + " annotate cluster.postgresql.cnpg.io " + .metadata.name + " --overwrite cnpg.io/hibernation=on"'
+| yq -r '.items[] | .metadata.labels."kustomize.toolkit.fluxcd.io/name" | select(. != null and . != "")' \
+| sort -u \
+| xargs -r -I{} flux --namespace flux-system suspend kustomization {}
 ```
 
-2. Execute hibernation.
+2. Dry run: print hibernation commands (no changes made).
 
 ```bash
 kubectl get clusters.postgresql.cnpg.io -A -o json \
-| yq -r '.items[] | "kubectl -n " + .metadata.namespace + " annotate cluster.postgresql.cnpg.io " + .metadata.name + " --overwrite cnpg.io/hibernation=on"' \
+| yq -r '.items[] | "kubectl -n " + .metadata.namespace + " annotate cluster.postgresql.cnpg.io " + .metadata.name + " --overwrite --field-manager=flux-client-side-apply cnpg.io/hibernation=on"'
+```
+
+3. Execute hibernation.
+
+```bash
+kubectl get clusters.postgresql.cnpg.io -A -o json \
+| yq -r '.items[] | "kubectl -n " + .metadata.namespace + " annotate cluster.postgresql.cnpg.io " + .metadata.name + " --overwrite --field-manager=flux-client-side-apply cnpg.io/hibernation=on"' \
 | sh
 ```
 
-3. Verify annotation:
+4. Verify annotation:
 
 ```bash
 kubectl get clusters.postgresql.cnpg.io -A \
@@ -137,14 +150,14 @@ kubectl get clusters.postgresql.cnpg.io -A \
 
 ```bash
 kubectl get clusters.postgresql.cnpg.io -A -o json \
-| yq -r '.items[] | "kubectl -n " + .metadata.namespace + " annotate cluster.postgresql.cnpg.io " + .metadata.name + " --overwrite cnpg.io/hibernation=off"'
+| yq -r '.items[] | "kubectl -n " + .metadata.namespace + " annotate cluster.postgresql.cnpg.io " + .metadata.name + " --overwrite --field-manager=flux-client-side-apply cnpg.io/hibernation=off"'
 ```
 
 2. Execute unhibernate.
 
 ```bash
 kubectl get clusters.postgresql.cnpg.io -A -o json \
-| yq -r '.items[] | "kubectl -n " + .metadata.namespace + " annotate cluster.postgresql.cnpg.io " + .metadata.name + " --overwrite cnpg.io/hibernation=off"' \
+| yq -r '.items[] | "kubectl -n " + .metadata.namespace + " annotate cluster.postgresql.cnpg.io " + .metadata.name + " --overwrite --field-manager=flux-client-side-apply cnpg.io/hibernation=off"' \
 | sh
 ```
 
@@ -152,4 +165,13 @@ kubectl get clusters.postgresql.cnpg.io -A -o json \
 
 ```bash
 kubectl get pods -A -l cnpg.io/cluster
+```
+
+4. Resume Flux reconciliation for Kustomizations that own CNPG clusters.
+
+```bash
+kubectl get clusters.postgresql.cnpg.io -A -o json \
+| yq -r '.items[] | .metadata.labels."kustomize.toolkit.fluxcd.io/name" | select(. != null and . != "")' \
+| sort -u \
+| xargs -r -I{} flux --namespace flux-system resume kustomization {}
 ```
