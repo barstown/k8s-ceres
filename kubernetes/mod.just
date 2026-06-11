@@ -34,12 +34,20 @@ postgresql-scale-up-apps:
 [group('kube')]
 cnpg-hibernate-all:
     kubectl get clusters.postgresql.cnpg.io -A -o json \
-      | yq -r '.items[] | "kubectl -n " + .metadata.namespace + " annotate cluster.postgresql.cnpg.io " + .metadata.name + " --overwrite cnpg.io/hibernation=on"' \
+      | yq -r '.items[] | .metadata.labels."kustomize.toolkit.fluxcd.io/name" | select(. != null and . != "")' \
+      | sort -u \
+      | xargs -r -I{} flux --namespace flux-system suspend kustomization {}
+    kubectl get clusters.postgresql.cnpg.io -A -o json \
+      | yq -r '.items[] | "kubectl -n " + .metadata.namespace + " annotate cluster.postgresql.cnpg.io " + .metadata.name + " --overwrite --field-manager=flux-client-side-apply cnpg.io/hibernation=on"' \
       | sh
 
 [doc('Unhibernate all CNPG clusters')]
 [group('kube')]
 cnpg-unhibernate-all:
     kubectl get clusters.postgresql.cnpg.io -A -o json \
-      | yq -r '.items[] | "kubectl -n " + .metadata.namespace + " annotate cluster.postgresql.cnpg.io " + .metadata.name + " --overwrite cnpg.io/hibernation=off"' \
+      | yq -r '.items[] | "kubectl -n " + .metadata.namespace + " annotate cluster.postgresql.cnpg.io " + .metadata.name + " --overwrite --field-manager=flux-client-side-apply cnpg.io/hibernation=off"' \
       | sh
+    kubectl get clusters.postgresql.cnpg.io -A -o json \
+      | yq -r '.items[] | .metadata.labels."kustomize.toolkit.fluxcd.io/name" | select(. != null and . != "")' \
+      | sort -u \
+      | xargs -r -I{} flux --namespace flux-system resume kustomization {}
