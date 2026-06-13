@@ -136,7 +136,7 @@ spec:
                 TRANSFORMERS_CACHE: /cache
       persistence:
         cache:
-          accessMode: ReadWriteMany
+          accessMode: ReadWriteOnce
           enabled: true
           size: 10Gi
           storageClass: freenas-api-iscsi
