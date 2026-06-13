@@ -141,3 +141,5 @@ spec:
           size: 10Gi
           storageClass: freenas-api-iscsi
           type: persistentVolumeClaim
+        tmp:
+        type: emptyDir
