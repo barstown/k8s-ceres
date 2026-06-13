@@ -19,7 +19,7 @@ spec:
       database: immich
       owner: immich
       secret:
-        name: immich-secret
+        name: immich-db-secret
       postInitApplicationSQL:
         - CREATE EXTENSION IF NOT EXISTS "vchord" CASCADE;
         - CREATE EXTENSION IF NOT EXISTS "earthdistance" CASCADE;
