@@ -116,9 +116,9 @@ spec:
             securityContext:
               fsGroup: 2002 # media-ro
               fsGroupChangePolicy: OnRootMismatch
-              runAsGroup: 2002 # media-ro
+              runAsGroup: 65534
               runAsNonRoot: true
-              runAsUser: 2002 # media-ro
+              runAsUser: 65534
       service:
         main:
           ports:
