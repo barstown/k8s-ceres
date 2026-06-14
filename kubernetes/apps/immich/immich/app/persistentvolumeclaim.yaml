@@ -13,16 +13,16 @@ spec:
       storage: 100Gi
   storageClassName: freenas-api-nfs
 
-# ---
-# apiVersion: v1
-# kind: PersistentVolumeClaim
-# metadata:
-#   name: immich-external-library
-#   namespace: immich
-# spec:
-#   storageClassName: ""
-#   accessModes: ["ReadWriteMany"]
-#   resources:
-#     requests:
-#       storage: 10Ti
-#   volumeName: immich-external-library
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: immich-media
+  namespace: immich
+spec:
+  storageClassName: ""
+  accessModes: ["ReadOnlyMany"]
+  resources:
+    requests:
+      storage: 10Ti
+  volumeName: immich-media
