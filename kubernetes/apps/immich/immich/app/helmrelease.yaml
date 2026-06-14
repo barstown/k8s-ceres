@@ -115,6 +115,10 @@ spec:
           pod:
             securityContext:
               fsGroup: 2002 # media-ro
+              fsGroupChangePolicy: OnRootMismatch
+              runAsGroup: 65534
+              runAsNonRoot: true
+              runAsUser: 65534
       service:
         main:
           ports:
