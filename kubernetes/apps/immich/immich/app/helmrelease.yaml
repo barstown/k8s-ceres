@@ -130,17 +130,17 @@ spec:
                   port: *server-port
       persistence:
         media:
-        type: persistentVolumeClaim
-        existingClaim: "{{ .Release.Name }}-media"
-        advancedMounts:
-          main:
+          type: persistentVolumeClaim
+          existingClaim: "{{ .Release.Name }}-media"
+          advancedMounts:
             main:
-              - path: /photos-kyle
-                subPath: pictures/kyle
-              - path: /photos-haley
-                subPath: pictures/haley
-              - path: /photos-shared
-                subPath: pictures/shared
+              main:
+                - path: /photos-kyle
+                  subPath: pictures/kyle
+                - path: /photos-haley
+                  subPath: pictures/haley
+                - path: /photos-shared
+                  subPath: pictures/shared
     machine-learning:
       enabled: true
       controllers:
