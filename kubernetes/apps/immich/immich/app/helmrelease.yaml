@@ -114,7 +114,7 @@ spec:
                 IMMICH_PORT: &server-port 2283
           pod:
             securityContext:
-              fsGroup: 2002 # media-ro
+              fsGroup: 2001 # media-rw
               fsGroupChangePolicy: OnRootMismatch
               runAsGroup: 65534
               runAsNonRoot: true
