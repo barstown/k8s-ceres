@@ -71,13 +71,21 @@ spec:
         library:
           existingClaim: immich-library-pvc
       # ref: https://docs.immich.app/install/config-file
-      configuration: {}
-        # trash:
-        #   enabled: true
-        #   days: 30
-        # storageTemplate:
-        #   enabled: true
-        #   template: "{{y}}/{{y}}{{MM}}{{dd}}-{{HH}}{{mm}}{{ss}}"
+      configuration: # {}
+        ffmpeg:
+          acceptedVideoCodecs: ["h264", "av1", "hevc", "vp9"]
+          targetResolution: "1080"
+        machineLearning:
+          facialRecognition:
+            modelName: "antelopev2"
+        trash:
+          enabled: true
+          days: 30
+        server:
+          publicUsers: false
+        storageTemplate:
+          enabled: true
+          template: "{{y}}/{{y}}{{MM}}/{{y}}{{MM}}{{dd}}-{{H}}{{mm}}{{ss}}{{SSS}}"
     valkey:
       enabled: true
       controllers:
