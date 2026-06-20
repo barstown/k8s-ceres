@@ -83,6 +83,7 @@ spec:
           days: 30
         server:
           publicUsers: false
+          externalDomain: "https://{{ .Release.Name }}.${SECRET_DOMAIN}"
         storageTemplate:
           enabled: true
           template: "{{y}}/{{y}}{{MM}}/{{y}}{{MM}}{{dd}}-{{H}}{{mm}}{{ss}}{{SSS}}"
