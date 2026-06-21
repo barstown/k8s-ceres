@@ -1,0 +1,23 @@
+{
+  "default": true,
+  // MD007 - Unordered list indentation. Enforce 4-space indent to match PowerShell style.
+  "MD007": {
+    "indent": 4
+  },
+  // MD010 - No hard tabs. Enforce spaces only.
+  "MD010": true,
+  // MD012 - No multiple consecutive blank lines.
+  "MD012": true,
+  // MD013 - Line length. Disabled; long lines in tables and code blocks are unavoidable.
+  "MD013": false,
+  // MD024 - No duplicate headings. Disabled; sibling sections can share headings.
+  "MD024": false,
+  // MD031 - Fenced code blocks should be surrounded by blank lines.
+  "MD031": true,
+  // MD033 - Inline HTML. Disabled; HTML tables are acceptable in docs.
+  "MD033": false,
+  // MD040 - Fenced code blocks should have a language specified.
+  "MD040": true,
+  // MD041 - First line must be a top-level heading. Enabled.
+  "MD041": true
+}

@@ -1,18 +1,72 @@
 {
-    "editor.bracketPairColorization.enabled": true,
-    "files.associations": {
-        "**/*.json5": "json5"
-    },
-    "files.trimTrailingWhitespace": true,
-    "sops.defaults.ageKeyFile": "age.key",
-    "vs-kubernetes": {
-        "vs-kubernetes.kubeconfig": "./kubeconfig",
-        "vs-kubernetes.knownKubeconfigs": [
-          "./kubeconfig"
-      ]
-    },
-    "yaml.schemaStore.enable": true,
-    "yaml.schemas": {
-        "kubernetes": "./kubernetes/**/*.yaml"
+  "[ansible]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml",
+    "editor.formatOnSave": true
+  },
+  "[github-actions-workflow]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml",
+    "editor.formatOnSave": true
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[json5]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint",
+    "editor.formatOnSave": true,
+    "editor.rulers": [80, 120],
+    "rewrap.autoWrap.enabled": true
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml",
+    "editor.formatOnSave": true
+  },
+  "better-todo-tree.filtering.excludeGlobs": [
+    "**/docs/*/**",
+    "**/collections/ansible_collections/*/**",
+    "**/*.md"
+  ],
+  "better-todo-tree.general.tags": ["AUDIT", "BUG", "FIXME", "HACK", "TODO"],
+  "better-todo-tree.highlights.customHighlight": {
+    "AUDIT": {
+      "icon": "search"
     }
+  },
+  "editor.bracketPairColorization.enabled": true,
+  "editor.rulers": [80, 160],
+  "files.associations": {
+    "**/*.json5": "json5"
+  },
+  "files.trimFinalNewlines": true,
+  "git.autofetch": true,
+  "git.blame.editorDecoration.enabled": true,
+  "git.blame.editorDecoration.template": "${authorName} (${authorDateAgo}) ${subject}",
+  "git.confirmSync": false,
+  "markdown.extension.list.indentationSize": "inherit",
+  "markdown.extension.toc.levels": "1..6",
+  "redhat.telemetry.enabled": false,
+  "rewrap.autoWrap.enabled": true,
+  "sops.defaults.ageKeyFile": "age.key",
+  "telemetry.feedback.enabled": false,
+  "telemetry.telemetryLevel": "off",
+  "vs-kubernetes": {
+    "vs-kubernetes.knownKubeconfigs": ["./kubeconfig"],
+    "vs-kubernetes.kubeconfig": "./kubeconfig"
+  },
+  "vscode.env.isTelemetryEnabled": false,
+  "vsicons.dontShowNewVersionMessage": true,
+  "workbench.iconTheme": "vscode-icons",
+  "yaml.customTags": ["!vault scalar"],
+  "yaml.schemas": {
+    "kubernetes": "./kubernetes/**/*.yaml"
+  },
+  "yaml.schemaStore.enable": true
 }

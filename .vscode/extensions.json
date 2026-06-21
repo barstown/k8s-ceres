@@ -1,15 +1,21 @@
 {
   "recommendations": [
     "blueglassblock.better-json5",
+    "davidanson.vscode-markdownlint",
+    "dnut.rewrap-revived",
     "editorconfig.editorconfig",
-    "gruntfuggly.todo-tree",
+    "esbenp.prettier-vscode",
+    "fanaticpythoner.better-todo-tree",
     "hverlin.mise-vscode",
     "irongeek.vscode-env",
+    "ms-kubernetes-tools.vscode-kubernetes-tools",
+    "ms-vscode-remote.vscode-remote-extensionpack",
     "nefrob.vscode-just-syntax",
     "redhat.vscode-yaml",
-    "redhat.vscode-yaml",
     "signageos.signageos-vscode-sops",
+    "streetsidesoftware.code-spell-checker-cspell-bundled-dictionaries",
     "tamasfe.even-better-toml",
-    "vscode-icons-team.vscode-icons"
+    "vscode-icons-team.vscode-icons",
+    "yzhang.markdown-all-in-one"
   ]
 }
