@@ -8,7 +8,7 @@
     ":dependencyDashboard",
     ":disableRateLimiting",
     ":semanticCommits",
-    "github>home-operations/renovate-presets#2.0.0"
+    "github>home-operations/renovate-presets#2.0.1"
   ],
   configMigration: false,
   dependencyDashboard: true,
