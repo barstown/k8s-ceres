@@ -36,6 +36,14 @@
       pinDigests: false
     },
     {
+      description: "Disable digest pinning for CNPG extensions in clusters",
+      matchManagers: ["custom.regex"],
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/tensorchord/vchord-scratch"],
+      matchFileNames: ["/(^|/)cluster\\.ya?ml(?:\\.j2)?$/"],
+      pinDigests: false
+    },
+    {
       description: "Flux Operator Group",
       groupName: "flux-operator",
       matchDatasources: ["docker"],
