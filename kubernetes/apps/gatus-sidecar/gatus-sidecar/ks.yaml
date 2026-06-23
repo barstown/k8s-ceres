@@ -3,10 +3,10 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: gatus
+  name: gatus-sidecar
 spec:
   interval: 1h
-  path: ./kubernetes/apps/gatus/gatus/app
+  path: ./kubernetes/apps/gatus-sidecar/gatus-sidecar/app
   postBuild:
     substituteFrom:
       - name: cluster-secrets
@@ -16,5 +16,5 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  targetNamespace: gatus
+  targetNamespace: gatus-sidecar
   wait: false
