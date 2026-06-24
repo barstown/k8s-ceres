@@ -10,36 +10,124 @@ spec:
     name: victoria-metrics-k8s-stack
   interval: 1h
   values:
-    fullnameOverride: victoria-metrics
+    fullnameOverride: "victoria-metrics"
     victoria-metrics-operator:
       enabled: true
       crds:
-        enabled: true
-        plain: true
+        plain: false
         cleanup:
-          enabled: false
+          enabled: true
+        upgrade:
+          enabled: true
       global:
         image:
           registry: "quay.io"
       serviceMonitor:
         enabled: true
       operator:
+        disable_prometheus_converter: false
         enable_converter_ownership: true
-      securityContext:
+      securityContext: &securityContext
         allowPrivilegeEscalation: false
         capabilities: { drop: ["ALL"] }
         readOnlyRootFilesystem: true
         seccompProfile: { type: RuntimeDefault }
-      podSecurityContext:
+      podSecurityContext: &podSecurityContext
         fsGroup: 65534
         runAsGroup: 65534
         runAsNonRoot: true
         runAsUser: 65534
-    global:
-      image:
-        registry: quay.io
+    defaultDashboards:
+      grafanaOperator:
+        enabled: true
+        spec:
+          allowCrossNamespaceImport: true
+    syncJob:
+      enabled: true
+      podSecurityContext: *podSecurityContext
+      containerSecurityContext: *securityContext
+    defaultRules:
+      rules:
+        etcdMemberCommunicationSlow:
+          enabled: false
+    extraRules:
+      dockerhub-rules:
+        enabled: true
+        groups:
+          - name: dockerhub
+            rules:
+              - alert: DockerhubRateLimitRisk
+                annotations:
+                  summary: There are {{ $value }} containers pulling from Dockerhub. This may lead to rate limiting.
+                expr: count(time() - container_last_seen{image=~"(docker.io).*",container!=""} < 30) > 100
+                labels:
+                  severity: critical
+      oom-rules:
+        enabled: true
+        groups:
+          - name: oom
+            rules:
+              - alert: OomKilled
+                annotations:
+                  summary: Container {{ $labels.container }} in pod {{ $labels.namespace }}/{{ $labels.pod }} has been OOMKilled {{ $value }} times in the last 10 minutes.
+                expr: (kube_pod_container_status_restarts_total - kube_pod_container_status_restarts_total offset 10m >= 1) and ignoring (reason) min_over_time(kube_pod_container_status_last_terminated_reason{reason="OOMKilled"}[10m]) == 1
+                labels:
+                  severity: critical
+      zfs-rules:
+        enabled: true
+        groups:
+          - name: zfs
+            rules:
+              - alert: ZfsUnexpectedPoolState
+                annotations:
+                  summary: ZFS pool {{$labels.zpool}} on {{$labels.instance}} is in a unexpected state {{$labels.state}}
+                expr: node_zfs_zpool_state{state!="online"} > 0
+                labels:
+                  severity: critical
+    vmsingle:
+      spec:
+        retentionPeriod: 90d
+        storage:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 50Gi
+          storageClassName: freenas-api-iscsi
+        useStrictSecurity: true
+      route:
+        enabled: true
+        hostnames: ["vmsingle.${SECRET_DOMAIN}"]
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
     alertmanager:
       enabled: true
+      spec:
+        externalURL: https://vmalertmanager.${SECRET_DOMAIN}
+        image:
+          repository: quay.io/prometheus/alertmanager
+        storage:
+          volumeClaimTemplate:
+            spec:
+              storageClassName: freenas-api-iscsi
+              resources:
+                requests:
+                  storage: 1Gi
+        useStrictSecurity: true
+        securityContext: *securityContext
+        initContainers:
+          - name: config-init
+            securityContext: &initSecurityContext
+              allowPrivilegeEscalation: false
+              capabilities: { drop: ["ALL"] }
+              runAsNonRoot: true
+        containers:
+          - name: alertmanager
+            securityContext: *initSecurityContext
+          - name: config-reloader
+            securityContext: *initSecurityContext
+      podSecurityContext: *podSecurityContext
       config:
         route:
           receiver: ntfy-alerts
@@ -74,101 +162,8 @@ spec:
         parentRefs:
           - name: envoy-internal
             namespace: network
-      spec:
-        externalURL: https://vmalertmanager.${SECRET_DOMAIN}
-        image:
-          repository: quay.io/prometheus/alertmanager
-        storage:
-          volumeClaimTemplate:
-            spec:
-              storageClassName: freenas-api-iscsi
-              resources:
-                requests:
-                  storage: 1Gi
-        useStrictSecurity: true
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities: { drop: ["ALL"] }
-          fsGroup: 65534
-          readOnlyRootFilesystem: true
-          runAsGroup: 65534
-          runAsNonRoot: true
-          runAsUser: 65534
-          seccompProfile: { type: RuntimeDefault }
-        initContainers:
-          - name: config-init
-            securityContext: &securityContext
-              allowPrivilegeEscalation: false
-              capabilities: { drop: ["ALL"] }
-              runAsNonRoot: true
-        containers:
-          - name: alertmanager
-            securityContext: *securityContext
-          - name: config-reloader
-            securityContext: *securityContext
-      podSecurityContext:
-        fsGroup: 65534
-        runAsGroup: 65534
-        runAsNonRoot: true
-        runAsUser: 65534
-    useManagedConfig: true
-    defaultDashboards:
-      grafanaOperator:
-        enabled: true
-        spec:
-          allowCrossNamespaceImport: true
-    defaultDatasources:
-      grafanaOperator:
-        enabled: true
-        spec:
-          allowCrossNamespaceImport: true
-    defaultRules:
-      rules:
-        etcdMemberCommunicationSlow:
-          enabled: false
-    grafana:
-      enabled: false
-      forceDeployDatasource: true
-    kube-state-metrics:
-      enabled: false
-    kubeControllerManager:
-      vmScrape:
-        spec:
-          endpoints:
-            - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-              port: http-metrics
-              scheme: https
-              tlsConfig:
-                insecureSkipVerify: true
-    kubeEtcd:
-      service:
-        selector:
-          component: kube-apiserver
-        port: 2381
-        targetPort: 2381
-      vmScrape:
-        spec:
-          endpoints:
-            - scheme: http
-    kubeScheduler:
-      vmScrape:
-        spec:
-          endpoints:
-            - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
-              port: http-metrics
-              scheme: https
-              tlsConfig:
-                insecureSkipVerify: true
-    prometheus-node-exporter:
-      enabled: false
-    vmagent:
-      spec:
-        extraArgs:
-          promscrape.dropOriginalLabels: "true"
-          promscrape.maxScrapeSize: 50MiB
-          promscrape.streamParse: "true"
-        useStrictSecurity: true
     vmalert:
+      enabled: true
       spec:
         extraArgs:
           external.url: https://vmalert.${SECRET_DOMAIN}
@@ -196,55 +191,54 @@ spec:
                 - /select/logsql/.*
               url_prefix: http://victoria-logs.victoria-logs.svc.cluster.local:9428
         useStrictSecurity: true
-    vmsingle:
-      route:
-        enabled: true
-        hostnames: ["vmsingle.${SECRET_DOMAIN}"]
-        parentRefs:
-          - name: envoy-internal
-            namespace: network
+    vmagent:
+      enabled: true
       spec:
-        retentionPeriod: 90d
-        storage:
-          accessModes:
-            - ReadWriteOnce
-          resources:
-            requests:
-              storage: 50Gi
-          storageClassName: freenas-api-iscsi
+        extraArgs:
+          promscrape.dropOriginalLabels: "true"
+          promscrape.maxScrapeSize: 50MiB
+          promscrape.streamParse: "true"
         useStrictSecurity: true
-    extraRules:
-    # additionalVictoriaMetricsMap:
-      dockerhub-rules:
+    defaultDatasources:
+      grafanaOperator:
         enabled: true
-        groups:
-          - name: dockerhub
-            rules:
-              - alert: DockerhubRateLimitRisk
-                annotations:
-                  summary: There are {{ $value }} containers pulling from Dockerhub. This may lead to rate limiting.
-                expr: count(time() - container_last_seen{image=~"(docker.io).*",container!=""} < 30) > 100
-                labels:
-                  severity: critical
-      oom-rules:
-        enabled: true
-        groups:
-          - name: oom
-            rules:
-              - alert: OomKilled
-                annotations:
-                  summary: Container {{ $labels.container }} in pod {{ $labels.namespace }}/{{ $labels.pod }} has been OOMKilled {{ $value }} times in the last 10 minutes.
-                expr: (kube_pod_container_status_restarts_total - kube_pod_container_status_restarts_total offset 10m >= 1) and ignoring (reason) min_over_time(kube_pod_container_status_last_terminated_reason{reason="OOMKilled"}[10m]) == 1
-                labels:
-                  severity: critical
-      zfs-rules:
-        enabled: true
-        groups:
-          - name: zfs
-            rules:
-              - alert: ZfsUnexpectedPoolState
-                annotations:
-                  summary: ZFS pool {{$labels.zpool}} on {{$labels.instance}} is in a unexpected state {{$labels.state}}
-                expr: node_zfs_zpool_state{state!="online"} > 0
-                labels:
-                  severity: critical
+        spec:
+          allowCrossNamespaceImport: true
+    grafana:
+      enabled: false
+      forceDeployDatasource: true
+    prometheus-node-exporter:
+      enabled: false
+    kube-state-metrics:
+      enabled: false
+    kubeControllerManager:
+      enabled: true
+      vmScrape:
+        spec:
+          endpoints:
+            - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+              port: http-metrics
+              scheme: https
+              tlsConfig:
+                insecureSkipVerify: true
+    kubeEtcd:
+      enabled: true
+      service:
+        selector:
+          component: kube-apiserver
+        port: 2381
+        targetPort: 2381
+      vmScrape:
+        spec:
+          endpoints:
+            - scheme: http
+    kubeScheduler:
+      enabled: true
+      vmScrape:
+        spec:
+          endpoints:
+            - bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+              port: http-metrics
+              scheme: https
+              tlsConfig:
+                insecureSkipVerify: true
