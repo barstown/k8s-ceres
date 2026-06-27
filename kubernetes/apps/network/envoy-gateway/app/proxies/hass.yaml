@@ -1,0 +1,32 @@
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: Backend
+metadata:
+  name: external-home-assistant
+spec:
+  endpoints:
+    - ip:
+        address: 10.0.10.181
+        port: 8123
+
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: external-home-assistant
+spec:
+  hostnames: ["haos.${SECRET_DOMAIN}"]
+  parentRefs:
+    - name: envoy-internal
+      namespace: network
+      sectionName: https
+  rules:
+    - backendRefs:
+        - group: gateway.envoyproxy.io
+          kind: Backend
+          name: external-home-assistant
+          port: 8123
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
