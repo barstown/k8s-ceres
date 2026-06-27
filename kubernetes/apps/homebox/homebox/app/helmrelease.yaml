@@ -96,11 +96,11 @@ spec:
               seccompProfile: { type: RuntimeDefault }
             resources:
               requests:
-                cpu: 10m
-                memory: 20Mi
-              limits:
                 cpu: 100m
-                memory: 100Mi
+                memory: 128Mi
+              limits:
+                cpu: 1000m
+                memory: 512Mi
     defaultPodOptions:
       securityContext:
         fsGroup: 65534
