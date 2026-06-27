@@ -1,0 +1,14 @@
+
+# This CODEOWNERS file is used to automate pull request reviews
+
+# For full documentation, see
+
+# <https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners>
+
+# Set default ownership for all files
+
+* @barstown
+
+# Explicit ownership for /.github directory
+
+/.github/ @barstown
