@@ -9,3 +9,4 @@ resources:
   - ./ocirepository.yaml
   - ./podmonitor.yaml
   - ./proxies/hass.yaml
+  - ./proxies/pulse.yaml
