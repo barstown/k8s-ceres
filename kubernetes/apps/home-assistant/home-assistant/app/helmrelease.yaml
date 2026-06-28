@@ -44,8 +44,8 @@ spec:
           [{
             "name": "iot",
             "namespace": "kube-system",
-            "ips": ["172.16.100.0/24"],
-            "mac": "xx:xx:xx:xx:xx:xx" # TODO replace with actual MAC address
+            "ips": ["172.16.100.5/24"],
+            "mac": "66:44:5c:b1:83:a6"
           }]
       securityContext:
         fsGroup: 1000
