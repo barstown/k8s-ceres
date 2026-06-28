@@ -1,0 +1,89 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: mosquitto
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: mosquitto
+  interval: 1h
+  values:
+    controllers:
+      mosquitto:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        type: statefulset
+        containers:
+          app:
+            image:
+              repository: public.ecr.aws/docker/library/eclipse-mosquitto
+              tag: 2.0.22
+            env:
+              TZ: America/New_York
+            probes:
+              liveness:
+                enabled: true
+              readiness:
+                enabled: true
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities: { drop: ["ALL"] }
+              readOnlyRootFilesystem: true
+              seccompProfile: { type: RuntimeDefault }
+            resources:
+              requests:
+                cpu: 10m
+                memory: 64Mi
+              limits:
+                cpu: 500m
+                memory: 100Mi
+        statefulset:
+          volumeClaimTemplates:
+            - name: config
+              storageClass: freenas-api-iscsi
+              accessMode: ReadWriteOnce
+              size: 5Gi
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+    service:
+      app:
+        type: LoadBalancer
+        annotations:
+          external-dns.alpha.kubernetes.io/hostname: "{{ .Release.Name }}.${SECRET_DOMAIN}"
+          lbipam.cilium.io/ips: "10.0.50.7"
+        externalTrafficPolicy: Local
+        ports:
+          mqtt:
+            port: 1883
+    configMaps:
+      config:
+        data:
+          mosquitto.conf: |-
+            allow_anonymous true
+            autosave_interval 60
+            connection_messages false
+            listener 1883
+            per_listener_settings false
+            persistence true
+            persistence_location /config
+    persistence:
+      config-file:
+        type: configMap
+        identifier: config
+        globalMounts:
+          - path: /mosquitto/config/mosquitto.conf
+            subPath: mosquitto.conf
+      tmp:
+        type: emptyDir
