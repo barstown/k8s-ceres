@@ -95,6 +95,10 @@ nodes:
           - gateway: "10.0.50.1"
             network: 0.0.0.0/0
         mtu: 1500
+      - deviceSelector:
+          hardwareAddr: "bc:24:11:19:af:8f"
+        dhcp: false
+        mtu: 1500
         vlans:
           - vlanId: 100
   - hostname: "ceres-w2"
@@ -114,6 +118,10 @@ nodes:
           - gateway: "10.0.50.1"
             network: 0.0.0.0/0
         mtu: 1500
+      - deviceSelector:
+          hardwareAddr: "bc:24:11:d3:2b:31"
+        dhcp: false
+        mtu: 1500
         vlans:
           - vlanId: 100
   - hostname: "ceres-w3"
@@ -132,6 +140,10 @@ nodes:
         routes:
           - gateway: "10.0.50.1"
             network: 0.0.0.0/0
+        mtu: 1500
+      - deviceSelector:
+          hardwareAddr: "bc:24:11:bb:a4:61"
+        dhcp: false
         mtu: 1500
         vlans:
           - vlanId: 100
