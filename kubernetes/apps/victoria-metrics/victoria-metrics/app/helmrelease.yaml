@@ -119,7 +119,10 @@ spec:
                 requests:
                   storage: 1Gi
         useStrictSecurity: true
-        securityContext: *securityContext
+        securityContext:
+          <<: *securityContext
+          runAsGroup: 65534
+          runAsUser: 65534
         initContainers:
           - name: config-init
             securityContext: &initSecurityContext
