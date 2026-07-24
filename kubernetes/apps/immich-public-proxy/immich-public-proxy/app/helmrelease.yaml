@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: ghcr.io/alangrainger/immich-public-proxy
-              tag: 3.0.2@sha256:96b8667fd0df62693c79ddce6ade78d9a70d84f301c860c6f22b6f65acf73262
+              tag: 3.1.0@sha256:2f5021a317ebd22e544e68b896c79c7df573fc67f7e2f50f9fb6746a544508b5
             env:
               IMMICH_URL: http://immich-server.immich.svc.cluster.local:2283
               IPP_PORT: &port 80
