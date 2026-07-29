@@ -28,4 +28,4 @@ JUST_UNSTABLE = "1"
 "aqua:yannh/kubeconform" = "0.8.0"
 
 [settings]
-python.uv_venv_auto = true
+python.uv_venv_auto="create|source"
