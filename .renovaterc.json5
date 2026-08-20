@@ -8,9 +8,9 @@
     ":dependencyDashboard",
     ":disableRateLimiting",
     ":semanticCommits",
-    "github>home-operations/renovate-presets#7.0.0",
-    "github>home-operations/renovate-presets//apps/cnpg.json5#7.0.0",
-    "github>home-operations/renovate-presets//apps/grafanaDashboards.json5#7.0.0"
+    "github>home-operations/renovate-presets#8.0.0",
+    "github>home-operations/renovate-presets//apps/cnpg.json5#8.0.0",
+    "github>home-operations/renovate-presets//apps/grafanaDashboards.json5#8.0.0"
   ],
   configMigration: false,
   dependencyDashboard: true,
