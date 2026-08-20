@@ -9,6 +9,9 @@ spec:
     name: renovate
   interval: 1h
   values:
+    image:
+      repository: renovatebot/renovate
+      tag: 44.35.4
     env:
       LOG_LEVEL: INFO
       RENOVATE_AUTODISCOVER_FILTER: "barstown/*, !barstown/kubernetes-rke2, !barstown/kubernetes2"
