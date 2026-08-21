@@ -37,6 +37,7 @@ spec:
             "config:best-practices",
             "security:openssf-scorecard"
           ],
+          "timezone": "America/New_York",
           "dependencyDashboardOSVVulnerabilitySummary": "all",
           "osvVulnerabilityAlerts": true
         }
