@@ -10,6 +10,7 @@ spec:
   interval: 1h
   values:
     image:
+      registry: ghcr.io
       repository: renovatebot/renovate
       tag: 44.35.4
     env:
