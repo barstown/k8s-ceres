@@ -12,7 +12,7 @@ spec:
     image:
       registry: ghcr.io
       repository: renovatebot/renovate
-      tag: 44.35.4
+      tag: 44.38.0@sha256:4823735c60a8a68426a1a8086538f5d1c9788132eba162140c1da622571b776a
     env:
       LOG_LEVEL: INFO
       RENOVATE_AUTODISCOVER_FILTER: "barstown/*, !barstown/kubernetes-rke2, !barstown/kubernetes2"
