@@ -37,6 +37,7 @@ spec:
             "config:best-practices",
             "security:openssf-scorecard"
           ],
+          "minimumReleaseAge": "2 days",
           "timezone": "America/New_York",
           "dependencyDashboardOSVVulnerabilitySummary": "all",
           "osvVulnerabilityAlerts": true
