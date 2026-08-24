@@ -60,6 +60,12 @@
       minimumGroupSize: 3
     },
     {
+      description: "Use Grafana Operator GitHub releases for chart changelogs",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/grafana/helm-charts/grafana-operator"],
+      sourceUrl: "https://github.com/grafana/grafana-operator"
+    },
+    {
       description: "Auto-merge GitHub Actions",
       matchManagers: ["github-actions"],
       automerge: true,
