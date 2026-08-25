@@ -39,7 +39,15 @@ spec:
           ],
           "timezone": "America/New_York",
           "dependencyDashboardOSVVulnerabilitySummary": "all",
-          "osvVulnerabilityAlerts": true
+          "osvVulnerabilityAlerts": true,
+          "packageRules": [
+            {
+              "description": "Link fedora.linux_system_roles galaxy-collection changelog",
+              "matchDatasources": ["galaxy-collection"],
+              "matchPackageNames": ["fedora.linux_system_roles"],
+              "sourceUrl": "https://github.com/linux-system-roles/auto-maintenance"
+            }
+          ]
         }
       securityContext:
         allowPrivilegeEscalation: false
