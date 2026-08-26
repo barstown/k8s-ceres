@@ -28,7 +28,7 @@ spec:
         allowVolumeExpansion: true
         parameters:
           fsType: nfs
-          detachedVolumesFromSnapshots: 'false'
+          detachedVolumesFromSnapshots: "false"
         mountOptions:
           - nfsvers=3
           - noatime
@@ -36,4 +36,4 @@ spec:
     volumeSnapshotClasses:
       - name: freenas-api-nfs
         parameters:
-          detachedSnapshots: 'true'
+          detachedSnapshots: "true"

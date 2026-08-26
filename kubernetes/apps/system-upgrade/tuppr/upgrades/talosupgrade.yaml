@@ -10,8 +10,8 @@ spec:
     # renovate: datasource=docker depName=ghcr.io/siderolabs/installer
     version: v1.13.9
   policy:
-    rebootMode: powercycle  # Optional, default|powercycle
-    stage: false            # Optional, stage upgrade
+    rebootMode: powercycle # Optional, default|powercycle
+    stage: false # Optional, stage upgrade
   healthChecks:
     - apiVersion: v1
       kind: Node

@@ -28,7 +28,7 @@ spec:
           - name: ISCSIADM_HOST_PATH
             value: /usr/local/sbin/iscsiadm
         iscsiDirHostPath: /var/iscsi
-        iscsiDirHostPathType: ''
+        iscsiDirHostPathType: ""
       hostPID: true
     storageClasses:
       - name: freenas-api-iscsi
@@ -38,7 +38,7 @@ spec:
           - noatime
         parameters:
           fsType: xfs
-          detachedVolumesFromSnapshots: 'false'
+          detachedVolumesFromSnapshots: "false"
         reclaimPolicy: Retain
         volumeBindingMode: Immediate
       # - name: freenas-api-iscsi-sqlite
@@ -66,4 +66,4 @@ spec:
     volumeSnapshotClasses:
       - name: freenas-api-iscsi
         parameters:
-          detachedSnapshots: 'true'
+          detachedSnapshots: "true"
