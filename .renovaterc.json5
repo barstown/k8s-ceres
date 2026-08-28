@@ -66,6 +66,12 @@
       sourceUrl: "https://github.com/grafana/grafana-operator"
     },
     {
+      description: "Link Renovate Helm Chart releases for changelogs",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/renovatebot/charts/renovate"],
+      sourceUrl: "https://github.com/renovatebot/helm-charts"
+    },
+    {
       description: "Auto-merge GitHub Actions",
       matchManagers: ["github-actions"],
       automerge: true,
