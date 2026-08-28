@@ -60,7 +60,7 @@
       minimumGroupSize: 3
     },
     {
-      description: "Use Grafana Operator GitHub releases for chart changelogs",
+      description: "Link Grafana Operator Helm Chart releases for changelogs",
       matchDatasources: ["docker"],
       matchPackageNames: ["ghcr.io/grafana/helm-charts/grafana-operator"],
       sourceUrl: "https://github.com/grafana/grafana-operator"
@@ -75,7 +75,8 @@
       description: "Link Kavita repository for changelogs",
       matchDatasources: ["docker"],
       matchPackageNames: ["ghcr.io/kareadita/kavita"],
-      sourceUrl: "https://github.com/Kareadita/Kavita"
+      sourceUrl: "https://github.com/Kareadita/Kavita",
+      changelogUrl: "https://github.com/Kareadita/Kavita/releases"
     },
     {
       description: "Auto-merge GitHub Actions",
