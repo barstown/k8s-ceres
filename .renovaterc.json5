@@ -69,7 +69,6 @@
       description: "Link Renovate Helm Chart releases for changelogs",
       matchDatasources: ["docker"],
       matchPackageNames: ["ghcr.io/renovatebot/charts/renovate"],
-      extractVersion: "^renovate-(?<version>.*)$",
       sourceUrl: "https://github.com/renovatebot/helm-charts"
     },
     {
