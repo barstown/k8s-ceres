@@ -83,6 +83,7 @@
     {
       matchDatasources: ["docker"],
       matchPackageNames: [
+        "docker.io/grafana/grafana",
         "ghcr.io/siderolabs/installer",
         "ghcr.io/siderolabs/kubelet"
       ],
