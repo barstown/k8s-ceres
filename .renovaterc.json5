@@ -72,6 +72,12 @@
       sourceUrl: "https://github.com/renovatebot/helm-charts"
     },
     {
+      description: "Link Kavita repository for changelogs",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/kareadita/kavita"],
+      sourceUrl: "https://github.com/Kareadita/Kavita"
+    },
+    {
       description: "Auto-merge GitHub Actions",
       matchManagers: ["github-actions"],
       automerge: true,
