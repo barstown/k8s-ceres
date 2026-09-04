@@ -10,26 +10,28 @@ spec:
   interval: 1h
   values:
     env:
+      # RENOVATE_PRINT_CONFIG: "true" # debugging
       LOG_LEVEL: INFO
       RENOVATE_AUTODISCOVER_FILTER: "barstown/*, !barstown/kubernetes-rke2, !barstown/kubernetes2"
       RENOVATE_AUTODISCOVER: "true"
       RENOVATE_DRY_RUN: "null"
       RENOVATE_GIT_AUTHOR: "Renovate Bot <30529916+barstown@users.noreply.github.com>"
       RENOVATE_REPORT_TYPE: logging
+      RENOVATE_REPOSITORY_CACHE: enabled
       RENOVATE_TIMEZONE: "America/New_York"
       RENOVATE_X_GITHUB_HOST_RULES: "true"
-      # RENOVATE_PRINT_CONFIG: "true" # debugging
     envFrom:
       - secretRef:
           name: renovate-secrets
     cronjob:
       activeDeadlineSeconds: 600
-      schedule: "0 */3 * * *"
-      timeZone: America/New_York
-      successfulJobsHistoryLimit: 4
-      failedJobsHistoryLimit: 2
       concurrencyPolicy: Replace
-      ttlSecondsAfterFinished: 43200
+      failedJobsHistoryLimit: 4
+      jobBackoffLimit: 1
+      schedule: "0 */3 * * *"
+      successfulJobsHistoryLimit: 4
+      timeZone: America/New_York
+      ttlSecondsAfterFinished: 46800
     renovate:
       config: |
         {
