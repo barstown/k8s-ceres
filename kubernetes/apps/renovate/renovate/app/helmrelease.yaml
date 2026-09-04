@@ -24,7 +24,6 @@ spec:
       - secretRef:
           name: renovate-secrets
     cronjob:
-      activeDeadlineSeconds: 600
       concurrencyPolicy: Replace
       failedJobsHistoryLimit: 4
       jobBackoffLimit: 1
