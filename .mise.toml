@@ -26,7 +26,7 @@ JUST_UNSTABLE = "1"
 "aqua:mikefarah/yq" = "4.53.6"
 "aqua:siderolabs/talos" = "1.13.9"
 "aqua:yannh/kubeconform" = "0.8.0"
-"github:postfinance/topf" = "v0.5.0"
+"github:postfinance/topf" = "v0.6.0"
 "npm:oxfmt" = "0.66.0"
 
 [settings]
