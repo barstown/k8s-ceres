@@ -23,6 +23,7 @@ spec:
       - secretRef:
           name: renovate-secrets
     cronjob:
+      activeDeadlineSeconds: 600
       schedule: "0 */3 * * *"
       timeZone: America/New_York
       successfulJobsHistoryLimit: 4
