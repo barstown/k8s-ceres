@@ -909,6 +909,6 @@ url = "https://github.com/postfinance/topf/releases/download/v0.5.0/topf_darwin_
 url_api = "https://api.github.com/repos/postfinance/topf/releases/assets/508553239"
 
 [[tools."npm:oxfmt"]]
-version = "0.66.0"
+version = "0.67.0"
 backend = "npm:oxfmt"
-specifiers = ["0.66.0"]
+specifiers = ["0.67.0"]
