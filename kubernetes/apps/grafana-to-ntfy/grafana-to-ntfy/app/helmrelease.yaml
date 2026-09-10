@@ -18,7 +18,7 @@ spec:
           app:
             image:
               repository: kittyandrew/grafana-to-ntfy
-              tag: 2026.5.2@sha256:7adb3175144edcedfa715ab386e461168f550e7a0072ad8299a23f3973806dee
+              tag: 2026.5.2@sha256:bbdf8ad9b75f60fc5ac2a2b98695ef422719dbc74f5459b1c89c6bfe530f42a9
             env:
               TZ: America/New_York
               MARKDOWN: true
