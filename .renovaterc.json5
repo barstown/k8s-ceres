@@ -92,10 +92,15 @@
       matchDatasources: ["docker"],
       matchPackageNames: [
         "docker.io/grafana/grafana",
-        "ghcr.io/siderolabs/installer",
         "ghcr.io/siderolabs/kubelet"
       ],
       pinDigests: false,
+      separateMajorMinor: true,
+      separateMinorPatch: true
+    },
+    {
+      description: "Separate minor and patch Talos updates (talosupgrade.yaml, topf.yaml)",
+      matchDatasources: ["custom.talos-factory"],
       separateMajorMinor: true,
       separateMinorPatch: true
     },
