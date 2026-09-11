@@ -1,0 +1,80 @@
+---
+clusterName: ceres
+clusterEndpoint: https://10.0.50.2:6443
+
+# renovate: datasource=github-releases depName=siderolabs/talos
+talosVersion: v1.13.10
+# renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
+kubernetesVersion: v1.36.4
+
+schematicId: "@schematic.yaml.tpl"
+secureboot: true
+secretsPath: secrets.sops.yaml
+
+nodes:
+  - host: "ceres-cp1"
+    ip: "10.0.50.19"
+    role: control-plane
+    data:
+      installDisk: "/dev/sda"
+      installDiskSerial: ""
+      macAddr: "bc:24:11:98:5d:af"
+      macAddr2: ""
+      mtu: 1500
+      encryptDisk: false
+      kernelModules: []
+  - host: "ceres-cp2"
+    ip: "10.0.50.10"
+    role: control-plane
+    data:
+      installDisk: "/dev/sda"
+      installDiskSerial: ""
+      macAddr: "bc:24:11:fb:1f:54"
+      macAddr2: ""
+      mtu: 1500
+      encryptDisk: false
+      kernelModules: []
+  - host: "ceres-cp3"
+    ip: "10.0.50.17"
+    role: control-plane
+    data:
+      installDisk: "/dev/sda"
+      installDiskSerial: ""
+      macAddr: "bc:24:11:93:cb:99"
+      macAddr2: ""
+      mtu: 1500
+      encryptDisk: false
+      kernelModules: []
+  - host: "ceres-w1"
+    ip: "10.0.50.16"
+    role: worker
+    data:
+      installDisk: "/dev/sda"
+      installDiskSerial: ""
+      macAddr: "bc:24:11:79:9e:02"
+      macAddr2: "bc:24:11:19:af:8f"
+      mtu: 1500
+      encryptDisk: false
+      kernelModules: []
+  - host: "ceres-w2"
+    ip: "10.0.50.20"
+    role: worker
+    data:
+      installDisk: "/dev/sda"
+      installDiskSerial: ""
+      macAddr: "bc:24:11:12:b5:f3"
+      macAddr2: "bc:24:11:d3:2b:31"
+      mtu: 1500
+      encryptDisk: false
+      kernelModules: []
+  - host: "ceres-w3"
+    ip: "10.0.50.18"
+    role: worker
+    data:
+      installDisk: "/dev/sda"
+      installDiskSerial: ""
+      macAddr: "bc:24:11:77:95:0a"
+      macAddr2: "bc:24:11:bb:a4:61"
+      mtu: 1500
+      encryptDisk: false
+      kernelModules: []

@@ -1,8 +1,8 @@
 machine:
   features:
     kubernetesTalosAPIAccess:
-      allowedKubernetesNamespaces:
-        - system-upgrade
+      enabled: true
       allowedRoles:
         - os:admin
-      enabled: true
+      allowedKubernetesNamespaces:
+        - system-upgrade
