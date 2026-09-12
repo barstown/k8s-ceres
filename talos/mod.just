@@ -33,10 +33,10 @@ diff:
 nodes:
     topf nodes
 
-[doc('Render Talos machine configs to ./rendered')]
+[doc('Render Talos machine configs to ./output')]
 [group('talos')]
 render:
-    topf render --output ./rendered
+    topf render
 
 [confirm("This will destroy your cluster and reset all nodes to maintenance mode — continue? [y/N]")]
 [doc('Reset all nodes back to maintenance mode (DESTRUCTIVE)')]

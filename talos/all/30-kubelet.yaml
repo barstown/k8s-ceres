@@ -3,6 +3,8 @@ kind: KubeletConfig
 config:
   crashLoopBackOff:
     maxContainerRestartPeriod: 60s
+  imageGCHighThresholdPercent: 75
+  imageGCLowThresholdPercent: 70
   imageMaximumGCAge: 168h
   maxParallelImagePulls: 3
   serializeImagePulls: false
