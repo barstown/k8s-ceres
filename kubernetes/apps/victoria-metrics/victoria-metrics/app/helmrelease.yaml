@@ -91,6 +91,13 @@ spec:
     vmsingle:
       spec:
         retentionPeriod: 90d
+        resources:
+          requests:
+            cpu: 250m
+            memory: 1Gi
+          limits:
+            cpu: 1200m
+            memory: 2500Mi
         storage:
           accessModes:
             - ReadWriteOnce
@@ -205,6 +212,13 @@ spec:
           promscrape.dropOriginalLabels: "true"
           promscrape.maxScrapeSize: 50MiB
           promscrape.streamParse: "true"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 200Mi
+          limits:
+            cpu: 1000m
+            memory: 750Mi
         useStrictSecurity: true
     defaultDatasources:
       grafanaOperator:
