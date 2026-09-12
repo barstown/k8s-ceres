@@ -1,6 +1,7 @@
-machine:
-  network:
-    disableSearchDomain: true
-    nameservers:
-      - 10.0.10.22
-      - 10.0.10.20
+apiVersion: v1alpha1
+kind: ResolverConfig
+nameservers:
+  - address: 10.0.10.22
+  - address: 10.0.10.20
+searchDomains:
+  disableDefault: true

@@ -3,7 +3,7 @@ customization:
     officialExtensions:
       - siderolabs/intel-ucode
       - siderolabs/iscsi-tools
-      - siderolabs/nfsd
+      # - siderolabs/nfsd
       - siderolabs/qemu-guest-agent
       # {{- if eq .Node.Role "worker" }}
       # - siderolabs/nvidia-container-toolkit
