@@ -79,7 +79,12 @@ spec:
             lifecycle:
               postStart:
                 exec:
-                  command: ["/bin/sh", "-c", "(ip rule del table 51820; ip -6 rule del table 51820) || true"]
+                  command:
+                    [
+                      "/bin/sh",
+                      "-c",
+                      "(ip rule del table 51820; ip -6 rule del table 51820) || true",
+                    ]
             securityContext:
               allowPrivilegeEscalation: false
               capabilities: { add: ["NET_ADMIN", "CHOWN"], drop: ["ALL"] }
@@ -121,8 +126,8 @@ spec:
                 cpu: 250m
                 memory: 128Mi
               limits:
-                cpu: 500m
-                memory: 384Mi
+                cpu: 1000m
+                memory: 512Mi
     defaultPodOptions:
       securityContext:
         fsGroup: 2001 # media-rw
