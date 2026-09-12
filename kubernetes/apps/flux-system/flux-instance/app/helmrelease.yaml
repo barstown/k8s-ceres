@@ -57,6 +57,24 @@ spec:
             target:
               kind: Deployment
               name: (kustomize-controller|helm-controller|source-controller)
+          - # Raise the CPU limit to match --concurrent=20; the default single
+            # core held throttling above 25% for 7 of the last 336 hours
+            patch: |
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata:
+                name: all
+              spec:
+                template:
+                  spec:
+                    containers:
+                      - name: manager
+                        resources:
+                          limits:
+                            cpu: "2"
+            target:
+              kind: Deployment
+              name: kustomize-controller
           - # Enable in-memory kustomize builds
             patch: |
               - op: add
