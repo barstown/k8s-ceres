@@ -17,7 +17,7 @@ default:
 apply:
     topf apply
 
-[arg('mode', pattern='auto|reboot|no-reboot|staged|try')]
+[arg('mode', pattern='auto|no-reboot|staged|try')]
 [doc('Apply Talos config to a node (shows a diff and asks first)')]
 [group('talos')]
 apply-node node mode='auto':
