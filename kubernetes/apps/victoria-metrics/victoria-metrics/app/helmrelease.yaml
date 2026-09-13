@@ -144,7 +144,7 @@ spec:
       podSecurityContext: *podSecurityContext
       config:
         route:
-          receiver: ntfy-alerts
+          receiver: chaski
           repeat_interval: 12h
           routes:
             - receiver: blackhole
@@ -166,10 +166,10 @@ spec:
               - severity = "warning"
         receivers:
           - name: blackhole
-          - name: ntfy-alerts
+          - name: chaski
             webhook_configs:
               - send_resolved: true
-                url: http://grafana-to-ntfy.grafana-to-ntfy.svc.cluster.local:8080
+                url: http://chaski.chaski.svc.cluster.local:8080/hooks/alertmanager
       route:
         enabled: true
         hostnames: ["vmalertmanager.${SECRET_DOMAIN}"]

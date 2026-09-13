@@ -1,0 +1,82 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: chaski
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: chaski
+  interval: 1h
+  values:
+    deploymentAnnotations:
+      reloader.stakater.com/auto: "true"
+    envFrom:
+      - secretRef:
+          name: chaski-secret
+    monitoring:
+      serviceMonitor:
+        enabled: true
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        memory: 128Mi
+    config:
+      targets:
+        ntfy:
+          apprise:
+            url: '{{ env "NTFY_URL" }}'
+      templates:
+        severity: '{{ dig "commonLabels" "severity" .payload | default "" }}'
+        firstAlertname: '{{ with .payload.alerts }}{{ dig "labels" "alertname" (index . 0) | default "" }}{{ end }}'
+        alertname: '{{ coalesce (dig "groupLabels" "alertname" .payload) (dig "commonLabels" "alertname" .payload) (include "firstAlertname" .) | default "alert" }}'
+        scope: '{{ coalesce (dig "commonLabels" "namespace" .payload) (dig "commonLabels" "node" .payload) (dig "commonLabels" "instance" .payload) | default "" }}'
+        icon: '{{ if eq .payload.status "resolved" }}✅{{ else if eq (include "severity" .) "critical" }}🔥{{ else if eq (include "severity" .) "warning" }}⚠️{{ else }}ℹ️{{ end }}'
+      routes:
+        alertmanager:
+          description: Prometheus/VictoriaMetrics Alertmanager webhook → ntfy
+          target: ntfy
+          title: >-
+            {{ include "icon" . }} {{ include "alertname" . }}
+            {{- if gt (len .payload.alerts) 1 }} ×{{ len .payload.alerts }}{{ end }}
+            {{- with include "scope" . }} · {{ . }}{{ end }}
+          message: |-
+            {{- $sev := include "severity" . -}}
+            {{- if eq .payload.status "resolved" }}Resolved{{ else }}{{ len .payload.alerts }} firing{{ end }}{{ with $sev }} · {{ . }}{{ end }}{{ with dig "commonLabels" "cluster" .payload }} · {{ . }}{{ end }}
+            {{ range $i, $a := .payload.alerts }}{{ if lt $i 5 }}
+            • {{ coalesce (dig "annotations" "description" $a) (dig "annotations" "summary" $a) (printf "%s is %s" (dig "labels" "alertname" $a) $a.status) | trunc 300 }}
+            {{- $bits := "" -}}
+            {{- with dig "labels" "namespace" $a }}{{ $bits = printf "%s ns=%s" $bits . }}{{ end -}}
+            {{- with dig "labels" "pod" $a }}{{ $bits = printf "%s pod=%s" $bits . }}{{ end -}}
+            {{- with dig "labels" "container" $a }}{{ $bits = printf "%s container=%s" $bits . }}{{ end -}}
+            {{- with dig "labels" "node" $a }}{{ $bits = printf "%s node=%s" $bits . }}{{ end -}}
+            {{- with dig "labels" "instance" $a }}{{ $bits = printf "%s instance=%s" $bits . }}{{ end -}}
+            {{- with trim $bits }}
+              {{ . }}
+            {{- end }}
+            {{- end }}{{ end }}
+            {{- if gt (len .payload.alerts) 5 }}
+
+            …and {{ sub (len .payload.alerts) 5 }} more
+            {{- end }}
+            {{- with dig "commonAnnotations" "runbook_url" .payload }}
+
+            Runbook: {{ . }}
+            {{- end }}
+          params:
+            image: "false"
+            priority: >-
+              {{- if eq .payload.status "resolved" }}low
+              {{- else if eq (include "severity" .) "critical" }}max
+              {{- else if eq (include "severity" .) "warning" }}high
+              {{- else }}default{{ end }}
+            xtags: >-
+              {{- if eq .payload.status "resolved" }}white_check_mark,resolved
+              {{- else if eq (include "severity" .) "critical" }}rotating_light,firing
+              {{- else if eq (include "severity" .) "warning" }}warning,firing
+              {{- else }}information_source,firing{{ end }}
+            click: '{{ with .payload.alerts }}{{ with (index . 0).generatorURL }}{{ . }}{{ else }}{{ $.payload.externalURL }}{{ end }}{{ else }}{{ .payload.externalURL }}{{ end }}'
+            actions: 'view,Alertmanager,{{ .payload.externalURL }}'
