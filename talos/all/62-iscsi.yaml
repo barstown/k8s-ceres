@@ -1,0 +1,13 @@
+# EtcFileConfig cannot be used here: Talos owns /etc/iscsi (it generates
+# initiatorname.iscsi) and rejects the path as a managed etc file, so this stays
+# on the deprecated .machine.files and talosctl validate warns about it.
+#
+# iscsid copies these values into the per-target records under /var/lib/iscsi
+# when a record is created, so existing records must be refreshed separately.
+machine:
+  files:
+    - path: /etc/iscsi/iscsid.conf
+      permissions: 0o600
+      op: create
+      content: |
+        node.session.timeo.replacement_timeout = 300
