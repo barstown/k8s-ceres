@@ -87,7 +87,7 @@ spec:
                     ]
             securityContext:
               allowPrivilegeEscalation: false
-              capabilities: { add: ["NET_ADMIN", "CHOWN"], drop: ["ALL"] }
+              capabilities: { add: ["NET_ADMIN", "NET_RAW", "CHOWN"], drop: ["ALL"] }
               readOnlyRootFilesystem: false
               runAsGroup: 0
               runAsNonRoot: false
@@ -123,11 +123,11 @@ spec:
                   failureThreshold: 3
             resources:
               requests:
-                cpu: 250m
-                memory: 128Mi
+                cpu: 500m
+                memory: 256Mi
               limits:
-                cpu: 1000m
-                memory: 512Mi
+                cpu: 2000m
+                memory: 1Gi
     defaultPodOptions:
       securityContext:
         fsGroup: 2001 # media-rw
