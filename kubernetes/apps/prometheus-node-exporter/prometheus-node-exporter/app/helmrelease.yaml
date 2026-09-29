@@ -11,8 +11,8 @@ spec:
   values:
     service:
       enabled: true
-      annotations:
-        prometheus.io/scrape: "true"
+      # annotations:
+      #   prometheus.io/scrape: "true"
       labels:
         jobLabel: node-exporter
     extraArgs:
