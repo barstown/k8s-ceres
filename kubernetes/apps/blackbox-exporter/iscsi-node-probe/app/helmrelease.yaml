@@ -1,0 +1,64 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: iscsi-node-probe
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: iscsi-node-probe
+  interval: 1h
+  values:
+    fullnameOverride: iscsi-node-probe
+    kind: DaemonSet
+    hostNetwork: true
+    dnsPolicy: ClusterFirstWithHostNet
+    pod:
+      labels:
+        app.kubernetes.io/component: iscsi-node-probe
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: In
+                  values:
+                    - ceres-w1
+                    - ceres-w2
+                    - ceres-w3
+    config:
+      modules:
+        tcp_connect:
+          prober: tcp
+          timeout: 3s
+          tcp:
+            preferred_ip_protocol: ip4
+        icmp:
+          prober: icmp
+          timeout: 3s
+          icmp:
+            preferred_ip_protocol: ip4
+    serviceMonitor:
+      enabled: false
+      selfMonitor:
+        enabled: false
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        add:
+          - NET_RAW
+        drop:
+          - ALL
+      readOnlyRootFilesystem: true
+      runAsGroup: 1000
+      runAsNonRoot: true
+      runAsUser: 1000
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
