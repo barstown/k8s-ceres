@@ -28,6 +28,9 @@ spec:
                     # - SystemCriticalPods
             - name: LowNodeUtilization
               args:
+                evictableNamespaces:
+                  exclude:
+                    - renovate
                 metricsUtilization:
                   source: KubernetesMetrics
                 thresholds:

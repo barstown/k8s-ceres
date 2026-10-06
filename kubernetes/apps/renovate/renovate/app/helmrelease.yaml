@@ -31,6 +31,9 @@ spec:
       successfulJobsHistoryLimit: 4
       timeZone: America/New_York
       ttlSecondsAfterFinished: 46800
+    pod:
+      annotations:
+        descheduler.alpha.kubernetes.io/prefer-no-eviction: "true"
     renovate:
       config: |
         {
