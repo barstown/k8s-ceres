@@ -1,0 +1,60 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: iscsi-node-probe-rules
+spec:
+  groups:
+    - name: iscsi-node-probe.rules
+      rules:
+        - record: iscsi_probe:success_ratio_5m
+          expr: avg_over_time(probe_success{check=~"truenas-(iscsi-tcp|icmp)"}[5m])
+
+        - alert: IscsiTargetConnectivityFlaky
+          expr: iscsi_probe:success_ratio_5m{check="truenas-iscsi-tcp"} < 0.95
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: >-
+              iSCSI path to TrueNAS is flaky from node {{ $labels.node }}
+
+        - alert: IscsiTargetConnectivityDown
+          expr: iscsi_probe:success_ratio_5m{check="truenas-iscsi-tcp"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: >-
+              iSCSI path to TrueNAS is down from node {{ $labels.node }}
+
+        - alert: IscsiPortDownButIcmpReachable
+          expr: |-
+            iscsi_probe:success_ratio_5m{check="truenas-iscsi-tcp"} == 0
+            and on (node)
+            iscsi_probe:success_ratio_5m{check="truenas-icmp"} > 0.8
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: >-
+              Node {{ $labels.node }} can reach TrueNAS by ICMP but not TCP/3260 (likely iSCSI service/L4 issue)
+
+        - alert: TrueNasIscsiGlobalOutage
+          expr: sum(iscsi_probe:success_ratio_5m{check="truenas-iscsi-tcp"}) == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: >-
+              TrueNAS iSCSI appears unreachable from all monitored worker nodes
+
+        - alert: IscsiPathLatencyHigh
+          expr: avg_over_time(probe_duration_seconds{check="truenas-iscsi-tcp"}[10m]) > 0.05
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: >-
+              iSCSI probe latency to TrueNAS is elevated from node {{ $labels.node }}

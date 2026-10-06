@@ -1,0 +1,51 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/podmonitor_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: iscsi-node-probe
+spec:
+  namespaceSelector:
+    matchNames:
+      - blackbox-exporter
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: prometheus-blackbox-exporter
+      app.kubernetes.io/instance: iscsi-node-probe
+  podMetricsEndpoints:
+    - port: http
+      path: /probe
+      interval: 15s
+      scrapeTimeout: 5s
+      params:
+        module:
+          - tcp_connect
+        # TrueNAS iSCSI endpoint. FQDN alternative: truenas.lab.internal:3260
+        target:
+          - 10.0.10.50:3260
+      relabelings:
+        - sourceLabels:
+            - __meta_kubernetes_pod_node_name
+          targetLabel: node
+          action: replace
+        - targetLabel: check
+          replacement: truenas-iscsi-tcp
+          action: replace
+    - port: http
+      path: /probe
+      interval: 15s
+      scrapeTimeout: 5s
+      params:
+        module:
+          - icmp
+        # TrueNAS endpoint. FQDN alternative: truenas.lab.internal
+        target:
+          - 10.0.10.50
+      relabelings:
+        - sourceLabels:
+            - __meta_kubernetes_pod_node_name
+          targetLabel: node
+          action: replace
+        - targetLabel: check
+          replacement: truenas-icmp
+          action: replace
