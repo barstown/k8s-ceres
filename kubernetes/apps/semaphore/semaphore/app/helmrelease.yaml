@@ -28,7 +28,7 @@ spec:
           app:
             image:
               repository: semaphoreui/semaphore
-              tag: v2.19.12@sha256:3996804607ebb63690528185bb9adc3507ee896851098e4453975f2ce7f8b435
+              tag: v2.19.16@sha256:3707a971a57fdc5ac99a184bf83f2efb7d00cbeec8fb08a16a8028f77229e141
             env:
               ANSIBLE_HOME: /tmp/semaphore/.ansible
               ANSIBLE_HOST_KEY_CHECKING: false
