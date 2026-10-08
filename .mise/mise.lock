@@ -872,12 +872,6 @@ checksum = "sha256:cc15ef60d1d6ec852285fac64f3cac4fed18e6ffd59c996dd403d38ac8872
 url = "https://github.com/postfinance/topf/releases/download/v0.6.1/topf_darwin_amd64.tar.gz"
 url_api = "https://api.github.com/repos/postfinance/topf/releases/assets/597558295"
 
-[[tools."npm:kubectl-mcp-server"]]
-version = "1.24.0"
-aube = { path = "locks/npm-kubectl-mcp-server/1.24.0", digest = "sha256:e78e3b488612c69b4012e2ba9137399787a72e612a42883d5c2ec19459f83332" }
-backend = "npm:kubectl-mcp-server"
-specifiers = ["1.24.0"]
-
 [[tools."npm:oxfmt"]]
 version = "0.72.0"
 aube = { path = "locks/npm-oxfmt/0.72.0", digest = "sha256:8cff19be82a82e83efe243f08fd8bf1a2a2f635f10384d070d7956209ddd9b44" }
