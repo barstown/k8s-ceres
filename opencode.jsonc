@@ -1,0 +1,15 @@
+// opencode.json
+{
+  "$schema": "https://opencode.ai/schemas/config.json",
+  "mcp": {
+    "servers": {
+      // Kubernetes MCP for cluster management
+      "kubectl-mcp": {
+        "type": "local",
+        "command": ["npx", "-y", "kubectl-mcp-server@latest", "--read-only"]
+        // Optional: restrict to read-only operations
+        // "env": { "MCP_READ_ONLY": "true" }
+      }
+    }
+  }
+}

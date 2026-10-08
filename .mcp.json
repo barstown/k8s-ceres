@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "kubectl-mcp": {
+      "command": "npx",
+      "args": ["-y", "kubectl-mcp-server@latest", "--read-only"]
+    }
+  }
+}
