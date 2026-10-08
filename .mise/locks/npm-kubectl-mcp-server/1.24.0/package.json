@@ -1,0 +1,7 @@
+{
+  "name": "mise-npm-install",
+  "private": true,
+  "dependencies": {
+    "kubectl-mcp-server": "1.24.0"
+  }
+}
