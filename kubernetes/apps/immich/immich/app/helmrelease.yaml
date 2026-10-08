@@ -156,6 +156,7 @@ spec:
       enabled: true
       controllers:
         main:
+          strategy: Recreate
           containers:
             main:
               image:
