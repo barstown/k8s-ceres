@@ -11,7 +11,7 @@ spec:
   values:
     env:
       # RENOVATE_PRINT_CONFIG: "true" # debugging
-      LOG_LEVEL: debug
+      LOG_LEVEL: INFO
       RENOVATE_AUTODISCOVER_FILTER: "barstown/*, !barstown/kubernetes-rke2, !barstown/kubernetes2"
       RENOVATE_AUTODISCOVER: "true"
       RENOVATE_DRY_RUN: "null"
