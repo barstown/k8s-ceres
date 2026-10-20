@@ -1,0 +1,94 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: otbr
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: otbr
+  interval: 1h
+  values:
+    controllers:
+      otbr:
+        # Only one border router may hold the radio, and the data volume is RWO
+        strategy: Recreate
+        containers:
+          app:
+            image:
+              repository: docker.io/bnutzer/otbr-tcp
+              tag: v2-20261019@sha256:c036476bc4aabb4d6b204b0e92e556977d7d518811ee5dab3c5f0fd4d9169ce3
+            env:
+              TZ: America/New_York
+              # Thread radio on the SLZB-MR5U
+              RCP_HOST: 172.16.100.254
+              RCP_PORT: "7638"
+              OTBR_BACKBONE_IF: net1
+              # The REST API is unauthenticated; bind it to the pod network only so
+              # it is not reachable from the IoT VLAN
+              OTBR_REST_LISTEN_ADDRESS:
+                valueFrom:
+                  fieldRef:
+                    fieldPath: status.podIP
+              OTBR_REST_LISTEN_PORT: &port 8081
+            probes:
+              liveness: &probe
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command: ["wrap-ot-ctl", "state"]
+                  periodSeconds: 15
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              readiness: *probe
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  exec:
+                    command: ["wrap-ot-ctl", "state"]
+                  periodSeconds: 5
+                  timeoutSeconds: 5
+                  failureThreshold: 24
+            # s6-overlay init runs as root; otbr-agent needs to create wpan0 and
+            # manage IPv6 routes
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities: { add: ["NET_ADMIN", "NET_RAW"] }
+              seccompProfile: { type: RuntimeDefault }
+            resources:
+              requests:
+                cpu: 10m
+                memory: 64Mi
+              limits:
+                memory: 256Mi
+    defaultPodOptions:
+      annotations:
+        k8s.v1.cni.cncf.io/networks: |-
+          [{
+            "name": "iot-otbr",
+            "namespace": "kube-system",
+            "ips": ["172.16.100.6/24"],
+            "mac": "6e:6d:22:47:ad:0d"
+          }]
+    service:
+      app:
+        ports:
+          http:
+            port: *port
+    persistence:
+      data:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 1Gi
+        storageClass: freenas-api-iscsi
+        globalMounts:
+          - path: /var/lib/thread
+      tun:
+        type: hostPath
+        hostPath: /dev/net/tun
+        hostPathType: CharDevice
+        globalMounts:
+          - path: /dev/net/tun
