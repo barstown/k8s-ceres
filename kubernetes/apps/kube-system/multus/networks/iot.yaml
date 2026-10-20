@@ -15,14 +15,42 @@ spec:
           "master": "bond1.100",
           "mode": "bridge",
           "ipam": {
-            "type": "static",
-            "routes": [
-              {"dst": "0.0.0.0/0", "gw": "172.16.100.1"}
-            ]
+            "type": "static"
           }
-        },
-        {
-          "type": "sbr"
         }
       ]
     }
+
+# ---
+# Routed variant: sbr forces replies sourced from the pod's IoT IP back out
+# net1, for apps that clients on other subnets reach directly by that IP.
+# Trade-off: sbr also moves the 172.16.100.0/24 route out of the main table,
+# so connections the pod starts to IoT devices egress the pod network instead.
+#
+# # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/k8s.cni.cncf.io/networkattachmentdefinition_v1.json
+# apiVersion: k8s.cni.cncf.io/v1
+# kind: NetworkAttachmentDefinition
+# metadata:
+#   name: iot-routed
+# spec:
+#   config: |-
+#     {
+#       "cniVersion": "0.3.1",
+#       "name": "iot-routed",
+#       "plugins": [
+#         {
+#           "type": "macvlan",
+#           "master": "bond1.100",
+#           "mode": "bridge",
+#           "ipam": {
+#             "type": "static",
+#             "routes": [
+#               {"dst": "0.0.0.0/0", "gw": "172.16.100.1"}
+#             ]
+#           }
+#         },
+#         {
+#           "type": "sbr"
+#         }
+#       ]
+#     }
