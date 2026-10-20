@@ -1,0 +1,33 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/k8s.cni.cncf.io/networkattachmentdefinition_v1.json
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: iot-otbr
+spec:
+  # Same as iot, plus the pod-scoped sysctls a Thread border router needs:
+  # IPv6 forwarding between wpan0 and net1, and accepting RAs (including route
+  # information options) on net1 while forwarding is enabled.
+  config: |-
+    {
+      "cniVersion": "0.3.1",
+      "name": "iot-otbr",
+      "plugins": [
+        {
+          "type": "macvlan",
+          "master": "bond1.100",
+          "mode": "bridge",
+          "ipam": {
+            "type": "static"
+          }
+        },
+        {
+          "type": "tuning",
+          "sysctl": {
+            "net.ipv6.conf.all.forwarding": "1",
+            "net.ipv6.conf.IFNAME.accept_ra": "2",
+            "net.ipv6.conf.IFNAME.accept_ra_rt_info_max_plen": "64"
+          }
+        }
+      ]
+    }
