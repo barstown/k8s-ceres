@@ -23,6 +23,7 @@ spec:
               ND_ENABLEINSIGHTSCOLLECTOR: false
               ND_LOGLEVEL: info
               ND_MUSICFOLDER: "/music"
+              ND_LYRICSPRIORITY: ".ttml,.yaml,.yml,.elrc,.lrc,.srt,.txt,embedded,nd-lyrics"
               ND_PORT: &port 4533
               TZ: America/New_York
             # envFrom:
