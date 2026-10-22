@@ -20,10 +20,11 @@ spec:
               repository: ghcr.io/navidrome/navidrome
               tag: 0.64.2@sha256:38dc2727bfcfd5ede290f8ada114fc90368146f265ae4701ddddbcbe2a44ee52
             env:
+              ND_AGENTS: "apple-music,deezer,lastfm,listenbrainz"
               ND_ENABLEINSIGHTSCOLLECTOR: false
               ND_LOGLEVEL: info
-              ND_MUSICFOLDER: "/music"
               ND_LYRICSPRIORITY: ".ttml,.yaml,.yml,.elrc,.lrc,.srt,.txt,embedded,nd-lyrics"
+              ND_MUSICFOLDER: "/music"
               ND_PORT: &port 4533
               TZ: America/New_York
             # envFrom:
