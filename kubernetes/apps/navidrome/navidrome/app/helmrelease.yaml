@@ -37,7 +37,6 @@ spec:
                   failureThreshold: 5
               readiness:
                 enabled: true
-                custom: true
                 spec:
                   periodSeconds: 10
                   timeoutSeconds: 5
