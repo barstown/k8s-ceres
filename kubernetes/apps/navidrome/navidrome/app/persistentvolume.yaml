@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: navidrome-media
+spec:
+  capacity:
+    storage: 10Ti
+  accessModes: ["ReadWriteMany"]
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  mountOptions:
+    - noatime
+  nfs:
+    server: 10.0.10.50
+    path: /mnt/storage/media
