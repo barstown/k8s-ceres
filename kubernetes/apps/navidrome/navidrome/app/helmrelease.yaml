@@ -73,12 +73,19 @@ spec:
           http:
             port: *port
     route:
-      internal:
+      external:
         hostnames: ["{{ .Release.Name }}.${SECRET_DOMAIN}"]
         parentRefs:
           - name: envoy-external
             namespace: network
             sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
+      internal:
+        hostnames: ["{{ .Release.Name }}.${SECRET_DOMAIN}"]
+        parentRefs:
           - name: envoy-internal
             namespace: network
             sectionName: https
