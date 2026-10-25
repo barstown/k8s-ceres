@@ -15,11 +15,26 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         type: statefulset
-        containers:
-          app:
-            image:
+        initContainers:
+          init-config:
+            image: &image
               repository: public.ecr.aws/docker/library/eclipse-mosquitto
               tag: 2.1.2-alpine@sha256:38c0da4f2ef84284d47b3b3eeea1cb3bdeabe81ee10caf0cd5c5ff61ee3ea408
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                umask 077
+                cp /mosquitto/config/acl /mosquitto/auth/acl
+                cp /mosquitto/secret/mosquitto_pwd /mosquitto/auth/passwd
+                mosquitto_passwd -U /mosquitto/auth/passwd
+            securityContext: &securityContext
+              allowPrivilegeEscalation: false
+              capabilities: { drop: ["ALL"] }
+              readOnlyRootFilesystem: true
+              seccompProfile: { type: RuntimeDefault }
+        containers:
+          app:
+            image: *image
             env:
               TZ: America/New_York
             probes:
@@ -32,11 +47,7 @@ spec:
                 spec:
                   failureThreshold: 30
                   periodSeconds: 10
-            securityContext:
-              allowPrivilegeEscalation: false
-              capabilities: { drop: ["ALL"] }
-              readOnlyRootFilesystem: true
-              seccompProfile: { type: RuntimeDefault }
+            securityContext: *securityContext
             resources:
               requests:
                 cpu: 10m
@@ -70,15 +81,28 @@ spec:
     configMaps:
       config-file:
         data:
+          acl: |-
+            user zigbee2mqtt
+            topic readwrite zigbee2mqtt/#
+            topic readwrite homeassistant/#
+
+            user home-assistant
+            topic readwrite zigbee2mqtt/#
+            topic readwrite homeassistant/#
           mosquitto.conf: |-
-            allow_anonymous true
+            acl_file /mosquitto/auth/acl
+            allow_anonymous false
             autosave_interval 60
             connection_messages false
             listener 1883
-            per_listener_settings false
+            password_file /mosquitto/auth/passwd
             persistence true
             persistence_location /config
     persistence:
+      auth:
+        type: emptyDir
+        globalMounts:
+          - path: /mosquitto/auth
       config:
         type: persistentVolumeClaim
         accessMode: ReadWriteOnce
@@ -90,5 +114,19 @@ spec:
         globalMounts:
           - path: /mosquitto/config/mosquitto.conf
             subPath: mosquitto.conf
+        advancedMounts:
+          mosquitto:
+            init-config:
+              - path: /mosquitto/config/acl
+                subPath: acl
+                readOnly: true
+      secret-file:
+        type: secret
+        name: mosquitto-secret
+        advancedMounts:
+          mosquitto:
+            init-config:
+              - path: /mosquitto/secret
+                readOnly: true
       tmp:
         type: emptyDir
