@@ -1,0 +1,99 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: zwave-js-ui
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: zwave-js-ui
+  interval: 1h
+  values:
+    controllers:
+      zwave-js-ui:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image:
+              repository: ghcr.io/zwave-js/zwave-js-ui
+              tag: 11.25.1@sha256:52462f5cb50bd877f257947fa7c8c14c1b4f57140fc1043175c5742a3f18586e
+            env:
+              PORT: &port 8091
+              STORE_DIR: /config
+              TZ: America/New_York
+              ZWAVE_PORT: tcp://smlight.iot.internal:8638
+              ZWAVEJS_EXTERNAL_CONFIG: /config/.config-db
+            envFrom:
+              - secretRef:
+                  name: "{{ .Release.Name }}-secret"
+            probes:
+              liveness:
+                enabled: true
+                spec:
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /
+                    port: *port
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              startup:
+                enabled: true
+                spec:
+                  failureThreshold: 30
+                  periodSeconds: 10
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities: { drop: ["ALL"] }
+              readOnlyRootFilesystem: true
+              seccompProfile: { type: RuntimeDefault }
+            resources:
+              requests:
+                cpu: 10m
+                memory: 128Mi
+              limits:
+                cpu: 500m
+                memory: 1Gi
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 1000
+        runAsNonRoot: true
+        runAsUser: 1000
+    service:
+      app:
+        ports:
+          http:
+            port: *port
+          websocket:
+            port: 3000
+    route:
+      internal:
+        hostnames:
+          - "{{ .Release.Name }}.${SECRET_DOMAIN}"
+          - "zwave.${SECRET_DOMAIN}"
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
+    persistence:
+      config:
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        storageClass: freenas-api-iscsi
+      tmp:
+        type: emptyDir
