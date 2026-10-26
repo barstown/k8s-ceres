@@ -349,30 +349,37 @@ backend = "aqua:doitintl/kube-no-trouble"
 specifiers = ["0.7.3"]
 
 [tools."aqua:doitintl/kube-no-trouble"."platforms.linux-arm64"]
+checksum = "sha256:f6f669e19414b6ea3201103791d5c0965ad5c6f20cd6efbd5265d08d7bf6e478"
 url = "https://github.com/doitintl/kube-no-trouble/releases/download/0.7.3/kubent-0.7.3-linux-arm64.tar.gz"
 url_api = "https://api.github.com/repos/doitintl/kube-no-trouble/releases/assets/189194458"
 
 [tools."aqua:doitintl/kube-no-trouble"."platforms.linux-arm64-musl"]
+checksum = "sha256:f6f669e19414b6ea3201103791d5c0965ad5c6f20cd6efbd5265d08d7bf6e478"
 url = "https://github.com/doitintl/kube-no-trouble/releases/download/0.7.3/kubent-0.7.3-linux-arm64.tar.gz"
 url_api = "https://api.github.com/repos/doitintl/kube-no-trouble/releases/assets/189194458"
 
 [tools."aqua:doitintl/kube-no-trouble"."platforms.linux-x64"]
+checksum = "sha256:ac96ace138f18a864a6b5bd64643cecbab2887f868da35853812cfdecd307b6d"
 url = "https://github.com/doitintl/kube-no-trouble/releases/download/0.7.3/kubent-0.7.3-linux-amd64.tar.gz"
 url_api = "https://api.github.com/repos/doitintl/kube-no-trouble/releases/assets/189194461"
 
 [tools."aqua:doitintl/kube-no-trouble"."platforms.linux-x64-musl"]
+checksum = "sha256:ac96ace138f18a864a6b5bd64643cecbab2887f868da35853812cfdecd307b6d"
 url = "https://github.com/doitintl/kube-no-trouble/releases/download/0.7.3/kubent-0.7.3-linux-amd64.tar.gz"
 url_api = "https://api.github.com/repos/doitintl/kube-no-trouble/releases/assets/189194461"
 
 [tools."aqua:doitintl/kube-no-trouble"."platforms.macos-arm64"]
+checksum = "sha256:23d5ae5b7ecb46e870be555d87f1a7792a8d170a8fe488da63a5a31fcca5b176"
 url = "https://github.com/doitintl/kube-no-trouble/releases/download/0.7.3/kubent-0.7.3-darwin-arm64.tar.gz"
 url_api = "https://api.github.com/repos/doitintl/kube-no-trouble/releases/assets/189194457"
 
 [tools."aqua:doitintl/kube-no-trouble"."platforms.macos-x64"]
+checksum = "sha256:e6682a9595ee2767f0dd633c61006ccc2492e641ed64146d17aca671578e9e48"
 url = "https://github.com/doitintl/kube-no-trouble/releases/download/0.7.3/kubent-0.7.3-darwin-amd64.tar.gz"
 url_api = "https://api.github.com/repos/doitintl/kube-no-trouble/releases/assets/189194460"
 
 [tools."aqua:doitintl/kube-no-trouble"."platforms.windows-x64"]
+checksum = "sha256:c248d1287f28b25bd9dfac7173b01e77ae31d608c3b1ce0fd90856b5c82d1a64"
 url = "https://github.com/doitintl/kube-no-trouble/releases/download/0.7.3/kubent-0.7.3-windows-amd64.tar.gz"
 url_api = "https://api.github.com/repos/doitintl/kube-no-trouble/releases/assets/189194473"
 
