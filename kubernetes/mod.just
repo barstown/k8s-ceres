@@ -64,7 +64,8 @@ uncordon node *args:
 crowdsec-decisions *args:
     {{ kubectl_pretty }} -n crowdsec exec deploy/crowdsec-lapi -- cscli decisions list {{ args }}
 
-[doc('Delete CrowdSec decisions (unban) for an IP')]
+[doc('Delete CrowdSec decisions (unban) for an IP or CIDR range')]
 [group('kube')]
-crowdsec-unban ip:
-    {{ kubectl_pretty }} -n crowdsec exec deploy/crowdsec-lapi -- cscli decisions delete --ip "{{ ip }}"
+crowdsec-unban target:
+    {{ kubectl_pretty }} -n crowdsec exec deploy/crowdsec-lapi -- cscli decisions delete \
+      {{ if target =~ '/' { '--range' } else { '--ip' } }} "{{ target }}"
