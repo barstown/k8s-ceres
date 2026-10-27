@@ -29,12 +29,15 @@ spec:
           app.kubernetes.io/name: flux
       kustomize:
         patches:
-          - # Add Kustomization defaults for all child Kustomizations
+          - # Decrypt SOPS secrets and add defaults for all child Kustomizations
             patch: |-
               - op: add
                 path: /spec/decryption
                 value:
                   provider: sops
+              - op: add
+                path: /spec/deletionPolicy
+                value: WaitForTermination
               - op: add
                 path: /spec/patches
                 value:
