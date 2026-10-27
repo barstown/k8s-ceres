@@ -13,11 +13,6 @@ default:
 reconcile:
     flux --namespace flux-system reconcile kustomization flux-system --with-source
 
-[doc('Force Flux to reconcile cluster apps')]
-[group('kube')]
-reconcile-apps:
-    flux --namespace flux-system reconcile kustomization cluster-apps --with-source
-
 [doc('Scale down all PostgreSQL-dependent Deployments to zero replicas')]
 [group('kube')]
 postgresql-scale-down-apps:

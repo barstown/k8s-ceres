@@ -23,12 +23,62 @@ spec:
         kind: GitRepository
         url: "https://github.com/barstown/k8s-ceres.git"
         ref: "refs/heads/main"
-        path: kubernetes/flux/cluster
+        path: kubernetes/apps
       commonMetadata:
         labels:
           app.kubernetes.io/name: flux
       kustomize:
         patches:
+          - # Add Kustomization defaults for all child Kustomizations
+            patch: |-
+              - op: add
+                path: /spec/decryption
+                value:
+                  provider: sops
+              - op: add
+                path: /spec/patches
+                value:
+                  - patch: |-
+                      apiVersion: kustomize.toolkit.fluxcd.io/v1
+                      kind: Kustomization
+                      metadata:
+                        name: _
+                      spec:
+                        decryption:
+                          provider: sops
+                        deletionPolicy: WaitForTermination
+                        patches:
+                          - patch: |-
+                              apiVersion: helm.toolkit.fluxcd.io/v2
+                              kind: HelmRelease
+                              metadata:
+                                name: _
+                              spec:
+                                install:
+                                  crds: CreateReplace
+                                  strategy:
+                                    name: RetryOnFailure
+                                rollback:
+                                  cleanupOnFail: true
+                                  recreate: true
+                                upgrade:
+                                  cleanupOnFail: true
+                                  crds: CreateReplace
+                                  strategy:
+                                    name: RemediateOnFailure
+                                  remediation:
+                                    remediateLastFailure: true
+                                    retries: 2
+                            target:
+                              group: helm.toolkit.fluxcd.io
+                              kind: HelmRelease
+                    target:
+                      group: kustomize.toolkit.fluxcd.io
+                      kind: Kustomization
+            target:
+              group: kustomize.toolkit.fluxcd.io
+              kind: Kustomization
+              name: flux-system
           - # Increase the number of workers
             patch: |
               - op: add
