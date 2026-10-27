@@ -28,6 +28,8 @@ spec:
         - secretRef:
             name: crowdsec-secret
       persistentVolume:
+        config:
+          size: 1Gi # xfs needs >= 300MB; the chart default (100Mi) fails mkfs
         data:
           storageClassName: freenas-api-iscsi-sqlite
           size: 1Gi
