@@ -5,9 +5,13 @@ kind: HelmRelease
 metadata:
   name: immich-public-proxy
 spec:
-  chartRef:
+  chart:
     kind: OCIRepository
-    name: immich-public-proxy
+    spec:
+      interval: 15m
+      ref:
+        tag: 5.3.0
+      url: oci://ghcr.io/bjw-s-labs/helm/app-template
   interval: 1h
   values:
     controllers:

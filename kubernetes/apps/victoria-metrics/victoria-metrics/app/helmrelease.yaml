@@ -5,9 +5,13 @@ kind: HelmRelease
 metadata:
   name: victoria-metrics-k8s-stack
 spec:
-  chartRef:
+  chart:
     kind: OCIRepository
-    name: victoria-metrics-k8s-stack
+    spec:
+      interval: 15m
+      ref:
+        tag: 0.97.0
+      url: oci://ghcr.io/victoriametrics/helm-charts/victoria-metrics-k8s-stack
   interval: 1h
   values:
     fullnameOverride: "victoria-metrics"

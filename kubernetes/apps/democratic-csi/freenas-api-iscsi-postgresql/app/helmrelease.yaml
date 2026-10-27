@@ -4,9 +4,13 @@ kind: HelmRelease
 metadata:
   name: freenas-api-iscsi-postgresql
 spec:
-  chartRef:
+  chart:
     kind: OCIRepository
-    name: freenas-api-iscsi-postgresql
+    spec:
+      interval: 15m
+      ref:
+        tag: 0.15.1
+      url: oci://ghcr.io/democratic-csi/charts/democratic-csi
   interval: 1h
   values:
     csiDriver:

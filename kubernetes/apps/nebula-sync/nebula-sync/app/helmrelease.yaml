@@ -4,9 +4,13 @@ kind: HelmRelease
 metadata:
   name: nebula-sync
 spec:
-  chartRef:
+  chart:
     kind: OCIRepository
-    name: nebula-sync
+    spec:
+      interval: 15m
+      ref:
+        tag: 5.3.0
+      url: oci://ghcr.io/bjw-s-labs/helm/app-template
   interval: 1h
   values:
     controllers:
