@@ -1,0 +1,34 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: envoy-proxy-bouncer
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: envoy-proxy-bouncer
+  interval: 1h
+  values:
+    podAnnotations:
+      reloader.stakater.com/auto: "true"
+    referenceGrant:
+      create: true
+      fromNamespaces:
+        - network
+    config:
+      trustedProxies:
+        - 10.42.0.0/16
+      bouncer:
+        lapiURL: http://crowdsec-service.crowdsec.svc.cluster.local:8080
+        metrics: true
+        apiKeySecretRef:
+          name: crowdsec-secret
+          key: BOUNCER_KEY_ENVOY
+      prometheus:
+        enabled: true
+        serviceMonitor:
+          enabled: true
+    grafana:
+      dashboard:
+        enabled: true

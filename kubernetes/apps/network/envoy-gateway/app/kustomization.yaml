@@ -10,3 +10,5 @@ resources:
   - ./podmonitor.yaml
   - ./proxies/hass.yaml
   - ./proxies/pulse.yaml
+  - ./rbac/crowdsec.yaml
+  - ./securitypolicies/crowdsec.yaml
