@@ -8,7 +8,7 @@ metadata:
 spec:
   decryption:
     provider: sops
-  deletionPolicy: Orphan
+  deletionPolicy: WaitForTermination
   interval: 1h
   path: ./kubernetes/apps
   prune: true
