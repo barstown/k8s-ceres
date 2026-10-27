@@ -58,3 +58,13 @@ drain node *args:
 [group('kube')]
 uncordon node *args:
     {{ kubectl_pretty }} uncordon "{{ node }}" {{ args }}
+
+[doc('List active CrowdSec decisions (bans)')]
+[group('kube')]
+crowdsec-decisions *args:
+    {{ kubectl_pretty }} -n crowdsec exec deploy/crowdsec-lapi -- cscli decisions list {{ args }}
+
+[doc('Delete CrowdSec decisions (unban) for an IP')]
+[group('kube')]
+crowdsec-unban ip:
+    {{ kubectl_pretty }} -n crowdsec exec deploy/crowdsec-lapi -- cscli decisions delete --ip "{{ ip }}"
