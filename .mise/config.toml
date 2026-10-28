@@ -6,7 +6,6 @@ TALOSCONFIG = "{{config_root}}/talos/output/talosconfig"
 JUST_UNSTABLE = "1"
 
 [tools]
-"aqua:budimanjojo/talhelper" = "3.1.17"
 "aqua:casey/just" = "1.59.0"
 "aqua:charmbracelet/gum" = "2.0.2"
 "aqua:cilium/cilium-cli" = "0.20.1"
