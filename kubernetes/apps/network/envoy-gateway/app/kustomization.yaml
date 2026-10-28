@@ -6,7 +6,6 @@ resources:
   - ./certificate.yaml
   - ./envoy.yaml
   - ./helmrelease.yaml
-  - ./ocirepository.yaml
   - ./podmonitor.yaml
   - ./proxies/hass.yaml
   - ./proxies/pulse.yaml

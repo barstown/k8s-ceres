@@ -4,9 +4,13 @@ kind: HelmRelease
 metadata:
   name: prometheus-node-exporter
 spec:
-  chartRef:
+  chart:
     kind: OCIRepository
-    name: prometheus-node-exporter
+    spec:
+      interval: 15m
+      ref:
+        tag: 4.60.1
+      url: oci://ghcr.io/prometheus-community/charts/prometheus-node-exporter
   interval: 1h
   values:
     service:

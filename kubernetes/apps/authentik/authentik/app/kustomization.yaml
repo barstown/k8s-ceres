@@ -7,5 +7,4 @@ resources:
   - ./objectstore.yaml
   - ./scheduledbackup.yaml
   - ./helmrelease.yaml
-  - ./ocirepository.yaml
   - ./secret.sops.yaml

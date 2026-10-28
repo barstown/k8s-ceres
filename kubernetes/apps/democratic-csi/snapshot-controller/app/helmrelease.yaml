@@ -4,8 +4,12 @@ kind: HelmRelease
 metadata:
   name: snapshot-controller
 spec:
-  chartRef:
+  chart:
     kind: OCIRepository
-    name: snapshot-controller
+    spec:
+      interval: 15m
+      ref:
+        tag: 0.3.0
+      url: oci://ghcr.io/democratic-csi/charts/snapshot-controller
   interval: 1h
   values: {}

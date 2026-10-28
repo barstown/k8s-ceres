@@ -6,5 +6,4 @@ resources:
   - ./persistentvolume.yaml
   - ./persistentvolumeclaim.yaml
   - ./helmrelease.yaml
-  - ./ocirepository.yaml
   - ./secret.sops.yaml

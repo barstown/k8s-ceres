@@ -4,9 +4,13 @@ kind: HelmRelease
 metadata:
   name: renovate
 spec:
-  chartRef:
+  chart:
     kind: OCIRepository
-    name: renovate
+    spec:
+      interval: 15m
+      ref:
+        tag: 46.388.0
+      url: oci://ghcr.io/renovatebot/charts/renovate
   interval: 1h
   values:
     env:
