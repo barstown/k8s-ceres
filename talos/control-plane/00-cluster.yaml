@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siderolabs/talos/release-1.14/pkg/machinery/config/schemas/config.schema.json
 cluster:
   etcd:
     extraArgs:
@@ -5,6 +6,7 @@ cluster:
     advertisedSubnets:
       - 10.0.50.0/24
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siderolabs/talos/release-1.14/pkg/machinery/config/schemas/config.schema.json
 apiVersion: v1alpha1
 kind: KubeAdmissionControlConfig
 name: PodSecurity
@@ -42,6 +44,7 @@ kind: KubeControllerManagerConfig
 extraArgs:
   bind-address: 0.0.0.0
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siderolabs/talos/release-1.14/pkg/machinery/config/schemas/config.schema.json
 apiVersion: v1alpha1
 kind: KubeCoreDNSConfig
 enabled: false

@@ -18,25 +18,35 @@ spec:
         containers:
           app:
             image:
-              repository: ghcr.io/kashalls/kromgo
-              tag: v0.10.0@sha256:965ecc92d68dc1a4a969397855367bbc70da03227a941ea607b73bb7e0b78fd6
+              repository: ghcr.io/home-operations/kromgo
+              tag: 0.16.3@sha256:98775a53019250a517a09a0fb716404146d1aaa6fb1f67091c58345663e5b7b5
             env:
-              PROMETHEUS_URL: http://vmsingle-victoria-metrics-cluster.o11y.svc.cluster.local:8428
-              SERVER_PORT: &port 80
-              HEALTH_PORT: &healthPort 8080
+              KROMGO_PROMETHEUS_URL: http://vmsingle-victoria-metrics-cluster.o11y.svc.cluster.local:8428
+              KROMGO_SERVER_PORT: &port 80
+              KROMGO_METRICS_PORT: &metricsPort 8081
             probes:
-              liveness: &probes
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: *port
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness:
                 enabled: true
                 custom: true
                 spec:
                   httpGet:
                     path: /readyz
-                    port: *healthPort
+                    port: *port
                   initialDelaySeconds: 0
                   periodSeconds: 10
                   timeoutSeconds: 1
                   failureThreshold: 3
-              readiness: *probes
             securityContext:
               allowPrivilegeEscalation: false
               capabilities: { drop: ["ALL"] }
@@ -59,8 +69,8 @@ spec:
         ports:
           http:
             port: *port
-          health:
-            port: *healthPort
+          metrics:
+            port: *metricsPort
     route:
       app:
         annotations:
@@ -79,5 +89,5 @@ spec:
         type: configMap
         name: kromgo-configmap
         globalMounts:
-          - path: /kromgo/config.yaml
+          - path: /config/config.yaml
             subPath: config.yaml
