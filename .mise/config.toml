@@ -1,12 +1,13 @@
+min_version = "2026.10.18"
+monorepo_root = true
+
 [env]
 KUBECONFIG = "{{config_root}}/kubeconfig"
 SOPS_CONFIG = "{{config_root}}/.sops.yaml"
 SOPS_AGE_KEY_FILE = "{{env.HOME}}/.config/sops/age/keys.txt"
 TALOSCONFIG = "{{config_root}}/talos/output/talosconfig"
-JUST_UNSTABLE = "1"
 
 [tools]
-"aqua:casey/just" = "1.59.0"
 "aqua:charmbracelet/gum" = "2.0.2"
 "aqua:cilium/cilium-cli" = "0.20.1"
 "aqua:cli/cli" = "2.103.3"
@@ -30,5 +31,20 @@ JUST_UNSTABLE = "1"
 "node" = "26.12.1"
 "npm:oxfmt" = "0.74.0"
 
+# Shared log helper, called from project tasks as `mise run //:log`.
+[tasks.log]
+hide = true
+run = "gum log -t rfc3339 -s -l"
+
+[task_config]
+cascade = true
+shell = "bash -euo pipefail -c"
+
+# Each project's tasks live in <dir>/mise.toml and run from that directory,
+# e.g. `mise run //talos:apply` (or `mise run apply` from inside talos/).
+[monorepo]
+config_roots = ["bootstrap", "kubernetes", "talos"]
+
 [settings]
 python.uv_venv_auto = "create|source"
+task.quiet = true

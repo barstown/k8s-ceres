@@ -1,0 +1,92 @@
+# kubectl reads data for scripting; kubecolor prints output meant for humans.
+
+[tasks.reconcile]
+description = "Force Flux to pull in changes from your Git repository"
+run = "flux --namespace flux-system reconcile kustomization flux-system --with-source"
+
+[tasks.postgresql-scale-down-apps]
+description = "Scale down all PostgreSQL-dependent Deployments to zero replicas"
+run = '''
+kubectl get deploy -A -l app.ceres.io/depends-on-postgresql=true -o json \
+    | yq -r '.items[] | .metadata.namespace + " " + .metadata.name' \
+    | while read -r ns name; do kubecolor -n "$ns" scale deploy "$name" --replicas=0; done
+'''
+
+[tasks.postgresql-scale-up-apps]
+description = "Scale up all PostgreSQL-dependent Deployments to one replica"
+run = '''
+kubectl get deploy -A -l app.ceres.io/depends-on-postgresql=true -o json \
+    | yq -r '.items[] | .metadata.namespace + " " + .metadata.name' \
+    | while read -r ns name; do kubecolor -n "$ns" scale deploy "$name" --replicas=1; done
+'''
+
+# Flux Kustomizations are suspended first so they don't revert the annotation.
+[tasks.cnpg-hibernate-all]
+description = "Hibernate all CNPG clusters"
+run = '''
+clusters="$(kubectl get clusters.postgresql.cnpg.io -A -o json)"
+yq -r '.items[] | .metadata.labels."kustomize.toolkit.fluxcd.io/name" | select(. != null and . != "")' <<< "$clusters" \
+    | sort -u \
+    | xargs -r -I{} flux --namespace flux-system suspend kustomization {}
+yq -r '.items[] | .metadata.namespace + " " + .metadata.name' <<< "$clusters" \
+    | while read -r ns name; do
+        kubecolor -n "$ns" annotate cluster.postgresql.cnpg.io "$name" \
+            --overwrite --field-manager=flux-client-side-apply cnpg.io/hibernation=on
+    done
+'''
+
+[tasks.cnpg-unhibernate-all]
+description = "Unhibernate all CNPG clusters"
+run = '''
+clusters="$(kubectl get clusters.postgresql.cnpg.io -A -o json)"
+yq -r '.items[] | .metadata.namespace + " " + .metadata.name' <<< "$clusters" \
+    | while read -r ns name; do
+        kubecolor -n "$ns" annotate cluster.postgresql.cnpg.io "$name" \
+            --overwrite --field-manager=flux-client-side-apply cnpg.io/hibernation=off
+    done
+yq -r '.items[] | .metadata.labels."kustomize.toolkit.fluxcd.io/name" | select(. != null and . != "")' <<< "$clusters" \
+    | sort -u \
+    | xargs -r -I{} flux --namespace flux-system resume kustomization {}
+'''
+
+[tasks.drain]
+description = "Drain a Kubernetes node"
+usage = '''
+arg "<node>" help="Node name from topf.yaml"
+arg "[args]..." var=#true help="Extra flags passed to kubectl drain"
+complete "node" run="yq '.nodes[].host' \"$(git rev-parse --show-toplevel)/talos/topf.yaml\""
+'''
+run = '''
+eval "set -- ${usage_args:-}"
+kubecolor drain "${usage_node}" --ignore-daemonsets --delete-emptydir-data "$@"
+'''
+
+[tasks.uncordon]
+description = "Uncordon a Kubernetes node"
+usage = '''
+arg "<node>" help="Node name from topf.yaml"
+arg "[args]..." var=#true help="Extra flags passed to kubectl uncordon"
+complete "node" run="yq '.nodes[].host' \"$(git rev-parse --show-toplevel)/talos/topf.yaml\""
+'''
+run = '''
+eval "set -- ${usage_args:-}"
+kubecolor uncordon "${usage_node}" "$@"
+'''
+
+[tasks.crowdsec-decisions]
+description = "List active CrowdSec decisions (bans)"
+usage = '''
+arg "[args]..." var=#true help="Extra flags passed to cscli decisions list"
+'''
+run = '''
+eval "set -- ${usage_args:-}"
+kubecolor -n crowdsec exec deploy/crowdsec-lapi -- cscli decisions list "$@"
+'''
+
+[tasks.crowdsec-unban]
+description = "Delete CrowdSec decisions (unban) for an IP or CIDR range"
+usage = 'arg "<target>" help="IP address or CIDR range"'
+run = '''
+if [[ "${usage_target}" == */* ]]; then flag=--range; else flag=--ip; fi
+kubecolor -n crowdsec exec deploy/crowdsec-lapi -- cscli decisions delete "$flag" "${usage_target}"
+'''

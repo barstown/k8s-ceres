@@ -16,8 +16,6 @@ talosconfig
 # Misc.
 .DS_Store
 .private/
-.task/
 .venv/
 etcd-*.snapshot
-talhelper/
 Thumbs.db
