@@ -5,7 +5,7 @@ clusterEndpoint: https://10.0.50.2:6443
 # talosVersion is managed by Renovate via the talosFactory preset (custom.talos-factory)
 talosVersion: v1.14.4
 # renovate: datasource=docker depName=ghcr.io/siderolabs/kubelet
-kubernetesVersion: v1.37.1
+kubernetesVersion: v1.37.2
 
 schematicId: "@schematic.yaml.tpl"
 secureboot: true
