@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siderolabs/talos/release-1.14/pkg/machinery/config/schemas/config.schema.json
 # Talos 1.14 defaults to running kubelet and pods in a sandboxed PID/mount
 # namespace, which breaks workloads that rely on hostPID or host mounts
 # (node-exporter, GPU plugins, in-tree iSCSI). Set to true to opt in; on

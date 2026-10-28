@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/rbac.authorization.k8s.io/role_v1.json
 # Allows the CrowdSec agent to read envoy-external proxy logs in this namespace
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -12,6 +13,7 @@ rules:
     resources: ["pods/log"]
     verbs: ["get"]
 ---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/rbac.authorization.k8s.io/rolebinding_v1.json
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:

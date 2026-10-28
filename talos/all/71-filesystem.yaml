@@ -1,9 +1,11 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siderolabs/talos/release-1.14/pkg/machinery/config/schemas/config.schema.json
 # Weekly online maintenance for XFS volumes: trim discards unused blocks
 # (SSDs, thin provisioning) and scrub checks filesystem metadata.
 apiVersion: v1alpha1
 kind: FilesystemTrimConfig
 interval: 168h0m0s
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siderolabs/talos/release-1.14/pkg/machinery/config/schemas/config.schema.json
 apiVersion: v1alpha1
 kind: FilesystemScrubConfig
 interval: 168h0m0s

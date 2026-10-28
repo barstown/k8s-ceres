@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siderolabs/talos/release-1.14/pkg/machinery/config/schemas/config.schema.json
 # NTS requires hostnames rather than IPs so the NTS-KE handshake can validate
 # the server certificate. time.cloudflare.com resolves to the same anycast
 # addresses previously listed (162.159.200.1 / .123).

@@ -1,5 +1,6 @@
 ---
 ---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/core/persistentvolumeclaim_v1.json
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -14,6 +15,7 @@ spec:
   storageClassName: freenas-api-nfs
 
 ---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/core/persistentvolumeclaim_v1.json
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

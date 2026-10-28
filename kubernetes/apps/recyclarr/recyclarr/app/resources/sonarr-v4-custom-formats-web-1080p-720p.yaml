@@ -1,6 +1,4 @@
 ---
-# yaml-language-server: $schema=https://raw.githubusercontent.com/recyclarr/recyclarr/refs/heads/master/schemas/settings-schema.json
-
 custom_formats:
   - trash_ids:
       # Unwanted

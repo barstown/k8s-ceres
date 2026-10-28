@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://json.schemastore.org/helmfile.json
 helmDefaults:
   cleanupOnFail: true
   wait: true

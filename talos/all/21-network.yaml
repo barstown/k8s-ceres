@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/siderolabs/talos/release-1.14/pkg/machinery/config/schemas/config.schema.json
 apiVersion: v1alpha1
 kind: ResolverConfig
 nameservers:
