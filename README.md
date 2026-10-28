@@ -156,21 +156,21 @@ These guidelines provide a strong baseline, but there are always exceptions and 
 1. Install Talos:
 
     ```sh
-    task bootstrap:talos
+    mise run //bootstrap:talos
     ```
 
 2. Push your changes to git:
 
     ```sh
     git add -A
-    git commit -m "chore: add talhelper encrypted secret :lock:"
+    git commit -m "chore: add talos secrets bundle :lock:"
     git push
     ```
 
 3. Install cilium, coredns, spegel, flux and sync the cluster to the repository state:
 
     ```sh
-    task bootstrap:apps
+    mise run //bootstrap:apps
     ```
 
 4. Watch the rollout of your cluster happen:
@@ -191,7 +191,7 @@ These guidelines provide a strong baseline, but there are always exceptions and 
 
 2. Check the status of Flux and if the Flux resources are up-to-date and in a ready state:
 
-    📍 _Run `task reconcile` to force Flux to sync your Git repository state_
+    📍 _Run `mise run //kubernetes:reconcile` to force Flux to sync your Git repository state_
 
     ```sh
     flux check
@@ -266,39 +266,40 @@ By default Flux will periodically check your git repository for changes. In-orde
 There might be a situation where you want to destroy your Kubernetes cluster. The following command will reset your nodes back to maintenance mode.
 
 ```sh
-task talos:reset
+mise run //talos:reset
 ```
 
 ## 🛠️ Talos and Kubernetes Maintenance
 
+Run `mise tasks --all` to list every task. Tasks live in `bootstrap/`, `kubernetes/` and `talos/` `mise.toml` files and can be run from anywhere as `mise run //<dir>:<task>`, or as `mise run <task>` from inside that directory.
+
 ### ⚙️ Updating Talos node configuration
 
 > [!TIP]
-> Ensure you have updated `talconfig.yaml` and any patches with your updated configuration. In some cases you **not only need to apply the configuration but also upgrade talos** to apply new configuration.
+> Ensure you have updated `talos/topf.yaml` and any patches under `talos/` with your updated configuration. In some cases you **not only need to apply the configuration but also upgrade talos** to apply new configuration.
 
 ```sh
-# (Re)generate the Talos config
-task talos:generate-config
-# Apply the config to the node
-task talos:apply-node IP=? MODE=?
-# e.g. task talos:apply-node IP=10.10.10.10 MODE=auto
+# Preview the changes
+mise run //talos:diff
+# Apply the config to a node (shows a diff and asks first)
+mise run //talos:apply-node <node> [auto|reboot|no-reboot|staged|try]
+# e.g. mise run //talos:apply-node ceres-w1 auto
 ```
 
 ### ⬆️ Updating Talos and Kubernetes versions
 
 > [!TIP]
-> Ensure the `talosVersion` and `kubernetesVersion` in `talenv.yaml` are up-to-date with the version you wish to upgrade to.
+> Ensure the `talosVersion` and `kubernetesVersion` in `talos/topf.yaml` are up-to-date with the version you wish to upgrade to.
 
 ```sh
 # Upgrade node to a newer Talos version
-task talos:upgrade-node IP=?
-# e.g. task talos:upgrade-node IP=10.10.10.10
+mise run //talos:upgrade-node <node>
+# e.g. mise run //talos:upgrade-node ceres-w1
 ```
 
 ```sh
 # Upgrade cluster to a newer Kubernetes version
-task talos:upgrade-k8s
-# e.g. task talos:upgrade-k8s
+mise run //talos:upgrade-k8s
 ```
 
 ### ➕ Adding a node to your cluster
@@ -316,17 +317,17 @@ You don't need to re-bootstrap the cluster to add new nodes. Follow these steps:
     talosctl get links -n <ip> --insecure
     ```
 
-3. **Update the configuration**: Read the documentation for [talhelper](https://budimanjojo.github.io/talhelper/latest/) and extend the `talconfig.yaml` file manually with the new node information (including the disk and MAC address from step 2).
+3. **Update the configuration**: Read the documentation for [topf](https://github.com/postfinance/topf) and add the new node to `talos/topf.yaml`, with any node-specific patches under `talos/` (including the disk and MAC address from step 2).
 
 4. **Generate and apply the configuration**:
 
     ```sh
-    # Render your talosconfig based on the talconfig.yaml file
-    task talos:generate-config
+    # Preview the rendered config for the new node
+    mise run //talos:diff
 
     # Apply the configuration to the node
-    task talos:apply-node IP=?
-    # e.g. task talos:apply-node IP=10.10.10.10
+    mise run //talos:apply-node <node>
+    # e.g. mise run //talos:apply-node ceres-w4
     ```
 
 The node should join the cluster automatically and workloads will be scheduled once they report as ready.
@@ -345,7 +346,7 @@ Below is a general guide on trying to debug an issue with an resource or applica
 
 1. Check if the Flux resources are up-to-date and in a ready state:
 
-    📍 _Run `task reconcile` to force Flux to sync your Git repository state_
+    📍 _Run `mise run //kubernetes:reconcile` to force Flux to sync your Git repository state_
 
     ```sh
     flux get sources git -A

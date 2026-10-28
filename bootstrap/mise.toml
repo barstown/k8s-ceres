@@ -1,0 +1,131 @@
+[tasks.talos]
+description = "Bootstrap the Talos cluster (secrets, apply, bootstrap, talosconfig, kubeconfig)"
+run = [
+  { task = ":talos-secret" },
+  { task = ":talos-apply" },
+  { task = ":talos-talosconfig" },
+  { task = ":talos-kubeconfig" },
+]
+
+[tasks.apps]
+description = "Bootstrap apps into the Talos cluster (waits, namespaces, secrets, CRDs, helm sync)"
+run = [
+  { task = ":apps-wait-nodes" },
+  { task = ":apps-namespaces" },
+  { task = ":apps-secrets" },
+  { task = ":apps-crds" },
+  { task = ":apps-helm" },
+  'mise run //:log info "Cluster is bootstrapped — Flux will start syncing the Git repository"',
+]
+
+# topf stores the bundle already encrypted with the repo's age recipient and
+# leaves an existing secrets.sops.yaml untouched.
+[tasks.talos-secret]
+hide = true
+dir = "{{ config_root }}/../talos"
+run = '''
+mise run //:log info "Generating secrets" stage "$MISE_TASK_NAME"
+topf secrets --confirm=false > /dev/null
+'''
+
+[tasks.talos-apply]
+hide = true
+dir = "{{ config_root }}/../talos"
+run = '''
+mise run //:log info "Applying talos config and bootstrapping" stage "$MISE_TASK_NAME"
+topf apply --auto-bootstrap --confirm=false
+'''
+
+[tasks.talos-talosconfig]
+hide = true
+dir = "{{ config_root }}/../talos"
+run = '''
+mise run //:log info "Generating talosconfig" stage "$MISE_TASK_NAME"
+mkdir -p "$(dirname "$TALOSCONFIG")"
+topf talosconfig > "$TALOSCONFIG"
+'''
+
+# topf issues short-lived admin certs by default; 8760h keeps the
+# kubeconfig usable long-term.
+[tasks.talos-kubeconfig]
+hide = true
+dir = "{{ config_root }}/../talos"
+run = '''
+mise run //:log info "Fetching kubeconfig" stage "$MISE_TASK_NAME"
+topf kubeconfig --validity 8760h > "$KUBECONFIG"
+'''
+
+[tasks.apps-crds]
+hide = true
+run = '''
+crds="$(helmfile --file helmfile.d/00-crds.yaml template --quiet \
+    | yq eval-all --exit-status 'select(.kind == "CustomResourceDefinition")')" \
+    || mise run //:log fatal "Failed to render CRDs"
+if kubectl diff --filename - <<< "$crds" &>/dev/null; then
+    mise run //:log info "CRDs already up-to-date"
+elif kubectl apply --server-side --filename - <<< "$crds" &>/dev/null; then
+    mise run //:log info "CRDs applied"
+else
+    mise run //:log fatal "Failed to apply CRDs"
+fi
+'''
+
+[tasks.apps-helm]
+hide = true
+run = '''
+mise run //:log info "Syncing helmfile" stage "$MISE_TASK_NAME"
+helmfile --file helmfile.d/01-apps.yaml sync --hide-notes \
+    || mise run //:log fatal "Failed to sync helmfile"
+'''
+
+[tasks.apps-namespaces]
+hide = true
+run = '''
+for app in ../kubernetes/apps/*/; do
+    ns="$(basename "$app")"
+    if kubectl get namespace "$ns" &>/dev/null; then
+        mise run //:log info "Namespace already exists" namespace "$ns"
+    elif kubectl create namespace "$ns" --dry-run=client -o yaml \
+            | kubectl apply --server-side --filename - &>/dev/null; then
+        mise run //:log info "Namespace applied" namespace "$ns"
+    else
+        mise run //:log fatal "Failed to apply namespace" namespace "$ns"
+    fi
+done
+'''
+
+[tasks.apps-secrets]
+hide = true
+run = '''
+for secret in \
+    sops-age.sops.yaml \
+    ../kubernetes/components/sops/cluster-secrets.sops.yaml
+do
+    name="$(basename "$secret" .sops.yaml)"
+    if sops exec-file "$secret" \
+            "kubectl --namespace flux-system diff --filename {}" &>/dev/null; then
+        mise run //:log info "Secret already up-to-date" resource "$name"
+    elif sops exec-file "$secret" \
+            "kubectl --namespace flux-system apply --server-side --filename {}" &>/dev/null; then
+        mise run //:log info "Secret applied" resource "$name"
+    else
+        mise run //:log fatal "Failed to apply secret" resource "$name"
+    fi
+done
+'''
+
+# Talos nodes register as Ready=False until the CNI is up; already-Ready is
+# also fine (re-running after the cluster is up).
+[tasks.apps-wait-nodes]
+hide = true
+run = '''
+if kubectl wait nodes --for=condition=Ready=True --all --timeout=10s &>/dev/null; then
+    mise run //:log info "Nodes are Ready, skipping wait"
+    exit 0
+fi
+until kubectl wait nodes --for=condition=Ready=False --all --timeout=10s &>/dev/null; do
+    mise run //:log info "Nodes not yet available, retrying in 10s..."
+    sleep 10
+done
+mise run //:log info "Nodes available"
+'''

@@ -21,21 +21,14 @@
       description: "Disable digest pinning for Flux OCIRepository resources",
       matchManagers: ["flux"],
       matchDatasources: ["docker"],
-      matchFileNames: ["/(^|/)ocirepository\\.ya?ml(?:\\.j2)?$/"],
+      matchFileNames: ["/(^|/)ocirepository\\.ya?ml$/"],
       pinDigests: false
     },
     {
       description: "Disable digest pinning in Helmfile bootstrap resources",
       matchManagers: ["helmfile"],
       matchDatasources: ["docker"],
-      matchFileNames: ["/(^|/)0[01]-(apps|crds)\\.ya?ml(?:\\.j2)?$/"],
-      pinDigests: false
-    },
-    {
-      description: "Disable digest pinning for talenv.yaml",
-      matchManagers: ["custom.regex"],
-      matchDatasources: ["docker"],
-      matchFileNames: ["/(^|/)talenv\\.ya?ml(?:\\.j2)?$/"],
+      matchFileNames: ["/(^|/)0[01]-(apps|crds)\\.ya?ml$/"],
       pinDigests: false
     },
     {
@@ -43,7 +36,7 @@
       matchManagers: ["custom.regex"],
       matchDatasources: ["docker"],
       matchPackageNames: ["ghcr.io/tensorchord/vchord-scratch"],
-      matchFileNames: ["/(^|/)cluster\\.ya?ml(?:\\.j2)?$/"],
+      matchFileNames: ["/(^|/)cluster\\.ya?ml$/"],
       pinDigests: false
     },
     {
@@ -153,7 +146,7 @@
       customType: "regex",
       datasourceTemplate: "docker",
       description: "Process imageName dependencies",
-      managerFilePatterns: ["/(^|/)kubernetes/.+\\.ya?ml(?:\\.j2)?$/"],
+      managerFilePatterns: ["/(^|/)kubernetes/.+\\.ya?ml$/"],
       matchStrings: [
         "imageName:\\s+(?<depName>[^:@\\s]+(?:/[^:@\\s]+)+):(?<currentValue>[^@\\s]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?"
       ]
