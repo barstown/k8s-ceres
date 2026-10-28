@@ -6,5 +6,4 @@ resources:
   - ./secret.sops.yaml
   - ./grafanadashboard.yaml
   - ./helmrelease.yaml
-  - ./ocirepository.yaml
   - ./rbac.yaml
