@@ -14,9 +14,10 @@
 kubeconfig
 talosconfig
 # Misc.
+.DS_Store
 .private/
 .task/
 .venv/
-.DS_Store
-Thumbs.db
+etcd-*.snapshot
 talhelper/
+Thumbs.db
