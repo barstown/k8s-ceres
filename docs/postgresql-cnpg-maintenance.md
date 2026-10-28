@@ -24,6 +24,21 @@ Do not perform PostgreSQL image updates while clusters are hibernated.
 - Rolling image updates require running Pods to reconcile and roll.
 - For image upgrades: keep clusters running (apps can be scaled down).
 
+### Tasks
+
+Each workflow step has a mise task (`kubernetes/mise.toml`). The raw commands
+in each section below are what the tasks run; use them for dry runs or when
+doing a step by hand.
+
+| Task | Does | Workflow |
+| --- | --- | --- |
+| `mise run //kubernetes:pg-apps down` | Scale apps to 0, wait until their pods stop | A1, B step 1 |
+| `mise run //kubernetes:pg-apps up` | Scale apps to 1 | A4, B step 7 |
+| `mise run //kubernetes:pg-hibernation on` | Suspend Flux owners, hibernate clusters | B1 |
+| `mise run //kubernetes:pg-hibernation off` | Wake clusters, wait for all instances ready, resume Flux owners | B2 |
+| `mise run //kubernetes:pg-maintenance start` | `pg-apps down`, then `pg-hibernation on` | B steps 1-3 |
+| `mise run //kubernetes:pg-maintenance end` | `pg-hibernation off`, then `pg-apps up` | B steps 5-7 |
+
 ### Workflow A: PostgreSQL Image Upgrade (No Hibernation)
 
 1. Scale down PostgreSQL-dependent apps.
@@ -32,6 +47,8 @@ Do not perform PostgreSQL image updates while clusters are hibernated.
 4. Scale applications back up.
 
 #### A1) Pre-Merge App Scale-Down
+
+Task: `mise run //kubernetes:pg-apps down`
 
 1. Validate which Deployments will be scaled down (dry run).
 
@@ -69,7 +86,11 @@ kubectl get clusters.postgresql.cnpg.io -A
 
 #### A4) Post-Upgrade App Scale-Up
 
-Current default for these apps is one instance each.
+Task: `mise run //kubernetes:pg-apps up`
+
+Current default for these apps is one instance each. These apps are
+HelmReleases without drift detection, so Flux will not correct a different
+replica count until the release's next Helm upgrade.
 
 1. Validate which Deployments will be scaled up (dry run).
 
@@ -104,7 +125,8 @@ Because `cnpg.io/hibernation` is now defined in Git (default `off`), Flux
 reconciliation must be suspended for the owning Kustomizations before applying
 manual hibernation annotations.
 
-Recommended sequence:
+Recommended sequence (`mise run //kubernetes:pg-maintenance start` runs steps
+1-3, `end` runs steps 5-7):
 
 1. Scale down PostgreSQL-dependent apps.
 2. Suspend Flux reconciliation for CNPG cluster owners.
@@ -115,6 +137,8 @@ Recommended sequence:
 7. Scale applications back up.
 
 #### B1) Hibernate All CNPG Clusters
+
+Task: `mise run //kubernetes:pg-hibernation on`
 
 1. Suspend Flux reconciliation for Kustomizations that own CNPG clusters.
 
@@ -148,6 +172,9 @@ Recommended sequence:
     ```
 
 #### B2) Unhibernate All CNPG Clusters
+
+Task: `mise run //kubernetes:pg-hibernation off` (waits until every cluster is
+back to its full instance count before resuming Flux)
 
 1. Dry run: print unhibernate commands.
 

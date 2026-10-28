@@ -4,49 +4,100 @@
 description = "Force Flux to pull in changes from your Git repository"
 run = "flux --namespace flux-system reconcile kustomization flux-system --with-source"
 
-[tasks.postgresql-scale-down-apps]
-description = "Scale down all PostgreSQL-dependent Deployments to zero replicas"
+# See docs/postgresql-cnpg-maintenance.md for when to use each of these.
+
+# The label is only on the Deployments (not their pods), so "down" waits on
+# Deployment status rather than on pods.
+[tasks.pg-apps]
+description = "Scale PostgreSQL-dependent Deployments down to zero or up to one replica"
+usage = '''
+arg "<action>" help="down scales to 0 and waits for pods to stop; up scales to 1" {
+  choices "down" "up"
+}
+'''
 run = '''
-kubectl get deploy -A -l app.ceres.io/depends-on-postgresql=true -o json \
+selector=app.ceres.io/depends-on-postgresql=true
+case "${usage_action}" in
+    down) replicas=0 ;;
+    up) replicas=1 ;;
+esac
+kubectl get deploy -A -l "$selector" -o json \
     | yq -r '.items[] | .metadata.namespace + " " + .metadata.name' \
-    | while read -r ns name; do kubecolor -n "$ns" scale deploy "$name" --replicas=0; done
+    | while read -r ns name; do kubecolor -n "$ns" scale deploy "$name" --replicas="$replicas"; done
+[[ "${usage_action}" == down ]] || exit 0
+deadline=$((SECONDS + 300))
+until (( $(kubectl get deploy -A -l "$selector" -o json \
+        | yq '.items[] as $d ireduce (0; . + ($d.status.replicas // 0) + ($d.status.terminatingReplicas // 0))') == 0 )); do
+    (( SECONDS < deadline )) || mise run //:log fatal "Timed out waiting for apps to stop"
+    sleep 5
+done
+mise run //:log info "PostgreSQL-dependent apps stopped"
 '''
 
-[tasks.postgresql-scale-up-apps]
-description = "Scale up all PostgreSQL-dependent Deployments to one replica"
-run = '''
-kubectl get deploy -A -l app.ceres.io/depends-on-postgresql=true -o json \
-    | yq -r '.items[] | .metadata.namespace + " " + .metadata.name' \
-    | while read -r ns name; do kubecolor -n "$ns" scale deploy "$name" --replicas=1; done
+# Owning Flux Kustomizations are suspended while hibernated so they don't
+# revert the annotation (Git sets cnpg.io/hibernation=off), and only resumed
+# once every cluster is back to its full instance count.
+[tasks.pg-hibernation]
+description = "Hibernate (on) or wake (off) all CNPG clusters"
+usage = '''
+arg "<state>" help="on suspends Flux owners then hibernates; off wakes, waits for Ready, then resumes" {
+  choices "on" "off"
+}
 '''
-
-# Flux Kustomizations are suspended first so they don't revert the annotation.
-[tasks.cnpg-hibernate-all]
-description = "Hibernate all CNPG clusters"
 run = '''
 clusters="$(kubectl get clusters.postgresql.cnpg.io -A -o json)"
-yq -r '.items[] | .metadata.labels."kustomize.toolkit.fluxcd.io/name" | select(. != null and . != "")' <<< "$clusters" \
-    | sort -u \
-    | xargs -r -I{} flux --namespace flux-system suspend kustomization {}
-yq -r '.items[] | .metadata.namespace + " " + .metadata.name' <<< "$clusters" \
-    | while read -r ns name; do
-        kubecolor -n "$ns" annotate cluster.postgresql.cnpg.io "$name" \
-            --overwrite --field-manager=flux-client-side-apply cnpg.io/hibernation=on
-    done
+flux_owners() {
+    yq -r '.items[] | .metadata.labels."kustomize.toolkit.fluxcd.io/name" | select(. != null and . != "")' <<< "$clusters" \
+        | sort -u \
+        | xargs -r -I{} flux --namespace flux-system "$1" kustomization {}
+}
+annotate() {
+    yq -r '.items[] | .metadata.namespace + " " + .metadata.name' <<< "$clusters" \
+        | while read -r ns name; do
+            kubecolor -n "$ns" annotate cluster.postgresql.cnpg.io "$name" \
+                --overwrite --field-manager=flux-client-side-apply cnpg.io/hibernation="$1"
+        done
+}
+case "${usage_state}" in
+    on)
+        flux_owners suspend
+        annotate on
+        ;;
+    off)
+        annotate off
+        deadline=$((SECONDS + 600))
+        until (( $(kubectl get clusters.postgresql.cnpg.io -A -o json \
+                | yq '[.items[] | select((.status.readyInstances // 0) != .spec.instances)] | length') == 0 )); do
+            (( SECONDS < deadline )) \
+                || mise run //:log fatal "Timed out waiting for CNPG clusters; their Flux Kustomizations are still suspended"
+            sleep 10
+        done
+        mise run //:log info "CNPG clusters ready"
+        flux_owners resume
+        ;;
+esac
 '''
 
-[tasks.cnpg-unhibernate-all]
-description = "Unhibernate all CNPG clusters"
+[tasks.pg-maintenance]
+description = "Stop apps and hibernate CNPG clusters (start), or wake clusters and restart apps (end)"
+usage = '''
+arg "<phase>" help="start: pg-apps down, pg-hibernation on; end: pg-hibernation off, pg-apps up" {
+  choices "start" "end"
+}
+'''
 run = '''
-clusters="$(kubectl get clusters.postgresql.cnpg.io -A -o json)"
-yq -r '.items[] | .metadata.namespace + " " + .metadata.name' <<< "$clusters" \
-    | while read -r ns name; do
-        kubecolor -n "$ns" annotate cluster.postgresql.cnpg.io "$name" \
-            --overwrite --field-manager=flux-client-side-apply cnpg.io/hibernation=off
-    done
-yq -r '.items[] | .metadata.labels."kustomize.toolkit.fluxcd.io/name" | select(. != null and . != "")' <<< "$clusters" \
-    | sort -u \
-    | xargs -r -I{} flux --namespace flux-system resume kustomization {}
+case "${usage_phase}" in
+    start)
+        mise run //kubernetes:pg-apps down
+        mise run //kubernetes:pg-hibernation on
+        mise run //:log info "PostgreSQL maintenance started, run 'mise run //kubernetes:pg-maintenance end' when done"
+        ;;
+    end)
+        mise run //kubernetes:pg-hibernation off
+        mise run //kubernetes:pg-apps up
+        mise run //:log info "PostgreSQL maintenance ended"
+        ;;
+esac
 '''
 
 [tasks.drain]
