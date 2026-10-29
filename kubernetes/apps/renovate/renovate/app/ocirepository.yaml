@@ -10,5 +10,5 @@ spec:
     mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
   ref:
-    tag: 46.391.0
+    tag: 46.393.0
   url: oci://ghcr.io/renovatebot/charts/renovate
