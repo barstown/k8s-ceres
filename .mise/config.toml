@@ -9,7 +9,7 @@ TALOSCONFIG = "{{config_root}}/talos/output/talosconfig"
 
 [tools]
 "aqua:charmbracelet/gum" = "2.0.2"
-"aqua:cilium/cilium-cli" = "0.20.1"
+"aqua:cilium/cilium-cli" = "0.20.2"
 "aqua:cli/cli" = "2.103.3"
 "aqua:cloudflare/cloudflared" = "2026.10.5"
 "aqua:derailed/k9s" = "0.51.0"
