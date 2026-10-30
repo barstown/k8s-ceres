@@ -29,7 +29,7 @@ TALOSCONFIG = "{{config_root}}/talos/output/talosconfig"
 "aqua:zizmorcore/zizmor" = "1.31.1"
 "github:postfinance/topf" = "v0.6.2"
 "node" = "26.13.0"
-"npm:oxfmt" = "0.74.0"
+"npm:oxfmt" = "0.75.0"
 
 # Shared log helper, called from project tasks as `mise run //:log`.
 [tasks.log]
