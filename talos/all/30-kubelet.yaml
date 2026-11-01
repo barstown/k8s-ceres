@@ -3,6 +3,19 @@ kind: KubeletConfig
 config:
   crashLoopBackOff:
     maxContainerRestartPeriod: 60s
+  kubeReserved:
+    cpu: 100m
+    memory: 512Mi
+  evictionHard:
+    memory.available: 200Mi
+    nodefs.available: 10%
+    nodefs.inodesFree: 5%
+    imagefs.available: 15%
+  evictionSoft:
+    memory.available: 500Mi
+  evictionSoftGracePeriod:
+    memory.available: 1m30s
+  evictionMaxPodGracePeriod: 60
   imageGCHighThresholdPercent: 75
   imageGCLowThresholdPercent: 70
   imageMaximumGCAge: 168h
