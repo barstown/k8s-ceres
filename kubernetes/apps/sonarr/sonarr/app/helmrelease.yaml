@@ -26,6 +26,7 @@ spec:
               SONARR__AUTH__REQUIRED: DisabledForLocalAddresses # Enabled
               SONARR__LOG__ANALYTICSENABLED: "False"
               SONARR__LOG__LEVEL: info
+              SONARR__SERVER__ALLOWEDHOSTS: sonarr.${SECRET_DOMAIN},sonarr.sonarr.svc.cluster.local
               SONARR__SERVER__PORT: &port 80
               SONARR__UPDATE__AUTOMATICALLY: "False"
               SONARR__UPDATE__BRANCH: develop
@@ -47,6 +48,9 @@ spec:
                 spec:
                   httpGet:
                     path: /ping
+                    httpHeaders:
+                      - name: Host
+                        value: localhost
                     port: *port
                   periodSeconds: 10
                   timeoutSeconds: 5
