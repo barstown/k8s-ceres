@@ -25,6 +25,10 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: rustfs-s3
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
   storage:
     size: 10Gi
     storageClass: freenas-api-iscsi

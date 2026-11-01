@@ -57,6 +57,10 @@ spec:
         serviceMonitor:
           enabled: true
       replicas: 1
+      resources:
+        requests:
+          cpu: 10m
+          memory: 128Mi
       rollOutPods: true
     prometheus:
       enabled: true

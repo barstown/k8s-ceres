@@ -16,6 +16,10 @@ spec:
       enabled: true
     serviceMonitor:
       enabled: true
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
     podSecurityContext:
       fsGroup: 1000
       fsGroupChangePolicy: OnRootMismatch

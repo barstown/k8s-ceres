@@ -11,6 +11,10 @@ spec:
   interval: 1h
   values:
     fullnameOverride: kube-state-metrics
+    resources:
+      requests:
+        cpu: 10m
+        memory: 128Mi
     prometheus:
       monitor:
         enabled: true
