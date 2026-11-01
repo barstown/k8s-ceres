@@ -9,4 +9,4 @@ components:
 
 resources:
   - ./namespace.yaml
-  - ./prometheus-adapter/ks.yaml
+  # - ./prometheus-adapter/ks.yaml
