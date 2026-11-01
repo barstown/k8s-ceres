@@ -45,6 +45,10 @@ spec:
           - /usr/share/postgresql/18/
     shared_preload_libraries:
       - "vchord.so"
+  resources:
+    requests:
+      cpu: 50m
+      memory: 256Mi
   storage:
     size: 20Gi
     storageClass: freenas-api-iscsi-postgresql

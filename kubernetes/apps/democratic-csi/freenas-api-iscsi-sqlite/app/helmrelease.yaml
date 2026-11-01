@@ -17,6 +17,10 @@ spec:
         image:
           registry: ghcr.io/democratic-csi/democratic-csi
           tag: v1.9.5
+        resources:
+          requests:
+            cpu: 10m
+            memory: 96Mi
     driver:
       existingConfigSecret: freenas-api-iscsi-sqlite-driver-config
       config:
@@ -30,6 +34,10 @@ spec:
             value: /usr/local/sbin/iscsiadm
         iscsiDirHostPath: /var/iscsi
         iscsiDirHostPathType: ""
+        resources:
+          requests:
+            cpu: 10m
+            memory: 96Mi
       hostPID: true
     storageClasses:
       - name: freenas-api-iscsi-sqlite

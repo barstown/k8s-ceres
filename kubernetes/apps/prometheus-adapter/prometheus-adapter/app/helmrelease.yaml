@@ -11,8 +11,12 @@ spec:
   interval: 1h
   values:
     prometheus:
-      url: http://vmsingle-victoria-metrics-cluster.o11y.svc.cluster.local # TODO update once victoria metrics is deployed
+      url: http://vmsingle-victoria-metrics.victoria-metrics.svc.cluster.local
       port: 8428
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
     rules:
       default: false
       external:

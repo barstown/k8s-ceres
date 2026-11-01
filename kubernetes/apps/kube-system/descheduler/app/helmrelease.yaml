@@ -11,10 +11,10 @@ spec:
   interval: 1h
   values:
     kind: Deployment
+    deschedulingInterval: 30m
     deschedulerPolicyAPIVersion: descheduler/v1alpha2
     deschedulerPolicy:
-      metricsProviders:
-        - source: KubernetesMetrics
+      nodeSelector: "!node-role.kubernetes.io/control-plane"
       profiles:
         - name: Default
           pluginConfig:
@@ -30,9 +30,8 @@ spec:
               args:
                 evictableNamespaces:
                   exclude:
+                    - home-assistant
                     - renovate
-                metricsUtilization:
-                  source: KubernetesMetrics
                 thresholds:
                   cpu: 35
                   memory: 35
@@ -79,8 +78,8 @@ spec:
       enabled: true
     resources:
       requests:
-        cpu: 500m
-        memory: 256Mi
+        cpu: 25m
+        memory: 64Mi
       limits:
         cpu: 500m
         memory: 256Mi

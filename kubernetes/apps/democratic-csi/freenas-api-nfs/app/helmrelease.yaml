@@ -17,10 +17,20 @@ spec:
         image:
           registry: ghcr.io/democratic-csi/democratic-csi
           tag: v1.9.5
+        resources:
+          requests:
+            cpu: 10m
+            memory: 96Mi
     driver:
       existingConfigSecret: freenas-api-nfs-driver-config
       config:
         driver: freenas-api-nfs
+    node:
+      driver:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 96Mi
     storageClasses:
       - name: freenas-api-nfs
         defaultClass: false

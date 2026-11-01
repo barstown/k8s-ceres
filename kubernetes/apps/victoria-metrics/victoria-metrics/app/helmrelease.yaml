@@ -31,6 +31,10 @@ spec:
       operator:
         disable_prometheus_converter: false
         enable_converter_ownership: true
+      resources:
+        requests:
+          cpu: 10m
+          memory: 96Mi
       securityContext: &securityContext
         allowPrivilegeEscalation: false
         capabilities: { drop: ["ALL"] }
