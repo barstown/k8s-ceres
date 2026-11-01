@@ -9,6 +9,5 @@ components:
 
 resources:
   - ./namespace.yaml
-  - ./helmrepository.yaml
   - ./mariadb-operator-crds/ks.yaml
   - ./mariadb-operator/ks.yaml

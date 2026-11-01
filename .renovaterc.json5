@@ -54,6 +54,20 @@
       minimumGroupSize: 3
     },
     {
+      description: "MariaDB Operator Group",
+      groupName: "mariadb-operator",
+      matchDatasources: ["docker"],
+      matchPackageNames: [
+        "ghcr.io/mariadb-operator/charts/mariadb-operator",
+        "ghcr.io/mariadb-operator/charts/mariadb-operator-crds"
+      ],
+      sourceUrl: "https://github.com/mariadb-operator/mariadb-operator",
+      group: {
+        commitMessageTopic: "{{{groupName}}} group"
+      },
+      minimumGroupSize: 2
+    },
+    {
       description: "Link Grafana Operator Helm Chart releases for changelogs",
       matchDatasources: ["docker"],
       matchPackageNames: ["ghcr.io/grafana/helm-charts/grafana-operator"],
