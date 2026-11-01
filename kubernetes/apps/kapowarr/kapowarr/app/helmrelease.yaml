@@ -48,7 +48,7 @@ spec:
               seccompProfile: { type: RuntimeDefault }
             resources:
               requests:
-                cpu: 100m
+                cpu: 10m
                 memory: 50Mi
               limits:
                 cpu: 1000m
