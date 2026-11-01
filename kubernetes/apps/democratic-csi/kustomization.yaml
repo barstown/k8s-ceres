@@ -9,6 +9,7 @@ components:
 
 resources:
   - ./namespace.yaml
+  - ./limitrange.yaml
   - ./snapshot-controller/ks.yaml
   - ./freenas-api-iscsi/ks.yaml
   - ./freenas-api-iscsi-sqlite/ks.yaml
