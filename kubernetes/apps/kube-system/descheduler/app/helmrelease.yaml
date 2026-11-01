@@ -14,6 +14,7 @@ spec:
     deschedulingInterval: 30m
     deschedulerPolicyAPIVersion: descheduler/v1alpha2
     deschedulerPolicy:
+      maxNoOfPodsToEvictTotal: 3
       nodeSelector: "!node-role.kubernetes.io/control-plane"
       profiles:
         - name: Default
@@ -30,11 +31,13 @@ spec:
               args:
                 evictableNamespaces:
                   exclude:
+                    - democratic-csi
+                    - gatus-sidecar
                     - home-assistant
                     - renovate
                 thresholds:
-                  cpu: 35
-                  memory: 35
+                  cpu: 40
+                  memory: 50
                   pods: 35
                 targetThresholds:
                   cpu: 55
