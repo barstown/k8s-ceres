@@ -3,14 +3,18 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: blackbox-exporter-lan
+  name: blackbox-exporter
 spec:
   interval: 1h
-  path: ./kubernetes/apps/o11y/blackbox-exporter/lan
+  path: ./kubernetes/apps/blackbox-exporter/blackbox-exporter/app
+  postBuild:
+    substituteFrom:
+      - name: cluster-secrets
+        kind: Secret
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  targetNamespace: o11y
+  targetNamespace: blackbox-exporter
   wait: false

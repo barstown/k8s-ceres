@@ -1,0 +1,153 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/probe_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: infrastructure-icmp
+spec:
+  module: icmp
+  prober:
+    url: blackbox-exporter.blackbox-exporter.svc.cluster.local:9115
+  targets:
+    staticConfig:
+      static:
+        - 10.0.10.20
+        - 10.0.10.22
+        - truenas.lab.internal
+        - unifi.ceres.internal
+  metricRelabelings:
+    - targetLabel: service
+      replacement: blackbox-exporter
+      action: replace
+    - targetLabel: tier
+      replacement: infrastructure
+      action: replace
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/probe_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: infrastructure-dns-external
+spec:
+  module: dns_external
+  prober:
+    url: blackbox-exporter.blackbox-exporter.svc.cluster.local:9115
+  targets:
+    staticConfig:
+      static:
+        - 10.0.10.20
+        - 10.0.10.22
+  metricRelabelings:
+    - targetLabel: service
+      replacement: blackbox-exporter
+      action: replace
+    - targetLabel: tier
+      replacement: infrastructure
+      action: replace
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/probe_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: infrastructure-dns-local
+spec:
+  module: dns_local
+  prober:
+    url: blackbox-exporter.blackbox-exporter.svc.cluster.local:9115
+  targets:
+    staticConfig:
+      static:
+        - 10.0.10.20
+        - 10.0.10.22
+  metricRelabelings:
+    - targetLabel: service
+      replacement: blackbox-exporter
+      action: replace
+    - targetLabel: tier
+      replacement: infrastructure
+      action: replace
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/probe_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: infrastructure-iscsi
+spec:
+  module: tcp_connect
+  prober:
+    url: blackbox-exporter.blackbox-exporter.svc.cluster.local:9115
+  targets:
+    staticConfig:
+      static:
+        - truenas.lab.internal:3260
+  metricRelabelings:
+    - targetLabel: service
+      replacement: blackbox-exporter
+      action: replace
+    - targetLabel: tier
+      replacement: infrastructure
+      action: replace
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/probe_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: infrastructure-nfs
+spec:
+  module: tcp_connect
+  prober:
+    url: blackbox-exporter.blackbox-exporter.svc.cluster.local:9115
+  targets:
+    staticConfig:
+      static:
+        - truenas.lab.internal:2049
+  metricRelabelings:
+    - targetLabel: service
+      replacement: blackbox-exporter
+      action: replace
+    - targetLabel: tier
+      replacement: infrastructure
+      action: replace
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/probe_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: infrastructure-proxmox
+spec:
+  module: tcp_connect
+  prober:
+    url: blackbox-exporter.blackbox-exporter.svc.cluster.local:9115
+  targets:
+    staticConfig:
+      static:
+        - proxmox.lab.internal:8006
+  metricRelabelings:
+    - targetLabel: service
+      replacement: blackbox-exporter
+      action: replace
+    - targetLabel: tier
+      replacement: infrastructure
+      action: replace
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/probe_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: lan-icmp
+spec:
+  module: icmp
+  prober:
+    url: blackbox-exporter.blackbox-exporter.svc.cluster.local:9115
+  targets:
+    staticConfig:
+      static:
+        - smlight.iot.internal
+        - tailscaled.lab.internal
+  metricRelabelings:
+    - targetLabel: service
+      replacement: blackbox-exporter
+      action: replace
+    - targetLabel: tier
+      replacement: lan
+      action: replace
