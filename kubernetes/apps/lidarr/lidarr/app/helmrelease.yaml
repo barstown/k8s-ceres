@@ -26,6 +26,7 @@ spec:
               LIDARR__AUTH__REQUIRED: DisabledForLocalAddresses # Enabled
               LIDARR__LOG__ANALYTICSENABLED: "False"
               LIDARR__LOG__LEVEL: info
+              LIDARR__SERVER__ALLOWEDHOSTS: lidarr.${SECRET_DOMAIN},lidarr.lidarr.svc.cluster.local
               LIDARR__SERVER__PORT: &port 80
               LIDARR__UPDATE__AUTOMATICALLY: "False"
               LIDARR__UPDATE__BRANCH: develop
@@ -47,6 +48,9 @@ spec:
                 spec:
                   httpGet:
                     path: /ping
+                    httpHeaders:
+                      - name: Host
+                        value: localhost
                     port: *port
                   periodSeconds: 10
                   timeoutSeconds: 5
