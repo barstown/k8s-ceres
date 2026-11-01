@@ -1,7 +1,6 @@
 customization:
   systemExtensions:
     officialExtensions:
-      - siderolabs/intel-ucode
       - siderolabs/iscsi-tools
       # - siderolabs/nfsd
       - siderolabs/qemu-guest-agent
