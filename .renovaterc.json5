@@ -1,9 +1,8 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
   extends: [
-    "config:recommended",
+    "config:best-practices",
     "docker:enableMajor",
-    "helpers:pinGitHubActionDigests",
     ":automergeBranch",
     ":dependencyDashboard",
     ":disableRateLimiting",
@@ -15,7 +14,7 @@
   ],
   configMigration: false,
   dependencyDashboard: true,
-  ignorePaths: ["**/*.sops.*"],
+  ignorePaths: ["**/*.sops.*", "**/locks/npm-*/**"],
   packageRules: [
     {
       description: "Disable digest pinning for Flux OCIRepository resources",
@@ -37,6 +36,26 @@
       matchDatasources: ["docker"],
       matchPackageNames: ["ghcr.io/tensorchord/vchord-scratch"],
       matchFileNames: ["/(^|/)cluster\\.ya?ml$/"],
+      pinDigests: false
+    },
+    {
+      description: "Disable digest pinning for the annotated Immich main.image.tag",
+      matchManagers: ["custom.regex"],
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/immich-app/immich-server"],
+      matchFileNames: ["kubernetes/apps/immich/immich/app/helmrelease.yaml"],
+      pinDigests: false
+    },
+    {
+      description: "Disable digest pinning for the Flux distribution OCI artifact",
+      matchManagers: ["custom.regex"],
+      matchDatasources: ["docker"],
+      matchPackageNames: [
+        "ghcr.io/controlplaneio-fluxcd/flux-operator-manifests"
+      ],
+      matchFileNames: [
+        "kubernetes/apps/flux-system/flux-instance/app/helmrelease.yaml"
+      ],
       pinDigests: false
     },
     {
@@ -159,10 +178,10 @@
     {
       customType: "regex",
       datasourceTemplate: "docker",
-      description: "Process imageName dependencies",
+      description: "Process registry/tag dependencies",
       managerFilePatterns: ["/(^|/)kubernetes/.+\\.ya?ml$/"],
       matchStrings: [
-        "imageName:\\s+(?<depName>[^:@\\s]+(?:/[^:@\\s]+)+):(?<currentValue>[^@\\s]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?"
+        "registry:\\s+(?<depName>[^:@\\s]+(?:/[^:@\\s]+)+)\\n\\s+tag:\\s+(?<currentValue>[^@\\s]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?"
       ]
     }
   ]
