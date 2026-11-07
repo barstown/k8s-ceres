@@ -18,6 +18,23 @@ spec:
     image:
       repository: mirror.gcr.io/crowdsecurity/crowdsec
       tag: v1.8.2@sha256:65b74942f7e7ed5c60fde4ac15fc4ba715904c398c8b16dd451f4907d90347d4
+    config:
+      parsers:
+        s02-enrich:
+          envoy-ext-authz-whitelist.yaml: |
+            name: ceres/envoy-ext-authz-whitelist
+            description: "Ignore requests already denied by the CrowdSec bouncer"
+            whitelist:
+              reason: "envoy ext_authz denial (UAEX)"
+              expression:
+                - evt.Unmarshaled.envoy?.response_flags != nil && "UAEX" in Split(evt.Unmarshaled.envoy.response_flags, ",")
+          immich-android-whitelist.yaml: |
+            name: ceres/immich-android-whitelist
+            description: "Ignore Immich Android app API 404s from the public proxy"
+            whitelist:
+              reason: "immich-android API call to immich-public-proxy"
+              expression:
+                - evt.Meta.target_fqdn == "immich.asteroids.sh" && evt.Meta.http_user_agent startsWith "immich-android/" && evt.Meta.http_status == "404"
     lapi:
       env:
         - name: USE_WAL
