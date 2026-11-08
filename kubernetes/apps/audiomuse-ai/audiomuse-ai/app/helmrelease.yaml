@@ -1,0 +1,160 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: audiomuse-ai
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: audiomuse-ai
+  interval: 1h
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Deployment
+              version: v1
+            patch: |
+              - op: add
+                path: "/metadata/labels/app.ceres.io~1depends-on-postgresql"
+                value: "true"
+  values:
+    controllers:
+      flask:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image: &image
+              repository: ghcr.io/neptunehub/audiomuse-ai
+              tag: 3.7.1@sha256:5bdf6c6c15073ddb85eaa2d6662439c176e35c7f5c00c0a3e59c3b119d800f30
+            env:
+              SERVICE_TYPE: flask
+              <<: &env
+                CLAP_OTHER_FEATURES_CACHE_DIR: /cache
+                FLASK_HTTPS_CERT_DIR: /tmp/tls
+                PLUGINS_DIR: /plugins
+                TEMP_DIR: /app/temp_audio
+                TZ: America/New_York
+                POSTGRES_HOST:
+                  valueFrom:
+                    secretKeyRef:
+                      name: "{{ .Release.Name }}-db-secret"
+                      key: host
+                POSTGRES_PORT:
+                  valueFrom:
+                    secretKeyRef:
+                      name: "{{ .Release.Name }}-db-secret"
+                      key: port
+                POSTGRES_DB:
+                  valueFrom:
+                    secretKeyRef:
+                      name: "{{ .Release.Name }}-db-secret"
+                      key: database
+                POSTGRES_USER:
+                  valueFrom:
+                    secretKeyRef:
+                      name: "{{ .Release.Name }}-db-secret"
+                      key: username
+                POSTGRES_PASSWORD:
+                  valueFrom:
+                    secretKeyRef:
+                      name: "{{ .Release.Name }}-db-secret"
+                      key: password
+            probes:
+              liveness: &probe
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/health
+                    port: &port 8000
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 5
+              readiness: *probe
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /api/health
+                    port: *port
+                  failureThreshold: 60
+                  periodSeconds: 10
+            securityContext: &securityContext
+              allowPrivilegeEscalation: false
+              capabilities: { drop: ["ALL"] }
+              readOnlyRootFilesystem: true
+              seccompProfile: { type: RuntimeDefault }
+            resources:
+              requests:
+                cpu: 100m
+                memory: 1Gi
+              limits:
+                cpu: 2000m
+                memory: 3Gi
+      worker:
+        annotations:
+          reloader.stakater.com/auto: "true"
+        containers:
+          app:
+            image: *image
+            env:
+              SERVICE_TYPE: worker
+              <<: *env
+            probes:
+              liveness:
+                enabled: false
+              readiness:
+                enabled: false
+              startup:
+                enabled: false
+            securityContext: *securityContext
+            resources:
+              requests:
+                cpu: 500m
+                memory: 2Gi
+              limits:
+                cpu: 3000m
+                memory: 6Gi
+    defaultPodOptions:
+      securityContext:
+        fsGroup: 65534
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+    service:
+      app:
+        controller: flask
+        ports:
+          http:
+            port: *port
+    route:
+      internal:
+        hostnames: ["{{ .Release.Name }}.${SECRET_DOMAIN}"]
+        parentRefs:
+          - name: envoy-internal
+            namespace: network
+            sectionName: https
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
+    persistence:
+      cache:
+        type: emptyDir
+      ivf-cache:
+        type: emptyDir
+        globalMounts:
+          - path: /app/ivf_cache
+      plugins:
+        type: emptyDir
+      temp-audio:
+        type: emptyDir
+        globalMounts:
+          - path: /app/temp_audio
+      tmp:
+        type: emptyDir
