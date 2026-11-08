@@ -181,8 +181,9 @@
       description: "Process registry/tag dependencies",
       managerFilePatterns: ["/(^|/)kubernetes/.+\\.ya?ml$/"],
       matchStrings: [
-        "registry:\\s+(?<depName>[^:@\\s]+(?:/[^:@\\s]+)+)\\n\\s+tag:\\s+(?<currentValue>[^@\\s]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?"
-      ]
+        "registry:\\s+(?<depName>[^:@\\s]+(?:/[^:@\\s]+)+)\\n(?<indentation>[ \\t]*)tag:\\s+(?<currentValue>[^@\\s]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?"
+      ],
+      autoReplaceStringTemplate: "registry: {{{depName}}}\n{{{indentation}}}tag: {{{newValue}}}{{#if newDigest}}@{{{newDigest}}}{{/if}}"
     }
   ]
 }

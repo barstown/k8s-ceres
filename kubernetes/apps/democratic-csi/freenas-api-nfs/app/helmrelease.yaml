@@ -27,6 +27,9 @@ spec:
         driver: freenas-api-nfs
     node:
       driver:
+        image:
+          registry: ghcr.io/democratic-csi/democratic-csi
+          tag: v1.9.5
         resources:
           requests:
             cpu: 10m
