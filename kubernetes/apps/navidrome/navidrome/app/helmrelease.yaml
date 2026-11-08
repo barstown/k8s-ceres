@@ -27,7 +27,7 @@ spec:
               - |
                 mkdir -p /data/plugins
                 curl -fsSL --retry 3 -o /data/plugins/.audiomuseai.ndp.tmp \
-                  "https://github.com/NeptuneHub/AudioMuse-AI-NV-plugin/releases/download/${PLUGIN_VERSION}/audiomuseai.ndp" \
+                  "https://github.com/NeptuneHub/AudioMuse-AI-NV-plugin/releases/download/$${PLUGIN_VERSION}/audiomuseai.ndp" \
                   && mv /data/plugins/.audiomuseai.ndp.tmp /data/plugins/audiomuseai.ndp \
                   || { rm -f /data/plugins/.audiomuseai.ndp.tmp; echo "audiomuseai.ndp download failed"; }
             securityContext:
