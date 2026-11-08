@@ -15,21 +15,36 @@ spec:
         annotations:
           reloader.stakater.com/auto: "true"
         initContainers:
-          audiomuse-plugin:
+          plugins:
             image:
               repository: docker.io/curlimages/curl
               tag: 8.23.0@sha256:3fb7e13e5d179a845c97d78204f3f1064d1907037f26a3ebf91710571151fd93
             env:
+              # renovate: datasource=github-releases depName=navidrome/apple-music-plugin
+              APPLE_MUSIC_VERSION: v0.2.0
               # renovate: datasource=github-releases depName=NeptuneHub/AudioMuse-AI-NV-plugin
-              PLUGIN_VERSION: v12
+              AUDIOMUSEAI_VERSION: v12
+              # renovate: datasource=github-releases depName=nenadjokic/navibeat-mixes
+              NAVIBEAT_MIXES_VERSION: v0.9.26
+              # renovate: datasource=github-releases depName=J0R6IT0/navidrome-lyrics-plugin
+              ND_LYRICS_VERSION: v8.1.0
             command: ["/bin/sh", "-c"]
             args:
               - |
+                fetch() {
+                  tmp="/data/plugins/.$$4.tmp"
+                  if curl -fsSL --retry 3 -o "$$tmp" "https://github.com/$$1/releases/download/$$2/$$3"; then
+                    mv "$$tmp" "/data/plugins/$$4"
+                  else
+                    rm -f "$$tmp"
+                    echo "$$4 download failed"
+                  fi
+                }
                 mkdir -p /data/plugins
-                curl -fsSL --retry 3 -o /data/plugins/.audiomuseai.ndp.tmp \
-                  "https://github.com/NeptuneHub/AudioMuse-AI-NV-plugin/releases/download/$${PLUGIN_VERSION}/audiomuseai.ndp" \
-                  && mv /data/plugins/.audiomuseai.ndp.tmp /data/plugins/audiomuseai.ndp \
-                  || { rm -f /data/plugins/.audiomuseai.ndp.tmp; echo "audiomuseai.ndp download failed"; }
+                fetch navidrome/apple-music-plugin "$${APPLE_MUSIC_VERSION}" apple-music.ndp apple-music.ndp
+                fetch NeptuneHub/AudioMuse-AI-NV-plugin "$${AUDIOMUSEAI_VERSION}" audiomuseai.ndp audiomuseai.ndp
+                fetch nenadjokic/navibeat-mixes "$${NAVIBEAT_MIXES_VERSION}" navibeat-mixes-navidrome-0.64.ndp navibeat-mixes.ndp
+                fetch J0R6IT0/navidrome-lyrics-plugin "$${ND_LYRICS_VERSION}" nd-lyrics.ndp nd-lyrics.ndp
             securityContext:
               allowPrivilegeEscalation: false
               capabilities: { drop: ["ALL"] }
