@@ -14,17 +14,40 @@ spec:
       navidrome:
         annotations:
           reloader.stakater.com/auto: "true"
+        initContainers:
+          audiomuse-plugin:
+            image:
+              repository: docker.io/curlimages/curl
+              tag: 8.23.0@sha256:3fb7e13e5d179a845c97d78204f3f1064d1907037f26a3ebf91710571151fd93
+            env:
+              # renovate: datasource=github-releases depName=NeptuneHub/AudioMuse-AI-NV-plugin
+              PLUGIN_VERSION: v12
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                mkdir -p /data/plugins
+                curl -fsSL --retry 3 -o /data/plugins/.audiomuseai.ndp.tmp \
+                  "https://github.com/NeptuneHub/AudioMuse-AI-NV-plugin/releases/download/${PLUGIN_VERSION}/audiomuseai.ndp" \
+                  && mv /data/plugins/.audiomuseai.ndp.tmp /data/plugins/audiomuseai.ndp \
+                  || { rm -f /data/plugins/.audiomuseai.ndp.tmp; echo "audiomuseai.ndp download failed"; }
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities: { drop: ["ALL"] }
+              readOnlyRootFilesystem: true
+              seccompProfile: { type: RuntimeDefault }
         containers:
           app:
             image:
               repository: ghcr.io/navidrome/navidrome
               tag: 0.64.2@sha256:38dc2727bfcfd5ede290f8ada114fc90368146f265ae4701ddddbcbe2a44ee52
             env:
-              ND_AGENTS: "apple-music,deezer,lastfm,listenbrainz"
+              ND_AGENTS: "audiomuseai,apple-music,deezer,lastfm,listenbrainz"
               ND_ENABLEINSIGHTSCOLLECTOR: false
               ND_LOGLEVEL: info
               ND_LYRICSPRIORITY: ".ttml,.yaml,.yml,.elrc,.lrc,.srt,.txt,embedded,nd-lyrics"
               ND_MUSICFOLDER: "/music"
+              ND_PLUGINS_AUTORELOAD: true
+              ND_PLUGINS_ENABLED: true
               ND_PORT: &port 4533
               TZ: America/New_York
             # envFrom:
