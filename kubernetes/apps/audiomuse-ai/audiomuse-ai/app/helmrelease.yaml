@@ -34,6 +34,7 @@ spec:
               <<: &env
                 CLAP_OTHER_FEATURES_CACHE_DIR: /cache
                 FLASK_HTTPS_CERT_DIR: /tmp/tls
+                HOME: /tmp
                 PLUGINS_DIR: /plugins
                 TEMP_DIR: /app/temp_audio
                 TZ: America/New_York
