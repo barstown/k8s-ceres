@@ -45,16 +45,28 @@ spec:
                 fetch NeptuneHub/AudioMuse-AI-NV-plugin "$${AUDIOMUSEAI_VERSION}" audiomuseai.ndp audiomuseai.ndp
                 fetch nenadjokic/navibeat-mixes "$${NAVIBEAT_MIXES_VERSION}" navibeat-mixes-navidrome-0.64.ndp navibeat-mixes.ndp
                 fetch J0R6IT0/navidrome-lyrics-plugin "$${ND_LYRICS_VERSION}" nd-lyrics.ndp nd-lyrics.ndp
-            securityContext:
+            securityContext: &securityContext
               allowPrivilegeEscalation: false
               capabilities: { drop: ["ALL"] }
               readOnlyRootFilesystem: true
               seccompProfile: { type: RuntimeDefault }
-        containers:
-          app:
-            image:
+          plugins-enable:
+            dependsOn: plugins
+            image: &image
               repository: ghcr.io/navidrome/navidrome
               tag: 0.64.2@sha256:38dc2727bfcfd5ede290f8ada114fc90368146f265ae4701ddddbcbe2a44ee52
+            command: ["/bin/sh", "-c"]
+            args:
+              - |
+                enabled=$$(navidrome plugin list -f csv | awk -F, '/,true,$$/ {print $$1}')
+                navidrome plugin rescan
+                for id in $$enabled; do
+                  navidrome plugin enable "$$id" || echo "$$id could not be re-enabled"
+                done
+            securityContext: *securityContext
+        containers:
+          app:
+            image: *image
             env:
               ND_AGENTS: "audiomuseai,apple-music,deezer,lastfm,listenbrainz"
               ND_ENABLEINSIGHTSCOLLECTOR: false
@@ -86,11 +98,7 @@ spec:
                 spec:
                   failureThreshold: 30
                   periodSeconds: 10
-            securityContext:
-              allowPrivilegeEscalation: false
-              capabilities: { drop: ["ALL"] }
-              readOnlyRootFilesystem: true
-              seccompProfile: { type: RuntimeDefault }
+            securityContext: *securityContext
             resources:
               requests:
                 cpu: 100m
