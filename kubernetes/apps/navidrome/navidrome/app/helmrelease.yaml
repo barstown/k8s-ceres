@@ -27,7 +27,7 @@ spec:
               # renovate: datasource=github-releases depName=nenadjokic/navibeat-mixes
               NAVIBEAT_MIXES_VERSION: v0.9.28
               # renovate: datasource=github-releases depName=J0R6IT0/navidrome-lyrics-plugin
-              ND_LYRICS_VERSION: v9.0.0
+              ND_LYRICS_VERSION: v9.2.0
             command: ["/bin/sh", "-c"]
             args:
               - |
