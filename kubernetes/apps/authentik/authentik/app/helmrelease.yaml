@@ -21,6 +21,34 @@ spec:
                 value: "true"
   values:
     global:
+      deploymentAnnotations:
+        reloader.stakater.com/auto: "true"
+      env:
+        - name: AUTHENTIK_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: authentik-app-secret
+              key: AUTHENTIK_SECRET_KEY
+        - name: AUTHENTIK_POSTGRESQL__HOST
+          valueFrom:
+            secretKeyRef:
+              name: &db-secret authentik-db-secret
+              key: host
+        - name: AUTHENTIK_POSTGRESQL__USER
+          valueFrom:
+            secretKeyRef:
+              name: *db-secret
+              key: username
+        - name: AUTHENTIK_POSTGRESQL__PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: *db-secret
+              key: password
+        - name: AUTHENTIK_POSTGRESQL__NAME
+          valueFrom:
+            secretKeyRef:
+              name: *db-secret
+              key: database
       securityContext:
         fsGroup: 65534
         runAsGroup: 65534
@@ -71,24 +99,3 @@ spec:
       containerSecurityContext: *securityContext
     postgresql:
       enabled: false
-  valuesFrom:
-    - kind: Secret
-      name: authentik-app-secret
-      valuesKey: AUTHENTIK_SECRET_KEY
-      targetPath: authentik.secret_key
-    - kind: Secret
-      name: &db-secret authentik-db-secret
-      valuesKey: host
-      targetPath: authentik.postgresql.host
-    - kind: Secret
-      name: *db-secret
-      valuesKey: username
-      targetPath: authentik.postgresql.user
-    - kind: Secret
-      name: *db-secret
-      valuesKey: password
-      targetPath: authentik.postgresql.password
-    - kind: Secret
-      name: *db-secret
-      valuesKey: database
-      targetPath: authentik.postgresql.name
