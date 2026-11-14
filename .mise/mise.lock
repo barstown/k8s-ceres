@@ -101,6 +101,48 @@ version = "0.20.3"
 backend = "aqua:cilium/cilium-cli"
 specifiers = ["0.20.3"]
 
+[tools."aqua:cilium/cilium-cli"."platforms.linux-arm64"]
+checksum = "sha256:fa1bd66b407ec205e88746fc0b17590a247f255bf71bb9dfb0008b14d158f68d"
+checksum_source = "mise-versions"
+url = "https://github.com/cilium/cilium-cli/releases/download/v0.20.3/cilium-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/cilium/cilium-cli/releases/assets/739456165"
+
+[tools."aqua:cilium/cilium-cli"."platforms.linux-arm64-musl"]
+checksum = "sha256:fa1bd66b407ec205e88746fc0b17590a247f255bf71bb9dfb0008b14d158f68d"
+checksum_source = "mise-versions"
+url = "https://github.com/cilium/cilium-cli/releases/download/v0.20.3/cilium-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/cilium/cilium-cli/releases/assets/739456165"
+
+[tools."aqua:cilium/cilium-cli"."platforms.linux-x64"]
+checksum = "sha256:b987ad0d195310d3fc96553aa7bcd41d1e97b64713ecdfee3eb48dd27e1ec7d7"
+checksum_source = "mise-versions"
+url = "https://github.com/cilium/cilium-cli/releases/download/v0.20.3/cilium-linux-amd64.tar.gz"
+url_api = "https://api.github.com/repos/cilium/cilium-cli/releases/assets/739456158"
+
+[tools."aqua:cilium/cilium-cli"."platforms.linux-x64-musl"]
+checksum = "sha256:b987ad0d195310d3fc96553aa7bcd41d1e97b64713ecdfee3eb48dd27e1ec7d7"
+checksum_source = "mise-versions"
+url = "https://github.com/cilium/cilium-cli/releases/download/v0.20.3/cilium-linux-amd64.tar.gz"
+url_api = "https://api.github.com/repos/cilium/cilium-cli/releases/assets/739456158"
+
+[tools."aqua:cilium/cilium-cli"."platforms.macos-arm64"]
+checksum = "sha256:5a53acbe09f1515f52b7e625517872dd0d0e02e2f6082c919527cc507b110a15"
+checksum_source = "mise-versions"
+url = "https://github.com/cilium/cilium-cli/releases/download/v0.20.3/cilium-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/cilium/cilium-cli/releases/assets/739456160"
+
+[tools."aqua:cilium/cilium-cli"."platforms.macos-x64"]
+checksum = "sha256:6141f85d8ddb9c2b26fb0ab7eb2ed7a5d0e9efe1fe59006419f30d8c2434b60c"
+checksum_source = "mise-versions"
+url = "https://github.com/cilium/cilium-cli/releases/download/v0.20.3/cilium-darwin-amd64.tar.gz"
+url_api = "https://api.github.com/repos/cilium/cilium-cli/releases/assets/739456157"
+
+[tools."aqua:cilium/cilium-cli"."platforms.windows-x64"]
+checksum = "sha256:3fe0df6fbf6471b958863106e23e46cc6339c86b74bf28b805e8a4113f7a2cde"
+checksum_source = "mise-versions"
+url = "https://github.com/cilium/cilium-cli/releases/download/v0.20.3/cilium-windows-amd64.zip"
+url_api = "https://api.github.com/repos/cilium/cilium-cli/releases/assets/739456161"
+
 [[tools."aqua:cli/cli"]]
 version = "2.104.0"
 backend = "aqua:cli/cli"
@@ -622,24 +664,45 @@ backend = "aqua:mikefarah/yq"
 specifiers = ["4.54.3"]
 
 [tools."aqua:mikefarah/yq"."platforms.linux-arm64"]
+checksum = "sha256:89f69310b61b68d1245065a1241d1fc843f7a36cd6103ffd77ad987613bd1b67"
+url = "https://github.com/mikefarah/yq/releases/download/v4.54.3/yq_linux_arm64"
+url_api = "https://api.github.com/repos/mikefarah/yq/releases/assets/726219924"
 provenance = "cosign"
 
 [tools."aqua:mikefarah/yq"."platforms.linux-arm64-musl"]
+checksum = "sha256:89f69310b61b68d1245065a1241d1fc843f7a36cd6103ffd77ad987613bd1b67"
+url = "https://github.com/mikefarah/yq/releases/download/v4.54.3/yq_linux_arm64"
+url_api = "https://api.github.com/repos/mikefarah/yq/releases/assets/726219924"
 provenance = "cosign"
 
 [tools."aqua:mikefarah/yq"."platforms.linux-x64"]
+checksum = "sha256:129534601871538efe0ba4c5e62a34fb1d5f469bcb975c4fddeb467d82974973"
+url = "https://github.com/mikefarah/yq/releases/download/v4.54.3/yq_linux_amd64"
+url_api = "https://api.github.com/repos/mikefarah/yq/releases/assets/726219936"
 provenance = "cosign"
 
 [tools."aqua:mikefarah/yq"."platforms.linux-x64-musl"]
+checksum = "sha256:129534601871538efe0ba4c5e62a34fb1d5f469bcb975c4fddeb467d82974973"
+url = "https://github.com/mikefarah/yq/releases/download/v4.54.3/yq_linux_amd64"
+url_api = "https://api.github.com/repos/mikefarah/yq/releases/assets/726219936"
 provenance = "cosign"
 
 [tools."aqua:mikefarah/yq"."platforms.macos-arm64"]
+checksum = "sha256:a2aebb93b5bdcb61bb76f630e42a0ef6a3ee10842a6516cd7b9e4080786ec593"
+url = "https://github.com/mikefarah/yq/releases/download/v4.54.3/yq_darwin_arm64"
+url_api = "https://api.github.com/repos/mikefarah/yq/releases/assets/726219940"
 provenance = "cosign"
 
 [tools."aqua:mikefarah/yq"."platforms.macos-x64"]
+checksum = "sha256:96d5105ffd693d6845c54fbd825b2d1bbdb8619e0a2ce6af95e5654e841e0984"
+url = "https://github.com/mikefarah/yq/releases/download/v4.54.3/yq_darwin_amd64"
+url_api = "https://api.github.com/repos/mikefarah/yq/releases/assets/726219934"
 provenance = "cosign"
 
 [tools."aqua:mikefarah/yq"."platforms.windows-x64"]
+checksum = "sha256:066ea0a09a282e47588ec1e1867280ff5ede458f7183617a2d99012e4e34f18a"
+url = "https://github.com/mikefarah/yq/releases/download/v4.54.3/yq_windows_amd64.exe"
+url_api = "https://api.github.com/repos/mikefarah/yq/releases/assets/726219881"
 provenance = "cosign"
 
 [[tools."aqua:siderolabs/talos"]]
