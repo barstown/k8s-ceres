@@ -8,4 +8,5 @@ resources:
   - ./scheduledbackup.yaml
   - ./helmrelease.yaml
   - ./ocirepository.yaml
+  - ./referencegrant.yaml
   - ./secret.sops.yaml
