@@ -5,6 +5,7 @@ kind: Kustomization
 namespace: authentik
 
 components:
+  - ../../components/network-policy
   - ../../components/sops
 
 resources:
