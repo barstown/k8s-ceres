@@ -23,6 +23,8 @@ spec:
     global:
       deploymentAnnotations:
         reloader.stakater.com/auto: "true"
+      podLabels:
+        app.ceres.io/egress-internet: "true"
       env:
         - name: AUTHENTIK_SECRET_KEY
           valueFrom:
@@ -90,6 +92,8 @@ spec:
         seccompProfile: { type: RuntimeDefault }
         capabilities: { drop: ["ALL"] }
     worker:
+      podLabels:
+        app.ceres.io/egress-kube-apiserver: "true"
       resources:
         requests:
           cpu: 100m

@@ -31,6 +31,12 @@ Application labels:
 
 - `app.ceres.io/depends-on-postgresql: "true"`
 - `app.ceres.io/depends-on-redis: "true"`
+- `app.ceres.io/egress-internet: "true"`: allows HTTPS (443) egress to the
+  internet, excluding private ranges, via the `network-policy` component. Must
+  be on the pod template; Cilium matches pod labels, not workload labels.
+- `app.ceres.io/egress-kube-apiserver: "true"`: allows egress to the Kubernetes
+  API via the `network-policy` component. Pod template label, as above. CNPG
+  pods get this access automatically and do not need the label.
 
 Operations labels:
 
