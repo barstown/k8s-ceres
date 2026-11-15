@@ -14,5 +14,9 @@ configMapGenerator:
   - name: authentik-blueprints
     files:
       - ceres-access.yaml=./resources/ceres-access.yaml
+      - ceres-system.yaml=./resources/ceres-system.yaml
+    options:
+      annotations:
+        reloader.stakater.com/ignore: "true"
 generatorOptions:
   disableNameSuffixHash: true

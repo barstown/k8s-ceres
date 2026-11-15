@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Ceres - System
+  labels:
+    blueprints.goauthentik.io/instantiate: "true"
+entries:
+  # Fallback for blueprint changes the file watcher misses (e.g. pod restarts)
+  - model: authentik_tasks_schedules.schedule
+    identifiers:
+      actor_name: authentik.blueprints.v1.tasks.blueprints_discovery
+    attrs:
+      crontab: "*/5 * * * *"
