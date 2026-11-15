@@ -9,6 +9,9 @@ spec:
     - group: gateway.envoyproxy.io
       kind: SecurityPolicy
       namespace: changedetection
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: kube-system
   to:
     - group: ""
       kind: Service

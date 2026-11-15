@@ -64,7 +64,12 @@
   "vscode.env.isTelemetryEnabled": false,
   "vsicons.dontShowNewVersionMessage": true,
   "workbench.iconTheme": "vscode-icons",
-  "yaml.customTags": ["!env_var", "!vault scalar"],
+  "yaml.customTags": [
+    "!env_var",
+    "!vault scalar",
+    "!KeyOf scalar",
+    "!Find sequence"
+  ],
   "yaml.schemas": {
     "kubernetes": "./kubernetes/**/*.yaml"
   },
