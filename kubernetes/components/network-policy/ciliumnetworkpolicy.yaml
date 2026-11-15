@@ -78,7 +78,7 @@ kind: CiliumNetworkPolicy
 metadata:
   name: cnpg-instances
 spec:
-  description: CNPG operator status checks and Kubernetes API egress for all CNPG pods
+  description: CNPG operator status checks, Kubernetes API, and barman S3 on TrueNAS for all CNPG pods
   endpointSelector:
     matchExpressions:
       - key: cnpg.io/cluster
@@ -95,3 +95,9 @@ spec:
   egress:
     - toEntities:
         - kube-apiserver
+    - toCIDR:
+        - 10.0.10.50/32 # truenas.lab.${INTERNAL_DOMAIN}
+      toPorts:
+        - ports:
+            - port: "30292"
+              protocol: TCP
