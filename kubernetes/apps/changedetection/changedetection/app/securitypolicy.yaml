@@ -9,6 +9,7 @@ spec:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
       name: changedetection
+      sectionName: app
   extAuth:
     headersToExtAuth:
       - cookie
