@@ -26,6 +26,10 @@ spec:
     # devices: eno+ eth+
     dashboards:
       enabled: true
+    encryption:
+      enabled: true
+      type: wireguard
+      # nodeEncryption: false # Beta, enable when supported by Cilium
     endpointRoutes:
       enabled: true
     envoy:
@@ -33,7 +37,26 @@ spec:
     gatewayAPI:
       enabled: false
     hubble:
-      enabled: false
+      enabled: true
+      metrics:
+        enabled:
+          - dns
+          - drop
+          - tcp
+          - flow
+          - port-distribution
+          - icmp
+          - httpV2
+        dashboards:
+          enabled: true
+        serviceMonitor:
+          enabled: true
+      relay:
+        enabled: true
+        rollOutPods: true
+      ui:
+        enabled: true
+        rollOutPods: true
     ipam:
       mode: kubernetes
     ipv4NativeRoutingCIDR: "10.42.0.0/16"
