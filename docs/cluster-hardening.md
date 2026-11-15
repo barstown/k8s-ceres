@@ -68,6 +68,18 @@ Move each namespace to default deny, then allow only the flows it needs. This co
 
 `CiliumNetworkPolicy` can also filter by HTTP path and method where a single port needs finer control.
 
+#### Hostname Rules (toFQDNs) and CoreDNS Autopath
+
+A `toFQDNs` rule on its own does not match in this cluster. Pods use `ndots: 5`, so a name with fewer than 5 dots is first looked up with the search domains. CoreDNS `autopath` answers that expanded query (`<name>.<namespace>.svc.cluster.local`) with a CNAME to the real name, and Cilium records the IP only under the expanded name.
+
+This blocked authentik-postgres backups to TrueNAS for about 11 minutes on 2026-11-15, until a CIDR rule was added. That rule (`10.0.10.50/32`, TCP 30292) now lives in the component's `cnpg-instances` policy, so every CNPG namespace gets backups without its own rule.
+
+- LAN targets with fixed IPs: add a `toCIDR` rule for the IP. Keeping the `toFQDNs` rule alongside it is harmless.
+- Hostnames whose IPs change: also match the expanded name, e.g. `matchPattern: "<name>.*.svc.cluster.local"`.
+- To check what Cilium recorded, run `cilium-dbg fqdn cache list` in the agent on the pod's node.
+
+App policies may apply a few seconds before the component and briefly deny traffic. That gap is accepted.
+
 ### 3. SSO with authentik
 
 Put authentik in front of apps so there is one login, with MFA and group-based access.
@@ -100,9 +112,11 @@ This section only lists questions; we'll review them separately. SPIFFE is the s
 
 ### Checklist
 
-- [ ] Enable Cilium WireGuard encryption and Hubble in one change; verify with `cilium encrypt status` and `hubble observe`
-- [ ] Write the default-deny network policy component
-- [ ] Lock down the `authentik` namespace first, then the remaining apps
+- [x] Enable Cilium WireGuard encryption and Hubble in one change; verify with `cilium encrypt status` and `hubble observe`
+- [x] Write the default-deny network policy component
+- [x] Lock down the `authentik` namespace
+- [ ] Roll out network policies to the remaining namespaces
+- [ ] Decide whether to remove CoreDNS `autopath` before the first internet `toFQDNs` rule
 - [ ] Put the first app (Changedetection) behind authentik forward auth
 - [ ] Move apps with OIDC support to authentik OIDC
 - [ ] Review PodSecurity levels per namespace
