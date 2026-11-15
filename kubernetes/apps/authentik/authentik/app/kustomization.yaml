@@ -10,3 +10,9 @@ resources:
   - ./ocirepository.yaml
   - ./referencegrant.yaml
   - ./secret.sops.yaml
+configMapGenerator:
+  - name: authentik-blueprints
+    files:
+      - ceres-access.yaml=./resources/ceres-access.yaml
+generatorOptions:
+  disableNameSuffixHash: true

@@ -1,0 +1,88 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+version: 1
+metadata:
+  name: Ceres - Access
+  labels:
+    blueprints.goauthentik.io/instantiate: "true"
+entries:
+  # Groups: admins inherit home-users, so household apps only bind home-users
+  - model: authentik_core.group
+    id: home-users
+    identifiers:
+      name: home-users
+  - model: authentik_core.group
+    id: admins
+    identifiers:
+      name: authentik Admins
+    attrs:
+      parents:
+        - !KeyOf home-users
+
+  # changedetection (home-users)
+  - model: authentik_providers_proxy.proxyprovider
+    id: changedetection-provider
+    identifiers:
+      name: Provider for changedetection
+    attrs:
+      mode: forward_single
+      external_host: https://changedetection.${SECRET_DOMAIN}
+      authorization_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-authorization-implicit-consent]
+      invalidation_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-invalidation-flow]
+  - model: authentik_core.application
+    id: changedetection
+    identifiers:
+      slug: changedetection
+    attrs:
+      name: changedetection
+      provider: !KeyOf changedetection-provider
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf changedetection
+      group: !KeyOf home-users
+      order: 0
+  - model: authentik_policies.policybinding
+    state: absent
+    identifiers:
+      target: !KeyOf changedetection
+      group: !KeyOf admins
+      order: 1
+
+  # hubble (admins only)
+  - model: authentik_providers_proxy.proxyprovider
+    id: hubble-provider
+    identifiers:
+      name: Provider for hubble
+    attrs:
+      mode: forward_single
+      external_host: https://hubble.${SECRET_DOMAIN}
+      authorization_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-authorization-implicit-consent]
+      invalidation_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-invalidation-flow]
+  - model: authentik_core.application
+    id: hubble
+    identifiers:
+      slug: hubble
+    attrs:
+      name: hubble
+      provider: !KeyOf hubble-provider
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf hubble
+      group: !KeyOf admins
+      order: 0
+
+  # Embedded outpost serves every forward-auth provider above
+  - model: authentik_outposts.outpost
+    identifiers:
+      managed: goauthentik.io/outposts/embedded
+    attrs:
+      providers:
+        - !KeyOf changedetection-provider
+        - !KeyOf hubble-provider

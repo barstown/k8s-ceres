@@ -59,6 +59,9 @@ spec:
       enabled: true
       error_reporting:
         enabled: false
+    blueprints:
+      configMaps:
+        - authentik-blueprints
     server:
       containerPorts:
         http: &port 9000
