@@ -5,6 +5,7 @@ kind: Kustomization
 namespace: lidarr
 
 components:
+  - ../../components/network-policy
   - ../../components/sops
 
 resources:

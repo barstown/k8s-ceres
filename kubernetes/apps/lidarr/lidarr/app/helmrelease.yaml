@@ -14,6 +14,10 @@ spec:
       lidarr:
         annotations:
           reloader.stakater.com/auto: "true"
+        pod:
+          labels:
+            app.ceres.io/egress-internet: "true"
+            app.ceres.io/egress-plex: "true"
         containers:
           app:
             image:

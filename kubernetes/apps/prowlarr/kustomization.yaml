@@ -5,6 +5,7 @@ kind: Kustomization
 namespace: prowlarr
 
 components:
+  - ../../components/network-policy
   - ../../components/sops
 
 resources:
