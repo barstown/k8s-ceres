@@ -16,3 +16,9 @@ spec:
         - ports:
             - port: "30292"
               protocol: TCP
+    - toCIDR:
+        - 10.0.10.50/32
+      toPorts:
+        - ports:
+            - port: "30292"
+              protocol: TCP
