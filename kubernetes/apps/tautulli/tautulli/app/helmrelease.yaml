@@ -27,6 +27,7 @@ spec:
               TAUTULLI_CHECK_GITHUB: 0
               TAUTULLI_HTTP_BASE_URL: "https://{{ .Release.Name }}.${SECRET_DOMAIN}"
               TAUTULLI_HTTP_PORT: &port 80
+              TAUTULLI_HTTP_PROXY: 1
               TZ: America/New_York
             envFrom:
               - secretRef:
