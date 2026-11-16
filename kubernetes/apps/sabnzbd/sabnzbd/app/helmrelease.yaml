@@ -147,6 +147,10 @@ spec:
             port: *port
     route:
       internal:
+        annotations:
+          gatus.home-operations.com/endpoint: |-
+            url: https://sabnzbd.${SECRET_DOMAIN}/api?mode=version
+            conditions: ["[STATUS] == 200"]
         hostnames: ["{{ .Release.Name }}.${SECRET_DOMAIN}"]
         parentRefs:
           - name: envoy-internal

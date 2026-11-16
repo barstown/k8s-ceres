@@ -70,6 +70,10 @@ spec:
             port: &port 5656
     route:
       internal:
+        annotations:
+          gatus.home-operations.com/endpoint: |-
+            path: /api/system/about
+            conditions: ["[STATUS] == 401"]
         hostnames: ["{{ .Release.Name }}.${SECRET_DOMAIN}"]
         parentRefs:
           - name: envoy-internal
