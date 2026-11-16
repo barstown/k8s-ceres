@@ -90,6 +90,10 @@ spec:
             port: *port
     route:
       internal:
+        annotations:
+          gatus.home-operations.com/endpoint: |-
+            path: /api/v3/system/status
+            conditions: ["[STATUS] == 401"]
         hostnames: ["{{ .Release.Name }}.${SECRET_DOMAIN}"]
         parentRefs:
           - name: envoy-internal
