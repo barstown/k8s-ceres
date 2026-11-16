@@ -1,0 +1,28 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/gateway.envoyproxy.io/securitypolicy_v1alpha1.json
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: tautulli-authentik
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: tautulli
+      sectionName: app
+  extAuth:
+    headersToExtAuth:
+      - cookie
+    http:
+      backendRefs:
+        - name: authentik-server
+          namespace: authentik
+          port: 80
+      path: /outpost.goauthentik.io/auth/envoy
+      headersToBackend:
+        - set-cookie
+        - x-authentik-username
+        - x-authentik-groups
+        - x-authentik-email
+        - x-authentik-name
+        - x-authentik-uid

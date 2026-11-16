@@ -76,7 +76,16 @@ spec:
             namespace: network
             sectionName: https
         rules:
-          - backendRefs:
+          - name: api
+            matches:
+              - path:
+                  type: PathPrefix
+                  value: /api
+            backendRefs:
+              - identifier: app
+                port: *port
+          - name: app
+            backendRefs:
               - identifier: app
                 port: *port
     persistence:

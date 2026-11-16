@@ -78,6 +78,195 @@ entries:
       group: !KeyOf admins
       order: 0
 
+  # sonarr (home-users)
+  - model: authentik_providers_proxy.proxyprovider
+    id: sonarr-provider
+    identifiers:
+      name: Provider for sonarr
+    attrs:
+      mode: forward_single
+      external_host: https://sonarr.${SECRET_DOMAIN}
+      authorization_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-authorization-implicit-consent]
+      invalidation_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-invalidation-flow]
+  - model: authentik_core.application
+    id: sonarr
+    identifiers:
+      slug: sonarr
+    attrs:
+      name: sonarr
+      provider: !KeyOf sonarr-provider
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf sonarr
+      group: !KeyOf home-users
+      order: 0
+
+  # radarr (home-users)
+  - model: authentik_providers_proxy.proxyprovider
+    id: radarr-provider
+    identifiers:
+      name: Provider for radarr
+    attrs:
+      mode: forward_single
+      external_host: https://radarr.${SECRET_DOMAIN}
+      authorization_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-authorization-implicit-consent]
+      invalidation_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-invalidation-flow]
+  - model: authentik_core.application
+    id: radarr
+    identifiers:
+      slug: radarr
+    attrs:
+      name: radarr
+      provider: !KeyOf radarr-provider
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf radarr
+      group: !KeyOf home-users
+      order: 0
+
+  # lidarr (home-users)
+  - model: authentik_providers_proxy.proxyprovider
+    id: lidarr-provider
+    identifiers:
+      name: Provider for lidarr
+    attrs:
+      mode: forward_single
+      external_host: https://lidarr.${SECRET_DOMAIN}
+      authorization_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-authorization-implicit-consent]
+      invalidation_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-invalidation-flow]
+  - model: authentik_core.application
+    id: lidarr
+    identifiers:
+      slug: lidarr
+    attrs:
+      name: lidarr
+      provider: !KeyOf lidarr-provider
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf lidarr
+      group: !KeyOf home-users
+      order: 0
+
+  # prowlarr (home-users)
+  - model: authentik_providers_proxy.proxyprovider
+    id: prowlarr-provider
+    identifiers:
+      name: Provider for prowlarr
+    attrs:
+      mode: forward_single
+      external_host: https://prowlarr.${SECRET_DOMAIN}
+      authorization_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-authorization-implicit-consent]
+      invalidation_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-invalidation-flow]
+  - model: authentik_core.application
+    id: prowlarr
+    identifiers:
+      slug: prowlarr
+    attrs:
+      name: prowlarr
+      provider: !KeyOf prowlarr-provider
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf prowlarr
+      group: !KeyOf home-users
+      order: 0
+
+  # sabnzbd (home-users)
+  - model: authentik_providers_proxy.proxyprovider
+    id: sabnzbd-provider
+    identifiers:
+      name: Provider for sabnzbd
+    attrs:
+      mode: forward_single
+      external_host: https://sabnzbd.${SECRET_DOMAIN}
+      authorization_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-authorization-implicit-consent]
+      invalidation_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-invalidation-flow]
+  - model: authentik_core.application
+    id: sabnzbd
+    identifiers:
+      slug: sabnzbd
+    attrs:
+      name: sabnzbd
+      provider: !KeyOf sabnzbd-provider
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf sabnzbd
+      group: !KeyOf home-users
+      order: 0
+
+  # kapowarr (home-users)
+  - model: authentik_providers_proxy.proxyprovider
+    id: kapowarr-provider
+    identifiers:
+      name: Provider for kapowarr
+    attrs:
+      mode: forward_single
+      external_host: https://kapowarr.${SECRET_DOMAIN}
+      authorization_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-authorization-implicit-consent]
+      invalidation_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-invalidation-flow]
+  - model: authentik_core.application
+    id: kapowarr
+    identifiers:
+      slug: kapowarr
+    attrs:
+      name: kapowarr
+      provider: !KeyOf kapowarr-provider
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf kapowarr
+      group: !KeyOf home-users
+      order: 0
+
+  # tautulli (home-users)
+  - model: authentik_providers_proxy.proxyprovider
+    id: tautulli-provider
+    identifiers:
+      name: Provider for tautulli
+    attrs:
+      mode: forward_single
+      external_host: https://tautulli.${SECRET_DOMAIN}
+      authorization_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-authorization-implicit-consent]
+      invalidation_flow: !Find
+        - authentik_flows.flow
+        - [slug, default-provider-invalidation-flow]
+  - model: authentik_core.application
+    id: tautulli
+    identifiers:
+      slug: tautulli
+    attrs:
+      name: tautulli
+      provider: !KeyOf tautulli-provider
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf tautulli
+      group: !KeyOf home-users
+      order: 0
+
   # Embedded outpost serves every forward-auth provider above
   - model: authentik_outposts.outpost
     identifiers:
@@ -86,3 +275,10 @@ entries:
       providers:
         - !KeyOf changedetection-provider
         - !KeyOf hubble-provider
+        - !KeyOf sonarr-provider
+        - !KeyOf radarr-provider
+        - !KeyOf lidarr-provider
+        - !KeyOf prowlarr-provider
+        - !KeyOf sabnzbd-provider
+        - !KeyOf kapowarr-provider
+        - !KeyOf tautulli-provider

@@ -12,6 +12,27 @@ spec:
     - group: gateway.envoyproxy.io
       kind: SecurityPolicy
       namespace: kube-system
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: sonarr
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: radarr
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: lidarr
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: prowlarr
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: sabnzbd
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: kapowarr
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: tautulli
   to:
     - group: ""
       kind: Service

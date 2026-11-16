@@ -129,6 +129,10 @@ spec:
                 cpu: 2000m
                 memory: 1Gi
     defaultPodOptions:
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "1"
       securityContext:
         fsGroup: 2001 # media-rw
         fsGroupChangePolicy: OnRootMismatch
@@ -149,7 +153,16 @@ spec:
             namespace: network
             sectionName: https
         rules:
-          - backendRefs:
+          - name: api
+            matches:
+              - path:
+                  type: PathPrefix
+                  value: /api
+            backendRefs:
+              - identifier: app
+                port: *port
+          - name: app
+            backendRefs:
               - identifier: app
                 port: *port
     persistence:
