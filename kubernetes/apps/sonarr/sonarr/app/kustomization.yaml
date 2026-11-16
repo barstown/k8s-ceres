@@ -9,3 +9,4 @@ resources:
   - ./persistentvolumeclaim.yaml
   - ./helmrelease.yaml
   - ./ocirepository.yaml
+  - ./securitypolicy.yaml

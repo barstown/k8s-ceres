@@ -25,7 +25,7 @@ spec:
             env:
               PROWLARR__APP__INSTANCENAME: Prowlarr
               PROWLARR__APP__THEME: dark
-              PROWLARR__AUTH__METHOD: forms
+              PROWLARR__AUTH__METHOD: External
               PROWLARR__AUTH__REQUIRED: Enabled # DisabledForLocalAddresses
               PROWLARR__LOG__DBENABLED: "false"
               PROWLARR__LOG__LEVEL: info
@@ -89,7 +89,16 @@ spec:
             namespace: network
             sectionName: https
         rules:
-          - backendRefs:
+          - name: api
+            matches:
+              - path:
+                  type: PathPrefix
+                  value: /api
+            backendRefs:
+              - identifier: app
+                port: *port
+          - name: app
+            backendRefs:
               - identifier: app
                 port: *port
     persistence:
