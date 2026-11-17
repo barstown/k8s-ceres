@@ -44,6 +44,8 @@ spec:
           - /usr/share/postgresql/18/
     shared_preload_libraries:
       - "vchord.so"
+  primaryUpdateMethod: switchover
+  smartShutdownTimeout: 15
   resources:
     requests:
       cpu: 50m

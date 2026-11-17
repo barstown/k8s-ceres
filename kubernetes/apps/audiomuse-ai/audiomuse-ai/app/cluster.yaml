@@ -28,6 +28,8 @@ spec:
       isWALArchiver: true
       parameters:
         barmanObjectName: rustfs-s3
+  primaryUpdateMethod: switchover
+  smartShutdownTimeout: 15
   resources:
     requests:
       cpu: 50m
