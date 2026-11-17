@@ -5,6 +5,7 @@ kind: Kustomization
 namespace: audiomuse-ai
 
 components:
+  - ../../components/network-policy
   - ../../components/sops
 
 resources:

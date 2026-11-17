@@ -38,8 +38,8 @@ Application labels:
   API via the `network-policy` component. Pod template label, as above. CNPG
   pods get this access automatically and do not need the label.
 - `app.ceres.io/egress-plex: "true"`: allows egress to the Plex server on the
-  LAN (`10.0.10.92:443`) via the `network-policy` component. Pod template
-  label, as above.
+  LAN (`10.0.10.92`, ports 443 and 32400) via the `network-policy` component.
+  Pod template label, as above.
 
 Operations labels:
 

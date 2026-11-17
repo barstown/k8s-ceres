@@ -1,0 +1,32 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: navidrome
+spec:
+  description: Lidarr and AudioMuse-AI API access; calls to AudioMuse-AI
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: navidrome
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: audiomuse-ai
+            app.kubernetes.io/name: audiomuse-ai
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: lidarr
+            app.kubernetes.io/name: lidarr
+      toPorts:
+        - ports:
+            - port: "4533"
+              protocol: TCP
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: audiomuse-ai
+            app.kubernetes.io/name: audiomuse-ai
+      toPorts:
+        - ports:
+            - port: "8000"
+              protocol: TCP
