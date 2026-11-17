@@ -18,6 +18,6 @@ spec:
       secretAccessKey:
         name: rustfs-secrets
         key: RUSTFS_ACCESS_SECRET_KEY
-    # wal:
-    #   compression: zstd
+    wal:
+      compression: zstd
   retentionPolicy: 4w
