@@ -7,5 +7,6 @@ resources:
   - ./helmrelease.yaml
   - ./httproute.yaml
   - ./ocirepository.yaml
+  - ./prometheusrule.yaml
   - ./securitypolicy.yaml
   - ./networks.yaml
