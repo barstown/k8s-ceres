@@ -92,6 +92,8 @@ spec:
         - ports:
             - port: "443"
               protocol: TCP
+            - port: "32400"
+              protocol: TCP
 
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json

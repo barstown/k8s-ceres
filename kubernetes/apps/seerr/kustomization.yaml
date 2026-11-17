@@ -5,6 +5,7 @@ kind: Kustomization
 namespace: seerr
 
 components:
+  - ../../components/network-policy
   - ../../components/sops
 
 resources:

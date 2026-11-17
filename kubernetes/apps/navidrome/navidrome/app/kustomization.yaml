@@ -6,4 +6,5 @@ resources:
   - ./persistentvolume.yaml
   - ./persistentvolumeclaim.yaml
   - ./helmrelease.yaml
+  - ./ciliumnetworkpolicy.yaml
   - ./ocirepository.yaml

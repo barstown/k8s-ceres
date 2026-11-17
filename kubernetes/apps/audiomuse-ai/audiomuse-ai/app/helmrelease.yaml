@@ -24,6 +24,9 @@ spec:
       flask:
         annotations:
           reloader.stakater.com/auto: "true"
+        pod:
+          labels:
+            app.ceres.io/egress-internet: "true"
         containers:
           app:
             image: &image
@@ -99,6 +102,9 @@ spec:
       worker:
         annotations:
           reloader.stakater.com/auto: "true"
+        pod:
+          labels:
+            app.ceres.io/egress-internet: "true"
         containers:
           app:
             image: *image

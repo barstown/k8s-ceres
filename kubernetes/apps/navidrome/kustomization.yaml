@@ -5,6 +5,7 @@ kind: Kustomization
 namespace: navidrome
 
 components:
+  - ../../components/network-policy
   - ../../components/sops
 
 resources:

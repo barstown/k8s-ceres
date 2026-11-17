@@ -1,0 +1,23 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: seerr
+spec:
+  description: Calls to Sonarr and Radarr
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: seerr
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: radarr
+            app.kubernetes.io/name: radarr
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: sonarr
+            app.kubernetes.io/name: sonarr
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
