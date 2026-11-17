@@ -1,19 +1,19 @@
 ## Cluster Hardening
 
-Plan for hardening the cluster, in priority order. As of 2026-11-14.
+Plan for hardening the cluster, in priority order. As of 2026-11-16.
 
 ### Current State
 
-The biggest gap is that any pod can reach any other pod: the repo has no network policies. The cluster is 6 Talos v1.14.6 nodes (3 control plane, 3 workers) on 10.0.50.0/24, running Cilium in native routing mode with Envoy Gateway in front.
+The cluster is 6 Talos v1.14.6 nodes (3 control plane, 3 workers) on 10.0.50.0/24, running Cilium in native routing mode with Envoy Gateway in front. The biggest remaining gap is the namespaces still without network policies.
 
 | Area | Today | Gap |
 | --- | --- | --- |
-| Pod-to-pod access | No `NetworkPolicy` or `CiliumNetworkPolicy` | Unrestricted lateral movement |
-| Traffic between nodes | Cilium, no encryption | Plain text on the node LAN |
-| App login | Each app's own auth; authentik deployed but not in front of apps | No SSO, uneven login strength |
+| Pod-to-pod access | Default deny in 15 app namespaces | The rest are unrestricted, including platform namespaces |
+| Traffic between nodes | WireGuard between pods | Host-network traffic plain text (`nodeEncryption` beta) |
+| App login | authentik forward auth on 9 apps | OIDC apps still use their own login |
 | Edge | CrowdSec bouncer on `envoy-external` | Covers the external gateway only |
 | Pod security | Talos PodSecurity admission; `kube-system` privileged | Not reviewed per namespace |
-| Visibility | Hubble disabled | Hard to write and debug policies |
+| Visibility | Hubble with UI, metrics and a policy drop alert | None for now |
 
 ### 1. Cilium: WireGuard Encryption and Hubble (Easy Win)
 
@@ -68,6 +68,16 @@ Move each namespace to default deny, then allow only the flows it needs. This co
 
 `CiliumNetworkPolicy` can also filter by HTTP path and method where a single port needs finer control.
 
+Done so far: authentik, changedetection, homebox, sonarr, radarr, lidarr, prowlarr, sabnzbd, kapowarr, tautulli, seerr, recyclarr, navidrome, kavita and audiomuse-ai. Pods opt into internet, Kubernetes API and Plex access with `app.ceres.io/egress-*` labels (see `docs/labels.md`).
+
+#### Catching Missed Flows
+
+A Hubble capture only covers its time window. It missed Recyclarr's once-a-day sync, which then failed on 2026-11-16.
+
+- Before writing rules, also check each app's settings (UI-configured URLs, scheduled jobs, plugins) for flows the capture may not show.
+- The `CiliumPolicyDenied` alert (`kube-system/cilium-rules`) sends to ntfy within about 10 minutes, naming both ends. It also fires briefly when a namespace first gets policies.
+- Hubble's flow buffer holds well under a minute of traffic on busy nodes, so check drops soon after a change.
+
 #### Hostname Rules (toFQDNs) and CoreDNS Autopath
 
 A `toFQDNs` rule on its own does not match in this cluster. Pods use `ndots: 5`, so a name with fewer than 5 dots is first looked up with the search domains. CoreDNS `autopath` answers that expanded query (`<name>.<namespace>.svc.cluster.local`) with a CNAME to the real name, and Cilium records the IP only under the expanded name.
@@ -88,7 +98,14 @@ Put authentik in front of apps so there is one login, with MFA and group-based a
 - **Apps without OIDC** (Sonarr, Radarr, Lidarr, Prowlarr, SABnzbd, Tautulli, Changedetection): use a proxy provider in forward auth mode, plus an Envoy Gateway `SecurityPolicy` with `extAuth` on the app's HTTPRoute. No Istio needed.
 - Keep `/api` paths that use API keys outside the proxy, and set each app's own auth to External.
 - Fail closed: no `failOpen` on these policies.
-- Package the policy as a kustomize component so enabling it is one line per app.
+
+Done so far: Changedetection, Hubble UI and the media stack (Sonarr, Radarr, Lidarr, Prowlarr, SABnzbd, Kapowarr, Tautulli).
+
+- Providers, applications and group bindings are managed by the authentik blueprint `kubernetes/apps/authentik/authentik/app/resources/ceres-access.yaml`. Apps are bound to `home-users`, except Hubble, which is `authentik Admins` only. Users and group membership stay in the UI.
+- Each HTTPRoute has named `api` and `app` rules, and the `SecurityPolicy` targets the `app` rule.
+- Calls between apps go to Services directly and don't pass through authentik.
+- Gatus probes these apps on an API path with an annotation, since `/` now redirects to authentik.
+- Tautulli has no External auth mode. It needs its admin password cleared and HTTP Proxy enabled (`TAUTULLI_HTTP_PROXY`).
 
 ### Deferred: Cilium Mutual Authentication
 
@@ -115,9 +132,12 @@ This section only lists questions; we'll review them separately. SPIFFE is the s
 - [x] Enable Cilium WireGuard encryption and Hubble in one change; verify with `cilium encrypt status` and `hubble observe`
 - [x] Write the default-deny network policy component
 - [x] Lock down the `authentik` namespace
+- [x] Alert on network policy drops
+- [x] Roll out network policies to the media apps
 - [ ] Roll out network policies to the remaining namespaces
 - [ ] Decide whether to remove CoreDNS `autopath` before the first internet `toFQDNs` rule
-- [ ] Put the first app (Changedetection) behind authentik forward auth
+- [x] Put the first app (Changedetection) behind authentik forward auth
+- [x] Put Hubble UI and the media stack behind authentik
 - [ ] Move apps with OIDC support to authentik OIDC
 - [ ] Review PodSecurity levels per namespace
 - [ ] Review SPIFFE/SPIRE
