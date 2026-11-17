@@ -1,0 +1,20 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/monitoring.coreos.com/prometheusrule_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cilium-rules
+spec:
+  groups:
+    - name: cilium.rules
+      rules:
+        - alert: CiliumPolicyDenied
+          expr: |-
+            sum by (source, destination, protocol) (
+              increase(hubble_drop_total{reason="POLICY_DENIED", protocol=~"TCP|UDP"}[10m])
+            ) > 0
+          annotations:
+            summary: >-
+              Network policy is dropping {{ $labels.protocol }} traffic from {{ $labels.source }} to {{ $labels.destination }}
+          labels:
+            severity: warning
