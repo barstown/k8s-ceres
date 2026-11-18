@@ -1,0 +1,23 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: mosquitto
+spec:
+  description: MQTT from Home Assistant and Zigbee2MQTT
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: mosquitto
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: home-assistant
+            app.kubernetes.io/name: home-assistant
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: zigbee2mqtt
+            app.kubernetes.io/name: zigbee2mqtt
+      toPorts:
+        - ports:
+            - port: "1883"
+              protocol: TCP

@@ -5,6 +5,7 @@ kind: Kustomization
 namespace: zigbee2mqtt
 
 components:
+  - ../../components/network-policy
   - ../../components/sops
 
 resources:
