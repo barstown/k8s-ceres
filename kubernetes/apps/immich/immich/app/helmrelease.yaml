@@ -126,6 +126,8 @@ spec:
                   cpu: 100m
                   memory: 1Gi
           pod:
+            labels:
+              app.ceres.io/egress-internet: "true"
             securityContext:
               fsGroup: 2001 # media-rw
               fsGroupChangePolicy: OnRootMismatch
@@ -166,6 +168,9 @@ spec:
       controllers:
         main:
           strategy: Recreate
+          pod:
+            labels:
+              app.ceres.io/egress-internet: "true"
           containers:
             main:
               image:

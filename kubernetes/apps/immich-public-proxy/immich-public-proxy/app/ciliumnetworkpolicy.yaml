@@ -1,0 +1,20 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: immich-public-proxy
+spec:
+  description: Calls to the Immich server
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: immich-public-proxy
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: immich
+            app.kubernetes.io/name: server
+      toPorts:
+        - ports:
+            - port: "2283"
+              protocol: TCP
