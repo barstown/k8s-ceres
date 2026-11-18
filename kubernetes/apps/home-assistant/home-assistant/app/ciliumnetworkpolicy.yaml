@@ -19,7 +19,13 @@ spec:
             - port: "1883"
               protocol: TCP
     - toCIDR:
-        - 10.0.50.1/32
+        - 10.0.10.5/32 # Proxmox
+      toPorts:
+        - ports:
+            - port: "8006"
+              protocol: TCP
+    - toCIDR:
+        - 10.0.50.1/32 # UDMP
       toPorts:
         - ports:
             - port: "443"
