@@ -5,7 +5,7 @@ kind: CiliumNetworkPolicy
 metadata:
   name: home-assistant
 spec:
-  description: Calls to Mosquitto and UniFi; mDNS and SSDP sent on the pod network
+  description: Calls to Mosquitto and UniFi; discovery broadcasts and multicast sent on the pod network
   endpointSelector:
     matchLabels:
       app.kubernetes.io/name: home-assistant
@@ -27,14 +27,10 @@ spec:
             - port: "7441"
               protocol: TCP
     - toCIDR:
-        - 224.0.0.251/32
+        - 224.0.0.0/4
+        - 255.255.255.255/32
       toPorts:
         - ports:
-            - port: "5353"
-              protocol: UDP
-    - toCIDR:
-        - 239.255.255.250/32
-      toPorts:
-        - ports:
-            - port: "1900"
+            - port: "1"
+              endPort: 65535
               protocol: UDP
