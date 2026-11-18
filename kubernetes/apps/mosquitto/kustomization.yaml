@@ -5,6 +5,7 @@ kind: Kustomization
 namespace: mosquitto
 
 components:
+  - ../../components/network-policy
   - ../../components/sops
 
 resources:

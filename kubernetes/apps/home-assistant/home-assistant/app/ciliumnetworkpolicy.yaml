@@ -1,0 +1,40 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: home-assistant
+spec:
+  description: Calls to Mosquitto and UniFi; mDNS and SSDP sent on the pod network
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: home-assistant
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: mosquitto
+            app.kubernetes.io/name: mosquitto
+      toPorts:
+        - ports:
+            - port: "1883"
+              protocol: TCP
+    - toCIDR:
+        - 10.0.50.1/32
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+            - port: "7441"
+              protocol: TCP
+    - toCIDR:
+        - 224.0.0.251/32
+      toPorts:
+        - ports:
+            - port: "5353"
+              protocol: UDP
+    - toCIDR:
+        - 239.255.255.250/32
+      toPorts:
+        - ports:
+            - port: "1900"
+              protocol: UDP
