@@ -5,15 +5,22 @@ kind: Kustomization
 metadata:
   name: victoria-logs
 spec:
+  dependsOn:
+    - name: grafana
+      namespace: grafana
   interval: 1h
-  path: ./kubernetes/apps/o11y/victoria-logs/app
+  path: ./kubernetes/apps/victoria-logs/victoria-logs/app
+  postBuild:
+    substituteFrom:
+      - name: cluster-secrets
+        kind: Secret
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  targetNamespace: o11y
-  wait: false
+  targetNamespace: victoria-logs
+  wait: true
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/kustomize.toolkit.fluxcd.io/kustomization_v1.json
 apiVersion: kustomize.toolkit.fluxcd.io/v1
@@ -24,11 +31,11 @@ spec:
   dependsOn:
     - name: victoria-logs
   interval: 1h
-  path: ./kubernetes/apps/o11y/victoria-logs/collector
+  path: ./kubernetes/apps/victoria-logs/victoria-logs/collector
   prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  targetNamespace: o11y
+  targetNamespace: victoria-logs
   wait: false

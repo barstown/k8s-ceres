@@ -1,0 +1,23 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: victoria-logs
+spec:
+  description: LogsQL queries from vmauth and Grafana
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: victoria-logs-single
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: victoria-metrics
+            app.kubernetes.io/name: vmauth
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: grafana
+            app: grafana
+      toPorts:
+        - ports:
+            - port: "9428"
+              protocol: TCP
