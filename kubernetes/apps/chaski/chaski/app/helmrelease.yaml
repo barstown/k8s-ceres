@@ -12,6 +12,8 @@ spec:
   values:
     deploymentAnnotations:
       reloader.stakater.com/auto: "true"
+    podLabels:
+      app.ceres.io/egress-internet: "true"
     envFrom:
       - secretRef:
           name: chaski-secret

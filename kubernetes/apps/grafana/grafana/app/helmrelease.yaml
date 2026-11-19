@@ -10,6 +10,9 @@ spec:
     name: grafana-operator
   interval: 1h
   values:
+    podLabels:
+      app.ceres.io/egress-internet: "true"
+      app.ceres.io/egress-kube-apiserver: "true"
     crds:
       immutable: false
     dashboard:

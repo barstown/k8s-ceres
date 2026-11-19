@@ -1,0 +1,19 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: pihole-exporter
+spec:
+  description: Pi-hole APIs
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: pihole-exporter
+  egress:
+    - toCIDR:
+        - 10.0.10.20/32
+        - 10.0.10.22/32
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP

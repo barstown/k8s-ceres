@@ -6,4 +6,5 @@ resources:
   - ./secret.sops.yaml
   - ./grafanadashboard.yaml
   - ./helmrelease.yaml
+  - ./ciliumnetworkpolicy.yaml
   - ./ocirepository.yaml

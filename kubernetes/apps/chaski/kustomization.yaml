@@ -5,6 +5,7 @@ kind: Kustomization
 namespace: chaski
 
 components:
+  - ../../components/network-policy
   - ../../components/sops
 
 resources:

@@ -1,0 +1,36 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: syncthing
+spec:
+  description: Sync with LAN peers; discovery, relays and remote peers on the internet
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: syncthing
+  egress:
+    - toCIDR:
+        - 10.0.0.0/8
+        - 172.16.0.0/12
+        - 192.168.0.0/16
+      toPorts:
+        - ports:
+            - port: "22000"
+              protocol: TCP
+            - port: "22000"
+              protocol: UDP
+    - toCIDRSet:
+        - cidr: 0.0.0.0/0
+          except:
+            - 10.0.0.0/8
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+      toPorts:
+        - ports:
+            - port: "1"
+              endPort: 65535
+              protocol: TCP
+            - port: "1"
+              endPort: 65535
+              protocol: UDP
