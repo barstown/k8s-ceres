@@ -30,6 +30,11 @@ spec:
         size: 50Gi
       retentionPeriod: 90d
       retentionMaxDiskUsagePercent: 85
+      syslog:
+        udp:
+          - name: syslog-udp
+            # Unprivileged port; the syslog Service maps 514 to it
+            value: :5514
       resources:
         requests:
           cpu: 50m

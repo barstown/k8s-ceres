@@ -8,3 +8,4 @@ resources:
   - ./helmrelease.yaml
   - ./ciliumnetworkpolicy.yaml
   - ./ocirepository.yaml
+  - ./service.yaml
