@@ -44,7 +44,7 @@ spec:
             "security:openssf-scorecard"
           ],
           "timezone": "America/New_York",
-          "dependencyDashboardOSVVulnerabilitySummary": "all",
+          "dependencyDashboard": { "osvVulnerabilitySummary": "all" },
           "osvVulnerabilityAlerts": true,
           "packageRules": [
             {
