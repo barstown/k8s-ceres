@@ -11,6 +11,8 @@ spec:
     name: victoria-logs-collector
   values:
     fullnameOverride: victoria-logs-collector
+    collector:
+      msgField: [message, msg, log, event, error]
     global:
       image:
         registry: quay.io
