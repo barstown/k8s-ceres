@@ -33,9 +33,9 @@ spec:
       resources:
         requests:
           cpu: 50m
-          memory: 256Mi
+          memory: 512Mi
         limits:
-          memory: 1Gi
+          memory: 3Gi
       podSecurityContext:
         enabled: true
         fsGroup: 65534
