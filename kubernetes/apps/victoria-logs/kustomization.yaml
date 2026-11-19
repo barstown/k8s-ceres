@@ -2,6 +2,12 @@
 # yaml-language-server: $schema=https://json.schemastore.org/kustomization
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+namespace: victoria-logs
+
+components:
+  - ../../components/network-policy
+  - ../../components/sops
+
 resources:
-  - ./helmrelease.yaml
-  - ./ocirepository.yaml
+  - ./namespace.yaml
+  - ./victoria-logs/ks.yaml

@@ -14,7 +14,15 @@ spec:
     global:
       image:
         registry: quay.io
+    podLabels:
+      app.ceres.io/egress-kube-apiserver: "true"
     podMonitor:
       enabled: true
     remoteWrite:
-      - url: http://victoria-logs.o11y.svc.cluster.local:9428
+      - url: http://victoria-logs.victoria-logs.svc.cluster.local:9428
+    resources:
+      requests:
+        cpu: 25m
+        memory: 64Mi
+      limits:
+        memory: 256Mi
