@@ -35,6 +35,8 @@ spec:
           - name: syslog-udp
             # Unprivileged port; the syslog Service maps 514 to it
             value: :5514
+            # The UDM sends RFC3164 local time without a zone, which parses as UTC
+            useLocalTimestamp: true
       resources:
         requests:
           cpu: 50m
