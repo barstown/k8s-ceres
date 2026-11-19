@@ -72,8 +72,8 @@ spec:
       internal:
         annotations:
           gatus.home-operations.com/endpoint: |-
-            path: /api/system/about
-            conditions: ["[STATUS] == 401"]
+            path: /api/public
+            conditions: ["[STATUS] == 200"]
         hostnames: ["{{ .Release.Name }}.${SECRET_DOMAIN}"]
         parentRefs:
           - name: envoy-internal
@@ -89,6 +89,14 @@ spec:
               - identifier: app
                 port: *port
           - name: app
+            matches:
+              # Keep /api/auth behind Authentik; it returns the API key when no app password is set
+              - path:
+                  type: Exact
+                  value: /api/auth
+              - path:
+                  type: PathPrefix
+                  value: /
             backendRefs:
               - identifier: app
                 port: *port

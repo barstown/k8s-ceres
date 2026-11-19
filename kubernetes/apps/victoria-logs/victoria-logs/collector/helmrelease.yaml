@@ -12,6 +12,7 @@ spec:
   values:
     fullnameOverride: victoria-logs-collector
     collector:
+      excludeFilter: kubernetes.container_name:=csi-proxy
       msgField: [message, msg, log, event, error]
     global:
       image:

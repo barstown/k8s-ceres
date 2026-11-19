@@ -9,4 +9,6 @@ spec:
     kind: OCIRepository
     name: snapshot-controller
   interval: 1h
-  values: {}
+  values:
+    controller:
+      verbosityLevel: 2
