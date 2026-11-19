@@ -1,0 +1,18 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: unpoller
+spec:
+  description: UniFi controller API
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: unpoller
+  egress:
+    - toCIDR:
+        - 10.0.50.1/32
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

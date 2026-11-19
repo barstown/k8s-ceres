@@ -36,6 +36,9 @@ spec:
       strategy:
         type: Recreate
       template:
+        metadata:
+          labels:
+            app.ceres.io/egress-internet: "true"
         spec:
           containers:
             - name: grafana
