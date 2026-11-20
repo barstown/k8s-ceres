@@ -39,6 +39,12 @@
       pinDigests: false
     },
     {
+      description: "Hold CNPG clusters on PostgreSQL 18 until a planned major upgrade",
+      matchDatasources: ["docker"],
+      matchPackageNames: ["ghcr.io/cloudnative-pg/postgresql"],
+      allowedVersions: "/^18[.-]/"
+    },
+    {
       description: "Disable digest pinning for the annotated Immich main.image.tag",
       matchManagers: ["custom.regex"],
       matchDatasources: ["docker"],
