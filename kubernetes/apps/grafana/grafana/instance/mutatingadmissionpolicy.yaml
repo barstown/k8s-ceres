@@ -46,3 +46,65 @@ spec:
               value: "mirror.gcr.io/grafana/" + object.spec.template.spec.containers[0].image.replace("docker.io/grafana/", "")
             }
           ]
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/admissionregistration.k8s.io/mutatingadmissionpolicybinding_v1.json
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingAdmissionPolicyBinding
+metadata:
+  name: grafana-plugins-env
+spec:
+  policyName: grafana-plugins-env
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/admissionregistration.k8s.io/mutatingadmissionpolicy_v1.json
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingAdmissionPolicy
+metadata:
+  name: grafana-plugins-env
+spec:
+  # Workaround for grafana/grafana-operator#3058: the operator flips between
+  # GF_INSTALL_PLUGINS and GF_PLUGINS_PREINSTALL_SYNC whenever status.version is
+  # cleared, restarting Grafana. Always rewrite to the newer variable so the pod
+  # template stays stable. Remove once fixed upstream.
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - apps
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - deployments
+  matchConditions:
+    - name: is-grafana-deployment
+      expression: >-
+        object.metadata.name == "grafana-deployment"
+    - name: has-legacy-plugins-env
+      expression: >-
+        has(object.spec.template.spec.containers[0].env) &&
+        object.spec.template.spec.containers[0].env.exists(e,
+          e.name == "GF_INSTALL_PLUGINS"
+        )
+  failurePolicy: Ignore
+  reinvocationPolicy: IfNeeded
+  variables:
+    - name: pluginsEnvIndex
+      expression: >-
+        object.spec.template.spec.containers[0].env.map(e, e.name).indexOf("GF_INSTALL_PLUGINS")
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: >-
+          [
+            JSONPatch{
+              op: "replace",
+              path: "/spec/template/spec/containers/0/env/" + string(variables.pluginsEnvIndex) + "/name",
+              value: "GF_PLUGINS_PREINSTALL_SYNC"
+            },
+            JSONPatch{
+              op: "replace",
+              path: "/spec/template/spec/containers/0/env/" + string(variables.pluginsEnvIndex) + "/value",
+              value: object.spec.template.spec.containers[0].env[variables.pluginsEnvIndex].value.replace(" ", "@")
+            }
+          ]
