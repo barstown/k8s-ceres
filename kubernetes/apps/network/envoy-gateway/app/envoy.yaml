@@ -140,35 +140,6 @@ spec:
         certificateRefs:
           - kind: Secret
             name: ${SECRET_DOMAIN/./-}-production-tls
-# ---
-# apiVersion: gateway.networking.k8s.io/v1
-# kind: Gateway
-# metadata:
-#   name: envoy-syncthing
-# spec:
-#   gatewayClassName: envoy
-#   infrastructure:
-#     annotations:
-#       lbipam.cilium.io/ips: "10.0.50.6"
-#   listeners:
-#     - name: syncthing-sync-tcp
-#       protocol: TCP
-#       port: 22000
-#       allowedRoutes:
-#         namespaces:
-#           from: All
-#     - name: syncthing-sync-udp
-#       protocol: UDP
-#       port: 22000
-#       allowedRoutes:
-#         namespaces:
-#           from: All
-#     - name: syncthing-discovery-udp
-#       protocol: UDP
-#       port: 21027
-#       allowedRoutes:
-#         namespaces:
-#           from: All
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/gateway.envoyproxy.io/backendtrafficpolicy_v1alpha1.json
 apiVersion: gateway.envoyproxy.io/v1alpha1
