@@ -48,7 +48,7 @@ key_groups:
 Then re-wrap the data key in every file (metadata-only change):
 
 ```sh
-find . -name '*.sops.yaml' -not -path './.git/*' -exec sops updatekeys --yes {} \;
+git ls-files -z '*.sops.yaml' ':!:.sops.yaml' | xargs -0 -n1 sops updatekeys --yes
 ```
 
 ## 4. Commit and verify
