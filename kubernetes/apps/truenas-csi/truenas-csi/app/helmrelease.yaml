@@ -34,10 +34,10 @@ spec:
                           type: ""
   values:
     truenas:
-      url: wss://10.0.50.6/api/current
+      url: wss://10.0.50.200/api/current
       defaultPool: storage
-      nfsServer: 10.0.50.6
-      iscsiPortal: 10.0.50.6:3260
+      nfsServer: 10.0.50.200
+      iscsiPortal: 10.0.50.200:3260
       insecureSkipTLS: true
       existingSecret: truenas-csi-secret
       existingSecretKey: api-key
