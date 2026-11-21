@@ -34,10 +34,10 @@ spec:
                           type: ""
   values:
     truenas:
-      url: wss://10.0.10.50/api/current
+      url: wss://10.0.50.6/api/current
       defaultPool: storage
-      nfsServer: 10.0.10.50
-      iscsiPortal: 10.0.10.50:3260
+      nfsServer: 10.0.50.6
+      iscsiPortal: 10.0.50.6:3260
       insecureSkipTLS: true
       existingSecret: truenas-csi-secret
       existingSecretKey: api-key
@@ -46,53 +46,39 @@ spec:
       serviceMonitor:
         enabled: true
     storageClasses:
-      - name: truenas-iscsi
+      - &iscsi
+        name: truenas-iscsi
         isDefault: false
         reclaimPolicy: Retain
         allowVolumeExpansion: true
         volumeBindingMode: Immediate
         mountOptions:
           - noatime
-        parameters:
+        parameters: &iscsiParameters
           protocol: iscsi
           datasetPath: k8s/truenas-csi/iscsi
           csi.storage.k8s.io/fstype: xfs
           volblocksize: 16K
           iscsi.blocksize: "4096"
           sparse: "true"
-      - name: truenas-iscsi-postgresql
-        isDefault: false
-        reclaimPolicy: Retain
-        allowVolumeExpansion: true
-        volumeBindingMode: Immediate
-        mountOptions:
-          - noatime
+      - <<: *iscsi
+        name: truenas-iscsi-postgresql
         parameters:
-          protocol: iscsi
-          datasetPath: k8s/truenas-csi/iscsi
-          csi.storage.k8s.io/fstype: xfs
+          <<: *iscsiParameters
           volblocksize: 8K
-          iscsi.blocksize: "4096"
-          sparse: "true"
-      - name: truenas-iscsi-sqlite
-        isDefault: false
-        reclaimPolicy: Retain
-        allowVolumeExpansion: true
-        volumeBindingMode: Immediate
-        mountOptions:
-          - noatime
+      - <<: *iscsi
+        name: truenas-iscsi-sqlite
         parameters:
-          protocol: iscsi
-          datasetPath: k8s/truenas-csi/iscsi
-          csi.storage.k8s.io/fstype: xfs
+          <<: *iscsiParameters
           volblocksize: 4K
-          iscsi.blocksize: "4096"
-          sparse: "true"
-      - name: truenas-nfs
-        isDefault: false
-        reclaimPolicy: Retain
-        allowVolumeExpansion: true
-        volumeBindingMode: Immediate
+      - <<: *iscsi
+        name: truenas-iscsi-sqlite-ext4
+        parameters:
+          <<: *iscsiParameters
+          csi.storage.k8s.io/fstype: ext4
+          volblocksize: 4K
+      - <<: *iscsi
+        name: truenas-nfs
         mountOptions:
           - nfsvers=3
           - noatime
