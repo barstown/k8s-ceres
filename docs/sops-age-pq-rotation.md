@@ -8,6 +8,7 @@ Expand-then-contract rotation: every file is encrypted to both the old and new k
 - `flux-system/sops-age` Secret (from `bootstrap/sops-age.sops.yaml`): read by kustomize-controller via `--sops-age-secret=sops-age`.
 - `~/.config/sops/age/keys.txt`: local identity (`SOPS_AGE_KEY_FILE` in `.mise/config.toml`).
 - `talos/secrets.sops.yaml`: decrypted by topf, which shells out to the local `sops` binary.
+- `talos-backup` (`AGE_RECIPIENT_PUBLIC_KEY` in its HelmRelease): encrypts etcd snapshots to the same public key. age refuses to mix PQ and X25519 recipients in one file, so it takes only one of the two keys.
 
 ## Prerequisites
 
@@ -59,10 +60,16 @@ git ls-files -z '*.sops.yaml' ':!:.sops.yaml' | xargs -0 -n1 sops updatekeys --y
 
 ## 5. Remove the old key
 
-1. Remove the old recipient from `.sops.yaml` and re-run the `updatekeys` command from step 3.
-2. Optionally rotate each file's data key: `sops rotate --in-place <file>`.
-3. Remove the old key from `bootstrap/sops-age.sops.yaml`, re-apply it, and restart kustomize-controller.
-4. Remove the old identity from `~/.config/sops/age/keys.txt`, keeping an offline archive copy to decrypt git history.
+1. Switch `talos-backup` to the PQ recipient and confirm a new snapshot decrypts with `age -d -i ~/.config/sops/age/keys.txt`.
+2. Remove the old recipient from `.sops.yaml` and re-run the `updatekeys` command from step 3.
+3. Rotate each file's data key. `updatekeys` keeps the data key, so without this the old key plus git history still decrypts current and future values:
+
+   ```sh
+   git ls-files -z '*.sops.yaml' ':!:.sops.yaml' | SOPS_AGE_KEY_FILE=~/.config/sops/age/keys.txt xargs -0 -n1 sops rotate --in-place
+   ```
+
+4. Remove the old key from `bootstrap/sops-age.sops.yaml`, re-apply it, and restart kustomize-controller.
+5. Remove the old identity from `~/.config/sops/age/keys.txt`, keeping an offline archive copy to decrypt git history and older etcd snapshots.
 
 ## Caveat
 
