@@ -10,10 +10,12 @@
     "github>home-operations/renovate-presets#12.0.0",
     "github>home-operations/renovate-presets//apps/cnpg.json5#12.0.0",
     "github>home-operations/renovate-presets//apps/grafanaDashboards.json5#12.0.0",
-    "github>home-operations/renovate-presets//apps/talosFactory.json5#12.0.0"
+    "github>home-operations/renovate-presets//apps/talosFactory.json5#12.0.0",
   ],
   configMigration: false,
-  dependencyDashboard: true,
+  dependencyDashboard: {
+    enabled: true,
+  },
   ignorePaths: ["**/*.sops.*", "**/locks/npm-*/**"],
   packageRules: [
     {
@@ -21,14 +23,14 @@
       matchManagers: ["flux"],
       matchDatasources: ["docker"],
       matchFileNames: ["/(^|/)ocirepository\\.ya?ml$/"],
-      pinDigests: false
+      pinDigests: false,
     },
     {
       description: "Disable digest pinning in Helmfile bootstrap resources",
       matchManagers: ["helmfile"],
       matchDatasources: ["docker"],
       matchFileNames: ["/(^|/)0[01]-(apps|crds)\\.ya?ml$/"],
-      pinDigests: false
+      pinDigests: false,
     },
     {
       description: "Disable digest pinning for CNPG extensions in clusters",
@@ -36,13 +38,13 @@
       matchDatasources: ["docker"],
       matchPackageNames: ["ghcr.io/tensorchord/vchord-scratch"],
       matchFileNames: ["/(^|/)cluster\\.ya?ml$/"],
-      pinDigests: false
+      pinDigests: false,
     },
     {
       description: "Hold CNPG clusters on PostgreSQL 18 until a planned major upgrade",
       matchDatasources: ["docker"],
       matchPackageNames: ["ghcr.io/cloudnative-pg/postgresql"],
-      allowedVersions: "/^18[.-]/"
+      allowedVersions: "/^18[.-]/",
     },
     {
       description: "Disable digest pinning for the annotated Immich main.image.tag",
@@ -50,19 +52,19 @@
       matchDatasources: ["docker"],
       matchPackageNames: ["ghcr.io/immich-app/immich-server"],
       matchFileNames: ["kubernetes/apps/immich/immich/app/helmrelease.yaml"],
-      pinDigests: false
+      pinDigests: false,
     },
     {
       description: "Disable digest pinning for the Flux distribution OCI artifact",
       matchManagers: ["custom.regex"],
       matchDatasources: ["docker"],
       matchPackageNames: [
-        "ghcr.io/controlplaneio-fluxcd/flux-operator-manifests"
+        "ghcr.io/controlplaneio-fluxcd/flux-operator-manifests",
       ],
       matchFileNames: [
-        "kubernetes/apps/flux-system/flux-instance/app/helmrelease.yaml"
+        "kubernetes/apps/flux-system/flux-instance/app/helmrelease.yaml",
       ],
-      pinDigests: false
+      pinDigests: false,
     },
     {
       description: "Flux Operator Group",
@@ -71,12 +73,12 @@
       matchPackageNames: [
         "/flux-operator/",
         "/flux-instance/",
-        "/flux-operator-manifests/"
+        "/flux-operator-manifests/",
       ],
       group: {
-        commitMessageTopic: "{{{groupName}}} group"
+        commitMessageTopic: "{{{groupName}}} group",
       },
-      minimumGroupSize: 3
+      minimumGroupSize: 3,
     },
     {
       description: "MariaDB Operator Group",
@@ -84,32 +86,32 @@
       matchDatasources: ["docker"],
       matchPackageNames: [
         "ghcr.io/mariadb-operator/charts/mariadb-operator",
-        "ghcr.io/mariadb-operator/charts/mariadb-operator-crds"
+        "ghcr.io/mariadb-operator/charts/mariadb-operator-crds",
       ],
       sourceUrl: "https://github.com/mariadb-operator/mariadb-operator",
       group: {
-        commitMessageTopic: "{{{groupName}}} group"
+        commitMessageTopic: "{{{groupName}}} group",
       },
-      minimumGroupSize: 2
+      minimumGroupSize: 2,
     },
     {
       description: "Link Grafana Operator Helm Chart releases for changelogs",
       matchDatasources: ["docker"],
       matchPackageNames: ["ghcr.io/grafana/helm-charts/grafana-operator"],
-      sourceUrl: "https://github.com/grafana/grafana-operator"
+      sourceUrl: "https://github.com/grafana/grafana-operator",
     },
     {
       description: "Link Renovate Helm Chart releases for changelogs",
       matchDatasources: ["docker"],
       matchPackageNames: ["ghcr.io/renovatebot/charts/renovate"],
-      sourceUrl: "https://github.com/renovatebot/helm-charts"
+      sourceUrl: "https://github.com/renovatebot/helm-charts",
     },
     {
       description: "Link Kavita repository for changelogs",
       matchDatasources: ["docker"],
       matchPackageNames: ["ghcr.io/kareadita/kavita"],
       sourceUrl: "https://github.com/Kareadita/Kavita",
-      changelogUrl: "https://github.com/Kareadita/Kavita/releases"
+      changelogUrl: "https://github.com/Kareadita/Kavita/releases",
     },
     {
       description: "Auto-merge GitHub Actions",
@@ -118,67 +120,67 @@
       automergeType: "branch",
       matchUpdateTypes: ["minor", "patch", "digest"],
       minimumReleaseAge: "3 days",
-      ignoreTests: true
+      ignoreTests: true,
     },
     {
       matchDatasources: ["docker"],
       matchPackageNames: [
         "docker.io/grafana/grafana",
-        "ghcr.io/siderolabs/kubelet"
+        "ghcr.io/siderolabs/kubelet",
       ],
       pinDigests: false,
       separateMajorMinor: true,
-      separateMinorPatch: true
+      separateMinorPatch: true,
     },
     {
       description: "Separate minor and patch Talos updates (talosupgrade.yaml, topf.yaml)",
       matchDatasources: ["custom.talos-factory"],
       separateMajorMinor: true,
-      separateMinorPatch: true
+      separateMinorPatch: true,
     },
     {
       matchManagers: ["mise"],
       matchPackageNames: ["kubectl"],
       separateMajorMinor: true,
-      separateMinorPatch: true
+      separateMinorPatch: true,
     },
     {
       matchManagers: ["mise"],
       semanticCommitScope: "mise",
-      commitMessageTopic: "tool {{depName}}"
+      commitMessageTopic: "tool {{depName}}",
     },
     {
       matchUpdateTypes: ["major"],
-      labels: ["type/major"]
+      labels: ["type/major"],
     },
     {
       matchUpdateTypes: ["minor"],
-      labels: ["type/minor"]
+      labels: ["type/minor"],
     },
     {
       matchUpdateTypes: ["patch"],
-      labels: ["type/patch"]
+      labels: ["type/patch"],
     },
     {
       matchUpdateTypes: ["digest"],
-      labels: ["type/digest"]
+      labels: ["type/digest"],
     },
     {
       matchDatasources: ["docker"],
-      addLabels: ["renovate/container"]
+      addLabels: ["renovate/container"],
     },
     {
       matchDatasources: ["helm"],
-      addLabels: ["renovate/helm"]
+      addLabels: ["renovate/helm"],
     },
     {
       matchManagers: ["github-actions"],
-      addLabels: ["renovate/github-action"]
+      addLabels: ["renovate/github-action"],
     },
     {
       matchDatasources: ["github-releases"],
-      addLabels: ["renovate/github-release"]
-    }
+      addLabels: ["renovate/github-release"],
+    },
   ],
   customManagers: [
     {
@@ -187,9 +189,9 @@
       description: "Process registry/tag dependencies",
       managerFilePatterns: ["/(^|/)kubernetes/.+\\.ya?ml$/"],
       matchStrings: [
-        "registry:\\s+(?<depName>[^:@\\s]+(?:/[^:@\\s]+)+)\\n(?<indentation>[ \\t]*)tag:\\s+(?<currentValue>[^@\\s]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?"
+        "registry:\\s+(?<depName>[^:@\\s]+(?:/[^:@\\s]+)+)\\n(?<indentation>[ \\t]*)tag:\\s+(?<currentValue>[^@\\s]+)(?:@(?<currentDigest>sha256:[a-f0-9]+))?",
       ],
-      autoReplaceStringTemplate: "registry: {{{depName}}}\n{{{indentation}}}tag: {{{newValue}}}{{#if newDigest}}@{{{newDigest}}}{{/if}}"
-    }
-  ]
+      autoReplaceStringTemplate: "registry: {{{depName}}}\n{{{indentation}}}tag: {{{newValue}}}{{#if newDigest}}@{{{newDigest}}}{{/if}}",
+    },
+  ],
 }
