@@ -7,7 +7,10 @@ metadata:
 spec:
   allowFirstLastIPs: "No"
   blocks:
-    - cidr: "10.0.50.0/24"
+    - start: "10.0.50.3"
+      stop: "10.0.50.9"
+    - start: "10.0.50.100"
+      stop: "10.0.50.199"
 ---
 # yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliuml2announcementpolicy_v2alpha1.json
 apiVersion: cilium.io/v2alpha1
@@ -16,10 +19,8 @@ metadata:
   name: l2-policy
 spec:
   loadBalancerIPs: true
-  # NOTE: interfaces might need to be set if you have more than one active NIC on your hosts
-  # interfaces:
-  #   - ^eno[0-9]+
-  #   - ^eth[0-9]+
+  interfaces:
+    - ^bond0$
   nodeSelector:
     matchLabels:
       kubernetes.io/os: linux
