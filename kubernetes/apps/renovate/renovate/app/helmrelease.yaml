@@ -35,6 +35,8 @@ spec:
     pod:
       annotations:
         descheduler.alpha.kubernetes.io/prefer-no-eviction: "true"
+      labels:
+        app.ceres.io/egress-internet: "true"
     renovate:
       config: |
         {
