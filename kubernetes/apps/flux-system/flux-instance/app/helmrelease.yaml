@@ -14,7 +14,7 @@ spec:
       distribution:
         artifact: oci://ghcr.io/controlplaneio-fluxcd/flux-operator-manifests:v0.63.1
       cluster:
-        networkPolicy: false
+        networkPolicy: true
       components:
         - source-controller
         - kustomize-controller
