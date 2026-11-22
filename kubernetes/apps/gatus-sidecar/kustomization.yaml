@@ -5,6 +5,7 @@ kind: Kustomization
 namespace: gatus-sidecar
 
 components:
+  - ../../components/network-policy
   - ../../components/sops
 
 resources:

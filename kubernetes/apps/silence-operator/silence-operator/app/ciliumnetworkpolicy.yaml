@@ -1,0 +1,22 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: silence-operator
+spec:
+  description: Kubernetes API and Alertmanager silences API
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: silence-operator
+  egress:
+    - toEntities:
+        - kube-apiserver
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: victoria-metrics
+            app.kubernetes.io/name: vmalertmanager
+      toPorts:
+        - ports:
+            - port: "9093"
+              protocol: TCP

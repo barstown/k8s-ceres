@@ -5,6 +5,7 @@ kind: Kustomization
 namespace: system-upgrade
 
 components:
+  - ../../components/network-policy
   - ../../components/sops
 
 resources:

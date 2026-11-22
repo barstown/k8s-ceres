@@ -12,6 +12,8 @@ spec:
   values:
     deploymentAnnotations:
       reloader.stakater.com/auto: "true"
+    podLabels:
+      app.ceres.io/egress-kube-apiserver: "true"
     gatus:
       delayStartSeconds: "5"
       env:

@@ -1,0 +1,35 @@
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: gatus-sidecar
+spec:
+  description: Probes through Envoy, plus public resolver connectivity checks
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: gatus-sidecar
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: network
+            app.kubernetes.io/name: envoy
+            app.kubernetes.io/component: proxy
+      toPorts:
+        - ports:
+            - port: "10443"
+              protocol: TCP
+    - toCIDR:
+        - 1.1.1.1/32
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: TCP
+    - toCIDR:
+        - 1.1.1.1/32
+        - 8.8.8.8/32
+        - 9.9.9.9/32
+      icmps:
+        - fields:
+            - type: EchoRequest
+              family: IPv4
