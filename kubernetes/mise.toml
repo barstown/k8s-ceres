@@ -4,6 +4,17 @@
 description = "Force Flux to pull in changes from your Git repository"
 run = "flux --namespace flux-system reconcile kustomization flux-system --with-source"
 
+# flate renders Flux resources offline. Without --base (or FLATE_BASE), test
+# checks every app and diff guesses the revision to compare against. Extra
+# arguments are passed through, e.g. `mise run //kubernetes:diff --base main`.
+[tasks.test]
+description = "Render and validate Flux resources offline with flate"
+run = "flate test all --path apps"
+
+[tasks.diff]
+description = "Diff rendered Flux resources against a Git revision with flate"
+run = "flate diff all --path apps"
+
 # See docs/postgresql-cnpg-maintenance.md for when to use each of these.
 
 # The label is only on the Deployments (not their pods), so "down" waits on

@@ -28,6 +28,7 @@ jobs:
           patterns: |
             kubernetes/**/*
             .github/workflows/flate.yaml
+            .mise/**
 
   flate:
     if: ${{ needs.filter.outputs.changed-files != '[]' }}
@@ -38,7 +39,9 @@ jobs:
       contents: read
       pull-requests: write
     env:
+      FLATE_BASE: ${{ github.event.repository.default_branch }}
       FLATE_DISABLE_CHART_DIGEST_TRACKING: "true"
+      MISE_TASK_RUN_AUTO_INSTALL: "false"
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -46,15 +49,31 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: Install Flate
-        uses: home-operations/flate/action@4e07f351352d235a335e5a1f0a088eab7ec40997 # v0.8.0
+      - name: Setup Mise
+        uses: jdx/mise-action@924e7c586e33d7d4bae9c14e26c5d22e2beb6e78 # v5.3.0
+        with:
+          experimental: true
+          install_args: --locked aqua:home-operations/flate
+
+      # Fetched charts and sources. Pull request caches are scoped to their
+      # pull request, so this speeds up later pushes to the same one.
+      - name: Cache Flate
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/flate
+          key: flate-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: flate-${{ runner.os }}-
 
       - name: Run Flate
         id: flate
-        run: flate test all -p ./kubernetes/apps
+        env:
+          FLATE_CACHE_DIR: ${{ runner.temp }}/flate
+        run: mise run //kubernetes:test
 
       - name: Run Flate Diff
-        run: flate diff all -p ./kubernetes/apps -o github > diff.patch
+        env:
+          FLATE_CACHE_DIR: ${{ runner.temp }}/flate
+        run: mise run //kubernetes:diff -o github > diff.patch
 
       - name: Generate Diff
         id: diff
