@@ -5,13 +5,9 @@ kind: HelmRelease
 metadata:
   name: truenas-csi
 spec:
-  chart:
-    spec:
-      chart: truenas-csi
-      version: 1.4.0
-      sourceRef:
-        kind: HelmRepository
-        name: truenas-csi
+  chartRef:
+    kind: OCIRepository
+    name: truenas-csi
   interval: 1h
   postRenderers:
     - kustomize:
