@@ -6,6 +6,7 @@ namespace: authentik
 
 components:
   - ../../components/network-policy
+  - ../../components/rustfs
   - ../../components/sops
 
 resources:

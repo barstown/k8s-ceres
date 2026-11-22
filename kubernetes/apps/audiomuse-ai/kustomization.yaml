@@ -6,6 +6,7 @@ namespace: audiomuse-ai
 
 components:
   - ../../components/network-policy
+  - ../../components/rustfs
   - ../../components/sops
 
 resources:
