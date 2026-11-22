@@ -13,14 +13,14 @@ Volumes cannot be handed from one CSI driver to the other. Every volume is
 
 ## What is staged
 
-| Path                                                              | Purpose                                                                                          |
-| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| `kubernetes/apps/truenas-csi/kustomization.yaml`                  | Creates the namespace. `./truenas-csi/ks.yaml` is commented out, so nothing deploys yet          |
-| `kubernetes/apps/truenas-csi/truenas-csi/ks.yaml`                 | Flux Kustomization, depends on `snapshot-controller`                                             |
-| `kubernetes/apps/truenas-csi/truenas-csi/app/helmrepository.yaml` | Chart source. Not published to OCI yet ([#83](https://github.com/truenas/truenas-csi/issues/83)) |
-| `kubernetes/apps/truenas-csi/truenas-csi/app/helmrelease.yaml`    | Driver, StorageClasses, Talos patch, metrics                                                     |
-| `kubernetes/apps/truenas-csi/truenas-csi/app/secret.sops.yaml`    | API key, currently a placeholder                                                                 |
-| `.mise/config.toml`                                               | Adds `pv-migrate`                                                                                |
+| Path                                                             | Purpose                                                                                                                              |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `kubernetes/apps/truenas-csi/kustomization.yaml`                 | Creates the namespace. `./truenas-csi/ks.yaml` is commented out, so nothing deploys yet                                              |
+| `kubernetes/apps/truenas-csi/truenas-csi/ks.yaml`                | Flux Kustomization, depends on `snapshot-controller`                                                                                 |
+| `kubernetes/apps/truenas-csi/truenas-csi/app/ocirepository.yaml` | Chart source: home-operations `charts-mirror` until upstream publishes OCI ([#83](https://github.com/truenas/truenas-csi/issues/83)) |
+| `kubernetes/apps/truenas-csi/truenas-csi/app/helmrelease.yaml`   | Driver, StorageClasses, Talos patch, metrics                                                                                         |
+| `kubernetes/apps/truenas-csi/truenas-csi/app/secret.sops.yaml`   | API key, currently a placeholder                                                                                                     |
+| `.mise/config.toml`                                              | Adds `pv-migrate`                                                                                                                    |
 
 ## Class mapping
 
