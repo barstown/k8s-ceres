@@ -8,7 +8,7 @@ The cluster is 6 Talos v1.14.6 nodes (3 control plane, 3 workers) on 10.0.50.0/2
 
 | Area | Today | Gap |
 | --- | --- | --- |
-| Pod-to-pod access | Default deny in 30 namespaces; Flux's own policies in `flux-system` | 13 namespaces with running pods are unrestricted, nearly all platform |
+| Pod-to-pod access | Default deny in 35 namespaces; Flux's own policies in `flux-system` | 8 platform namespaces with running pods are unrestricted |
 | Traffic between nodes | WireGuard between pods | Host-network traffic plain text (`nodeEncryption` beta) |
 | App login | authentik forward auth on 9 apps | OIDC apps still use their own login |
 | Edge | CrowdSec bouncer on `envoy-external` | Covers the external gateway only |
@@ -74,7 +74,7 @@ Pods opt into internet, Kubernetes API and Plex access with `app.ceres.io/egress
 
 Checked against git and the live cluster on 2026-11-22.
 
-Done (31):
+Done (36):
 
 | Group | Namespaces |
 | --- | --- |
@@ -84,9 +84,10 @@ Done (31):
 | Photos and records | immich, immich-public-proxy, homebox (component), lubelogger (component), changedetection (component) |
 | Tools and exporters | grafana, semaphore, syncthing, chaski, pihole-exporter, unpoller, victoria-logs |
 | Scheduled jobs | renovate (component), nebula-sync |
-| Platform | flux-system (Flux's built-in policies, see below) |
+| Platform | flux-system (Flux's built-in policies, see below), kube-state-metrics, silence-operator, gatus-sidecar, system-upgrade |
+| Test | default (component) |
 
-Not done, with running pods (13):
+Not done, with running pods (8):
 
 | Namespace | Workloads | Notes |
 | --- | --- | --- |
@@ -94,11 +95,8 @@ Not done, with running pods (13):
 | `cnpg-system` | operator, barman plugin | Must reach port 8000 on every CNPG pod |
 | `crowdsec` | LAPI, Envoy bouncer | Bouncer is called by Envoy |
 | `network` | Envoy Gateway, cloudflare-tunnel, external-dns | Reaches every backend; edge traffic from outside |
-| `victoria-metrics` | operator, vmagent, vmsingle, vmalert, Alertmanager, vmauth | vmagent scrapes all namespaces and nodes |
-| `kube-state-metrics`, `silence-operator`, `gatus-sidecar` | One pod each | Kubernetes API egress plus scraping |
+| `victoria-metrics` | operator, vmagent, vmsingle, vmalert, Alertmanager, vmauth | vmagent scrapes all namespaces and nodes; Alertmanager must accept `silence-operator` on 9093 |
 | `blackbox-exporter` | One pod | Probes LAN and internet targets |
-| `system-upgrade` | tuppr | Talos API on the nodes |
-| `default` | echo | Test app |
 | `kube-system` | Cilium, CoreDNS, control plane and others | 19 of 32 pods use host networking; do last |
 | `democratic-csi` | CSI controller and node plugins | 12 of 19 pods use host networking |
 
@@ -125,6 +123,8 @@ No workloads, so nothing to protect today: `mariadb-operator`, `o11y`, `promethe
 A Hubble capture only covers its time window. It missed Recyclarr's once-a-day sync, which then failed on 2026-11-16.
 
 For CronJobs, stream `hubble observe --follow --namespace <ns>` from every Cilium agent across a scheduled run. Reading the buffer afterwards misses short jobs. This is how the `nebula-sync` rules were written.
+
+Some flows only happen during rare events and won't show up in any capture. Read the app's code or chart for them. `tuppr` checks that the installer image exists on `factory.talos.dev` before each upgrade, and calls the Talos API on the nodes only while upgrading. Its admission webhook is only called when a `TalosUpgrade` or `KubernetesUpgrade` changes.
 
 - Before writing rules, also check each app's settings (UI-configured URLs, scheduled jobs, plugins) for flows the capture may not show.
 - The `CiliumPolicyDenied` alert (`kube-system/cilium-rules`) sends to ntfy within about 10 minutes, naming both ends. It also fires briefly when a namespace first gets policies.

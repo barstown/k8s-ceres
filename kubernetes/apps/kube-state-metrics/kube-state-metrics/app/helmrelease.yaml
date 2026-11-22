@@ -11,6 +11,8 @@ spec:
   interval: 1h
   values:
     fullnameOverride: kube-state-metrics
+    podLabels:
+      app.ceres.io/egress-kube-apiserver: "true"
     resources:
       requests:
         cpu: 10m
