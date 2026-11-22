@@ -2,8 +2,6 @@
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: "CI"
 
-# Runs on main too, so tool caches are saved where every pull request can
-# restore them.
 on:
   pull_request:
     branches:
@@ -26,6 +24,9 @@ concurrency:
 
 permissions: {}
 
+env:
+  MISE_TASK_RUN_AUTO_INSTALL: "false"
+
 jobs:
   lint:
     name: Lint
@@ -43,10 +44,12 @@ jobs:
         uses: jdx/mise-action@924e7c586e33d7d4bae9c14e26c5d22e2beb6e78 # v5.3.0
         with:
           experimental: true
-          install_args: --locked
+          install_args: >-
+            --locked
+            aqua:koalaman/shellcheck
+            aqua:rhysd/actionlint
+            aqua:zizmorcore/zizmor
 
-      # Runs every lint:* task in parallel, as `mise run lint` does locally,
-      # and reports all failures rather than stopping at the first.
       - name: Lint
         env:
           # zizmor's online audits query the GitHub API
