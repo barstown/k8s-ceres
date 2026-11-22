@@ -38,6 +38,8 @@ TALOSCONFIG = "{{config_root}}/talos/output/talosconfig"
 # Shared log helper, called from project tasks as `mise run //:log`.
 [tasks.log]
 hide = true
+# Without this, every log line is preceded by its own `$ gum log ...` line.
+quiet = true
 run = "gum log -t rfc3339 -s -l"
 
 [tasks.lint]
@@ -64,4 +66,3 @@ config_roots = ["bootstrap", "kubernetes", "talos"]
 
 [settings]
 python.uv_venv_auto = "create|source"
-task.quiet = true
