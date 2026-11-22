@@ -53,26 +53,16 @@ jobs:
         uses: jdx/mise-action@924e7c586e33d7d4bae9c14e26c5d22e2beb6e78 # v5.3.0
         with:
           experimental: true
-          install_args: --locked aqua:home-operations/flate
-
-      # Fetched charts and sources. Pull request caches are scoped to their
-      # pull request, so this speeds up later pushes to the same one.
-      - name: Cache Flate
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        with:
-          path: ${{ runner.temp }}/flate
-          key: flate-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}
-          restore-keys: flate-${{ runner.os }}-
+          install_args: >-
+            --locked
+            aqua:home-operations/flate
+          cache: false
 
       - name: Run Flate
         id: flate
-        env:
-          FLATE_CACHE_DIR: ${{ runner.temp }}/flate
         run: mise run //kubernetes:test
 
       - name: Run Flate Diff
-        env:
-          FLATE_CACHE_DIR: ${{ runner.temp }}/flate
         run: mise run //kubernetes:diff -o github > diff.patch
 
       - name: Generate Diff
