@@ -8,7 +8,7 @@ The cluster is 6 Talos v1.14.6 nodes (3 control plane, 3 workers) on 10.0.50.0/2
 
 | Area | Today | Gap |
 | --- | --- | --- |
-| Pod-to-pod access | Default deny in 28 app namespaces | 14 namespaces with running pods are unrestricted, nearly all platform |
+| Pod-to-pod access | Default deny in 28 app namespaces; Flux's own policies in `flux-system` | 13 namespaces with running pods are unrestricted, nearly all platform |
 | Traffic between nodes | WireGuard between pods | Host-network traffic plain text (`nodeEncryption` beta) |
 | App login | authentik forward auth on 9 apps | OIDC apps still use their own login |
 | Edge | CrowdSec bouncer on `envoy-external` | Covers the external gateway only |
@@ -74,7 +74,7 @@ Pods opt into internet, Kubernetes API and Plex access with `app.ceres.io/egress
 
 Checked against git and the live cluster on 2026-11-22.
 
-Done (28):
+Done (29):
 
 | Group | Namespaces |
 | --- | --- |
@@ -83,12 +83,12 @@ Done (28):
 | Home automation | home-assistant, mosquitto, zigbee2mqtt |
 | Photos and records | immich, immich-public-proxy, homebox (component), lubelogger (component), changedetection (component) |
 | Tools and exporters | grafana, semaphore, syncthing, chaski, pihole-exporter, unpoller, victoria-logs |
+| Platform | flux-system (Flux's built-in policies, see below) |
 
-Not done, with running pods (14):
+Not done, with running pods (13):
 
 | Namespace | Workloads | Notes |
 | --- | --- | --- |
-| `flux-system` | Flux controllers, flux-operator | In progress: Flux's built-in policies (see below) |
 | `cert-manager` | controller, webhook, cainjector | Webhook needs ingress from the API server |
 | `cnpg-system` | operator, barman plugin | Must reach port 8000 on every CNPG pod |
 | `crowdsec` | LAPI, Envoy bouncer | Bouncer is called by Envoy |
@@ -118,6 +118,7 @@ No workloads, so nothing to protect today: `mariadb-operator`, `o11y`, `promethe
 
 - This blocks the main risk: source-controller's artifact server (port 9090) is reachable only from Flux's own pods.
 - Egress stays open. Because Cilium combines every policy on a pod, egress can't be narrowed later without turning these policies off.
+- Verified on 2026-11-22: no drops after rollout, and a request from `default/echo` to source-controller timed out.
 - If a change breaks Flux, it can't apply its own fix. Run `flux suspend ks flux-system -n flux-system`, then delete the policies, push the fix and resume.
 
 #### Catching Missed Flows
