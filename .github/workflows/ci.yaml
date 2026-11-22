@@ -1,0 +1,54 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: "CI"
+
+# Runs on main too, so tool caches are saved where every pull request can
+# restore them.
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/**
+      - .mise/**
+      - .shellcheckrc
+  push:
+    branches:
+      - main
+    paths:
+      - .github/**
+      - .mise/**
+      - .shellcheckrc
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Mise
+        uses: jdx/mise-action@924e7c586e33d7d4bae9c14e26c5d22e2beb6e78 # v5.3.0
+        with:
+          experimental: true
+          install_args: --locked
+
+      # Runs every lint:* task in parallel, as `mise run lint` does locally,
+      # and reports all failures rather than stopping at the first.
+      - name: Lint
+        env:
+          # zizmor's online audits query the GitHub API
+          GH_TOKEN: ${{ github.token }}
+        run: mise run --continue-on-error lint
