@@ -5,6 +5,7 @@ kind: Kustomization
 namespace: nebula-sync
 
 components:
+  - ../../components/network-policy
   - ../../components/sops
 
 resources:
