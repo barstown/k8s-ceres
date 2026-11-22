@@ -1,6 +1,6 @@
 ## Cluster Hardening
 
-Plan for hardening the cluster, in priority order. As of 2026-11-16.
+Plan for hardening the cluster, in priority order. As of 2026-11-22.
 
 ### Current State
 
@@ -8,7 +8,7 @@ The cluster is 6 Talos v1.14.6 nodes (3 control plane, 3 workers) on 10.0.50.0/2
 
 | Area | Today | Gap |
 | --- | --- | --- |
-| Pod-to-pod access | Default deny in 15 app namespaces | The rest are unrestricted, including platform namespaces |
+| Pod-to-pod access | Default deny in 28 app namespaces | 14 namespaces with running pods are unrestricted, nearly all platform |
 | Traffic between nodes | WireGuard between pods | Host-network traffic plain text (`nodeEncryption` beta) |
 | App login | authentik forward auth on 9 apps | OIDC apps still use their own login |
 | Edge | CrowdSec bouncer on `envoy-external` | Covers the external gateway only |
@@ -68,7 +68,57 @@ Move each namespace to default deny, then allow only the flows it needs. This co
 
 `CiliumNetworkPolicy` can also filter by HTTP path and method where a single port needs finer control.
 
-Done so far: authentik, changedetection, homebox, sonarr, radarr, lidarr, prowlarr, sabnzbd, kapowarr, tautulli, seerr, recyclarr, navidrome, kavita and audiomuse-ai. Pods opt into internet, Kubernetes API and Plex access with `app.ceres.io/egress-*` labels (see `docs/labels.md`).
+Pods opt into internet, Kubernetes API and Plex access with `app.ceres.io/egress-*` labels (see `docs/labels.md`). Apps marked "component" need nothing beyond it; the rest also have their own `ciliumnetworkpolicy.yaml`.
+
+#### Namespace Status
+
+Checked against git and the live cluster on 2026-11-22.
+
+Done (28):
+
+| Group | Namespaces |
+| --- | --- |
+| Identity | authentik (component) |
+| Media | sonarr, radarr, lidarr, prowlarr, sabnzbd, seerr, recyclarr, navidrome, audiomuse-ai, kapowarr (component), kavita (component), tautulli (component) |
+| Home automation | home-assistant, mosquitto, zigbee2mqtt |
+| Photos and records | immich, immich-public-proxy, homebox (component), lubelogger (component), changedetection (component) |
+| Tools and exporters | grafana, semaphore, syncthing, chaski, pihole-exporter, unpoller, victoria-logs |
+
+Not done, with running pods (14):
+
+| Namespace | Workloads | Notes |
+| --- | --- | --- |
+| `flux-system` | Flux controllers, flux-operator | In progress: Flux's built-in policies (see below) |
+| `cert-manager` | controller, webhook, cainjector | Webhook needs ingress from the API server |
+| `cnpg-system` | operator, barman plugin | Must reach port 8000 on every CNPG pod |
+| `crowdsec` | LAPI, Envoy bouncer | Bouncer is called by Envoy |
+| `network` | Envoy Gateway, cloudflare-tunnel, external-dns | Reaches every backend; edge traffic from outside |
+| `victoria-metrics` | operator, vmagent, vmsingle, vmalert, Alertmanager, vmauth | vmagent scrapes all namespaces and nodes |
+| `kube-state-metrics`, `silence-operator`, `gatus-sidecar` | One pod each | Kubernetes API egress plus scraping |
+| `blackbox-exporter` | One pod | Probes LAN and internet targets |
+| `system-upgrade` | tuppr | Talos API on the nodes |
+| `default` | echo | Test app |
+| `kube-system` | Cilium, CoreDNS, control plane and others | 19 of 32 pods use host networking; do last |
+| `democratic-csi` | CSI controller and node plugins | 12 of 19 pods use host networking |
+
+CronJob only (2): `renovate` (GitHub token, internet egress) and `nebula-sync` (Pi-hole on the LAN).
+
+No workloads, so nothing to protect today: `mariadb-operator`, `o11y`, `prometheus-adapter`, `prometheus-operator-crds`, `truenas-csi`, `troubleshooting`. `prometheus-node-exporter` runs on host networking only, which pod policies don't cover.
+
+#### Flux Uses Its Own Policies
+
+`flux-system` uses Flux's built-in policies (`cluster.networkPolicy: true` in `flux-instance`), not the component. Flux is what applies every other fix, so we use the rules Flux maintains for its own controllers. Custom rules here would be more likely to break later.
+
+| Policy | Pods | Allows |
+| --- | --- | --- |
+| `allow-egress` | all | All egress; ingress only from `flux-system` |
+| `allow-scraping` | all | Port 8080 from any namespace |
+| `allow-webhooks` | notification-controller | Port 9292 (GitHub receiver) from any namespace |
+| `flux-operator-web` (operator chart) | flux-operator | Ports 9080 (web UI) and 8080 from any namespace |
+
+- This blocks the main risk: source-controller's artifact server (port 9090) is reachable only from Flux's own pods.
+- Egress stays open. Because Cilium combines every policy on a pod, egress can't be narrowed later without turning these policies off.
+- If a change breaks Flux, it can't apply its own fix. Run `flux suspend ks flux-system -n flux-system`, then delete the policies, push the fix and resume.
 
 #### Catching Missed Flows
 
@@ -134,11 +184,13 @@ This section only lists questions; we'll review them separately. SPIFFE is the s
 - [x] Lock down the `authentik` namespace
 - [x] Alert on network policy drops
 - [x] Roll out network policies to the media apps
-- [ ] Roll out network policies to the remaining namespaces
+- [x] Roll out network policies to the remaining app namespaces
+- [ ] Roll out network policies to the platform namespaces (see Namespace Status)
 - [ ] Decide whether to remove CoreDNS `autopath` before the first internet `toFQDNs` rule
 - [x] Put the first app (Changedetection) behind authentik forward auth
 - [x] Put Hubble UI and the media stack behind authentik
 - [ ] Move apps with OIDC support to authentik OIDC
+- [ ] Put the Flux Operator web UI behind authentik (no login today; read-only to anyone on `envoy-internal`)
 - [ ] Review PodSecurity levels per namespace
 - [ ] Review SPIFFE/SPIRE
 - [ ] Revisit Cilium mutual auth once it is out of beta
