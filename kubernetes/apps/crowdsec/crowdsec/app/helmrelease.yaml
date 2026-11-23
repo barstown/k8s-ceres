@@ -36,6 +36,8 @@ spec:
               expression:
                 - evt.Meta.target_fqdn == "immich.asteroids.sh" && evt.Meta.http_user_agent startsWith "immich-android/" && evt.Meta.http_status == "404"
     lapi:
+      podLabels:
+        app.ceres.io/egress-internet: "true"
       env:
         - name: USE_WAL
           value: "true"
@@ -61,6 +63,9 @@ spec:
       isDeployment: true
       hostVarLog: false
       serviceAccountName: crowdsec-agent
+      podLabels:
+        app.ceres.io/egress-internet: "true"
+        app.ceres.io/egress-kube-apiserver: "true"
       additionalAcquisition:
         - source: kubernetes
           namespace: network
