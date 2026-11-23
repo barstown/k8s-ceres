@@ -8,7 +8,7 @@ The cluster is 6 Talos v1.14.6 nodes (3 control plane, 3 workers) on 10.0.50.0/2
 
 | Area | Today | Gap |
 | --- | --- | --- |
-| Pod-to-pod access | Default deny in 38 namespaces; Flux's own policies in `flux-system` | 5 platform namespaces with running pods are unrestricted |
+| Pod-to-pod access | Default deny in 39 namespaces; Flux's own policies in `flux-system` | 4 platform namespaces with running pods are unrestricted |
 | Traffic between nodes | WireGuard between pods | Host-network traffic plain text (`nodeEncryption` beta) |
 | App login | authentik forward auth on 9 apps | OIDC apps still use their own login |
 | Edge | CrowdSec bouncer on `envoy-external` | Covers the external gateway only |
@@ -74,7 +74,7 @@ Pods opt into internet, Kubernetes API and Plex access with `app.ceres.io/egress
 
 Checked against git and the live cluster on 2026-11-22.
 
-Done (39):
+Done (40):
 
 | Group | Namespaces |
 | --- | --- |
@@ -84,14 +84,13 @@ Done (39):
 | Photos and records | immich, immich-public-proxy, homebox (component), lubelogger (component), changedetection (component) |
 | Tools and exporters | grafana, semaphore, syncthing, chaski, pihole-exporter, unpoller, victoria-logs |
 | Scheduled jobs | renovate (component), nebula-sync |
-| Platform | flux-system (Flux's built-in policies, see below), kube-state-metrics, silence-operator, gatus-sidecar, system-upgrade, cert-manager, blackbox-exporter, crowdsec |
+| Platform | flux-system (Flux's built-in policies, see below), kube-state-metrics, silence-operator, gatus-sidecar, system-upgrade, cert-manager, blackbox-exporter, crowdsec, cnpg-system |
 | Test | default (component) |
 
-Not done, with running pods (5):
+Not done, with running pods (4):
 
 | Namespace | Workloads | Notes |
 | --- | --- | --- |
-| `cnpg-system` | operator, barman plugin | Must reach port 8000 on every CNPG pod |
 | `network` | Envoy Gateway, cloudflare-tunnel, external-dns | Reaches every backend; edge traffic from outside |
 | `victoria-metrics` | operator, vmagent, vmsingle, vmalert, Alertmanager, vmauth | vmagent scrapes all namespaces and nodes; Alertmanager must accept `silence-operator` on 9093 |
 | `kube-system` | Cilium, CoreDNS, control plane and others | 19 of 32 pods use host networking; do last |

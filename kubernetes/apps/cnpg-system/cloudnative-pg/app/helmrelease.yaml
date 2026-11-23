@@ -10,6 +10,8 @@ spec:
     name: cloudnative-pg
   interval: 1h
   values:
+    podLabels:
+      app.ceres.io/egress-kube-apiserver: "true"
     resources:
       requests:
         cpu: 10m
