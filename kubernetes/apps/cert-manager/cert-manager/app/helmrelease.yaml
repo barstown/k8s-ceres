@@ -13,20 +13,30 @@ spec:
     crds:
       enabled: true
     replicaCount: 1
+    podLabels:
+      app.ceres.io/egress-internet: "true"
+      app.ceres.io/egress-kube-apiserver: "true"
     resources:
       requests:
         cpu: 10m
         memory: 64Mi
     cainjector:
+      podLabels:
+        app.ceres.io/egress-kube-apiserver: "true"
       resources:
         requests:
           cpu: 10m
           memory: 128Mi
     webhook:
+      podLabels:
+        app.ceres.io/egress-kube-apiserver: "true"
       resources:
         requests:
           cpu: 10m
           memory: 32Mi
+    startupapicheck:
+      podLabels:
+        app.ceres.io/egress-kube-apiserver: "true"
     dns01RecursiveNameservers: https://1.1.1.1:443/dns-query,https://1.0.0.1:443/dns-query
     dns01RecursiveNameserversOnly: true
     prometheus:
