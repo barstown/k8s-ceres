@@ -120,7 +120,7 @@ A Hubble capture only covers its time window. It missed Recyclarr's once-a-day s
 
 For CronJobs, stream `hubble observe --follow --namespace <ns>` from every Cilium agent across a scheduled run. Reading the buffer afterwards misses short jobs. This is how the `nebula-sync` rules were written.
 
-Some flows only happen during rare events and won't show up in any capture. Read the app's code or chart for them. `tuppr` checks that the installer image exists on `factory.talos.dev` before each upgrade, and calls the Talos API on the nodes only while upgrading. Its admission webhook is only called when a `TalosUpgrade` or `KubernetesUpgrade` changes.
+Some flows only happen during rare events and won't show up in any capture. Read the app's code or chart for them. `tuppr` checks that the installer image exists on `factory.talos.dev` before each upgrade, and calls the Talos API on the nodes only while upgrading. The upgrades themselves run as short-lived Jobs (`talos-upgrade`, `kubernetes-upgrade`) with their own labels, so they need their own policy for the Kubernetes API and the Talos API. Its admission webhook is only called when a `TalosUpgrade` or `KubernetesUpgrade` changes.
 
 - Before writing rules, also check each app's settings (UI-configured URLs, scheduled jobs, plugins) for flows the capture may not show.
 - The `CiliumPolicyDenied` alert (`kube-system/cilium-rules`) sends to ntfy within about 10 minutes, naming both ends. It also fires briefly when a namespace first gets policies.

@@ -24,3 +24,31 @@ spec:
         - ports:
             - port: "50000"
               protocol: TCP
+
+---
+# yaml-language-server: $schema=https://k8s-schemas.home-operations.com/cilium.io/ciliumnetworkpolicy_v2.json
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: tuppr-jobs
+spec:
+  description: Kubernetes API and Talos API on the nodes for the talosctl Jobs tuppr creates during upgrades
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: tuppr
+    matchExpressions:
+      - key: app.kubernetes.io/name
+        operator: In
+        values:
+          - talos-upgrade
+          - kubernetes-upgrade
+  egress:
+    - toEntities:
+        - kube-apiserver
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "50000"
+              protocol: TCP
