@@ -5,7 +5,7 @@ kind: CiliumNetworkPolicy
 metadata:
   name: syncthing
 spec:
-  description: Sync with LAN peers; discovery, relays and remote peers on the internet
+  description: Sync with LAN peers; discovery, relays and remote peers on the internet; explicitly deny other private ports
   endpointSelector:
     matchLabels:
       app.kubernetes.io/name: syncthing
@@ -32,5 +32,24 @@ spec:
               endPort: 65535
               protocol: TCP
             - port: "1"
+              endPort: 65535
+              protocol: UDP
+  egressDeny:
+    - toCIDRSet:
+        - cidr: 10.0.0.0/8
+        - cidr: 172.16.0.0/12
+        - cidr: 192.168.0.0/16
+      toPorts:
+        - ports:
+            - port: "1"
+              endPort: 21999
+              protocol: TCP
+            - port: "22001"
+              endPort: 65535
+              protocol: TCP
+            - port: "1"
+              endPort: 21999
+              protocol: UDP
+            - port: "22001"
               endPort: 65535
               protocol: UDP

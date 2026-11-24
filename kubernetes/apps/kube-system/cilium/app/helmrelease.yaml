@@ -40,7 +40,7 @@ spec:
       metrics:
         enabled:
           - dns
-          - drop:sourceContext=workload|reserved-identity;destinationContext=workload|reserved-identity
+          - drop:sourceContext=workload|pod|reserved-identity;destinationContext=workload|pod|reserved-identity
           - tcp
           - flow
           - port-distribution

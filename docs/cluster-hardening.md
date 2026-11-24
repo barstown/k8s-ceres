@@ -125,6 +125,8 @@ Some flows only happen during rare events and won't show up in any capture. Read
 - Before writing rules, also check each app's settings (UI-configured URLs, scheduled jobs, plugins) for flows the capture may not show.
 - The `CiliumPolicyDenied` alert (`kube-system/cilium-rules`) sends to ntfy within about 10 minutes, naming both ends. It also fires briefly when a namespace first gets policies.
 - Hubble's flow buffer holds well under a minute of traffic on busy nodes, so check drops soon after a change.
+- When a drop is intended and keeps recurring, write it as an `egressDeny` rule. Cilium then reports it as `POLICY_DENY`, which the alert ignores (it only matches `POLICY_DENIED`). Syncthing does this for the private addresses that remote peers announce, which it dials on every reconnect.
+- Node reboots (e.g. Talos upgrades) cause short bursts of drops to `reserved:world`: once a pod's old IP leaves Cilium's IP cache, traffic still sent to it counts as internet traffic. Pods with no workload owner, such as CNPG instances, show up by pod name.
 
 #### Hostname Rules (toFQDNs) and CoreDNS Autopath
 
