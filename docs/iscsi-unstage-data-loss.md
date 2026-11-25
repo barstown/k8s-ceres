@@ -41,6 +41,27 @@ PV: `pvc-79539cfa-654c-4845-9104-8594973bb281` (zigbee2mqtt `config`, `freenas-a
 
 Volumes moved off w3 during the 20:59 drain also needed recovery when mounted on w2 at 20:59:45 and 20:59:52. That was before w3 rebooted, so the power-cycle didn't cause this.
 
+### Second Incident: vmsingle (2026-11-25)
+
+This happened during the rollout of resource requests (#1839), when vmsingle was rescheduled from ceres-w3 to ceres-w2.
+
+PV: `pvc-25577ce3-4c79-4334-b4be-d956b01145fa` (victoria-metrics/`vmsingle-victoria-metrics`, 50Gi, `freenas-api-iscsi`, XFS). It was attached to w3 as `sdh` at 15:10:07.
+
+| Time (UTC) | Source | Event |
+| --- | --- | --- |
+| 16:41:48.492 | CSI | `NodeUnpublishVolume` |
+| 16:41:48.718 | CSI | `NodeUnstageVolume` call |
+| 16:41:48.856 | kernel | `device offline error, dev sdh ... op 0x1:(WRITE)` |
+| 16:41:48.857 | kernel | `sdh: writeback error on inode 67240474` and `67240476` (offsets 0 to about 11 MiB) |
+| 16:41:48.860 | kernel | `XFS (sdh): log I/O error -19`, then `Filesystem has been shut down due to log error` |
+| 16:41:49.213 | kernel | `XFS (sdh): Unmounting Filesystem` (after the device was already gone) |
+| 16:41:50.068 | CSI | `NodeUnstageVolume` response |
+| 16:42:11 | vmsingle (w2) | `invalid cache at /victoria-metrics-data/cache/*: cannot read maxBucketChunks from ".../metadata.bin": EOF` for 4 caches |
+
+This is the strongest evidence so far. Unlike the zigbee2mqtt case, the kernel itself reported that it had dirty pages it could not write because the device was already offline. The cache metadata files were left empty, the same 0-byte result as `coordinator_backup.json`. VictoriaMetrics rebuilds those caches on its own, and its data parts are written with `fsync`, so no metrics were lost. A data file written without `fsync` would have been lost the same way.
+
+In the same minute w2 shows the same signature on other volumes: `sdb` and `sdo` hit `log I/O error -19`, and `sds` logged `Block device removal`.
+
 ### How Common
 
 Since the workers' last boot, 13 of 53 PVC mounts needed XFS log recovery (`XFS (...): Starting recovery`). Each of those volumes was cut off while still mounted. Apps that `fsync` (Postgres, SQLite) survive this. Apps that don't, like the zigbee2mqtt backup, can lose writes from the last 30 seconds.
@@ -55,16 +76,16 @@ A healthy unstage logs `Unmounting Filesystem` with no `Block device removal` li
 
 ### Mitigations
 
-**Write data back to disk sooner (recommended).** Linux holds written data in memory for up to 30s by default. Shortening that shrinks the loss window for every volume, with no PVC changes. Add to the Talos machine config:
+**Write data back to disk sooner (applied 2026-11-25, `talos/all/40-sysctls.yaml`).** Linux holds written data in memory for up to about 35s by default. Shortening that shrinks the loss window for every volume, with no PVC changes:
 
 ```yaml
-machine:
-  sysctls:
-    vm.dirty_expire_centisecs: "300"     # write out data older than 3s (default 3000)
-    vm.dirty_writeback_centisecs: "100"  # check every 1s (default 500)
+vm.dirty_expire_centisecs: "500"       # write back data older than 5s (default 30s)
+vm.dirty_writeback_centisecs: "100"    # flusher wakes every 1s (default 5s)
+vm.dirty_background_bytes: "67108864"  # 64Mi: start background writeback (replaces the 10% ratio)
+vm.dirty_bytes: "268435456"            # 256Mi: throttle writers (replaces the 20% ratio)
 ```
 
-This would have saved the zigbee2mqtt backup, which was written about 18 seconds before the logout. It doesn't help when the logout follows a write within a second or two.
+The byte limits are sized for the current 1GbE storage link: 64Mi is about 0.6s of transfer and 256Mi about 2.3s. After moving to 10GbE, raise them to 128Mi / 1Gi. The worst-case age of unwritten data drops from about 35s to about 6s. That would have saved the zigbee2mqtt backup, which was written about 18 seconds before the logout. It doesn't help when the logout follows a write within a second or two. vmsingle flushes its caches on shutdown, so its lost cache files were probably that recent.
 
 **`sync` mount option (small, important apps only).** Every write waits until TrueNAS has it, which fully closes the gap. Writes get much slower. Add `sync` to an existing PV's `spec.mountOptions`, or set `node.mount.mount_flags` for a whole democratic-csi release. It takes effect the next time the volume is staged, with no rebuild.
 
