@@ -38,6 +38,10 @@ certExtraSANs:
 extraArgs:
   # https://kubernetes.io/docs/tasks/extend-kubernetes/configure-aggregation-layer/
   enable-aggregator-routing: "true"
+resources:
+  requests:
+    cpu: 200m
+    memory: 2Gi
 ---
 apiVersion: v1alpha1
 kind: KubeControllerManagerConfig
