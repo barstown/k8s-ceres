@@ -10,16 +10,16 @@ spec:
     # renovate: datasource=custom.talos-factory depName=siderolabs/talos
     version: v1.14.7
   policy:
-    rebootMode: powercycle # Optional, default|powercycle
-    stage: false # Optional, stage upgrade
+    waitForVolumeDetach: true
   healthChecks:
     - apiVersion: v1
       kind: Node
       expr: status.conditions.exists(c, c.type == "Ready" && c.status == "True")
+    - apiVersion: postgresql.cnpg.io/v1
+      kind: Cluster
+      expr: status.phase == "Cluster in healthy state" && status.topology.nodesUsed == object.spec.instances
   # maintenance:
   #   windows:
   #     - start: "0 2 * * 0"
   #       duration: "4h"
   #       timezone: "America/New_York"
-  drain:
-    enabled: true

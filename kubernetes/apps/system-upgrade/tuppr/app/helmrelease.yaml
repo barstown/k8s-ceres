@@ -17,6 +17,8 @@ spec:
     monitoring:
       serviceMonitor:
         enabled: true
+      prometheusRule:
+        enabled: true
     podSecurityContext:
       fsGroup: 65532
       fsGroupChangePolicy: OnRootMismatch
