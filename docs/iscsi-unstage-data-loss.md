@@ -1,6 +1,6 @@
 # iSCSI Volumes Losing Recent Writes on Unstage
 
-Investigated 2026-11-24, during the Talos v1.14.6 ➔ v1.14.7 rollout. Root cause not fully found (see Open Questions).
+Investigated 2026-11-24, during the Talos v1.14.6 ➔ v1.14.7 rollout, and updated 2026-11-25. Root cause not fully found (see Open Questions).
 
 ### What Happened
 
@@ -17,7 +17,7 @@ After the rollout, zigbee2mqtt crash-looped on start:
 Three things combined:
 
 1. **The app wrote without `fsync`.** zigbee-herdsman writes the backup to a `.tmp` file and renames it over the real one. It never calls `fsync`, so the new data sits in the node's page cache for up to about 30 seconds before reaching disk. `database.db` is written with `fsync` and survived.
-2. **democratic-csi logged out while XFS was still mounted.** `NodeUnstageVolume` (v1.9.5) runs plain `umount` on the staging path, then `iscsiadm ... -u` (logout) about 0.15 seconds later. It doesn't flush the filesystem or check that the device is unused. Sometimes `umount` returns while something still holds the filesystem open in the kernel. The logout then removes the disk under a live XFS, and any data not yet written back is lost.
+2. **democratic-csi logged out while XFS was still mounted.** `NodeUnstageVolume` (v1.9.5) runs plain `umount` on the staging path, then `iscsiadm ... -u` (logout). The gap between the two has been between 0.14s (vmsingle) and 3.2s (zigbee2mqtt). It doesn't flush the filesystem or check that the device is unused. Sometimes `umount` returns while something still holds the filesystem open in the kernel. The logout then removes the disk under a live XFS, and any data not yet written back is lost.
 3. **XFS kept the rename but not the data.** The rename reached the XFS journal, but the file contents were still in the page cache. On the next mount XFS replayed its log, which left the renamed file at 0 bytes.
 
 TrueNAS was not at fault. The lost data never left the Kubernetes node, so zvol settings like `sync=always` can't help.
@@ -34,12 +34,20 @@ PV: `pvc-79539cfa-654c-4845-9104-8594973bb281` (zigbee2mqtt `config`, `freenas-a
 | 20:59:33.9 | ceres-w3 | zigbee2mqtt writes `database.db` (with `fsync`, survived) |
 | 20:59:34.2 | ceres-w3 | zigbee2mqtt writes `coordinator_backup.json` (no `fsync`, lost) |
 | 20:59:49.770 | ceres-w3 | democratic-csi `umount .../7370127b.../globalmount` |
-| 20:59:52.943 | ceres-w3 | democratic-csi `iscsiadm ... -u` (logout) |
+| 20:59:52.943 | ceres-w3 | democratic-csi `iscsiadm ... -u` (logout). **The data is lost here.** |
+| 21:09:29 | ceres-w3 | First drain fails: the `authentik/authentik-postgres-2` PDB blocks eviction. tuppr uncordons the node |
+| 21:09:32 | ceres-w3 | tuppr starts a second drain |
+| 21:09:49 | ceres-w3 | tuppr: "Waiting for volumes to detach before reboot" (18 volumes), clear within about 1s |
+| 21:09:50 | ceres-w3 | tuppr creates the upgrade job; the reboot follows |
 | 21:11:59 | ceres-w3 | Next mount after the reboot: `XFS (sdc): Starting recovery` |
 | 21:27:56 | ceres-w3 | Reproduced on scale-to-0: kernel logs `Block device removal (0x20) detected ... Shutting down filesystem` before `Unmounting Filesystem` |
 | 21:31:03 | ceres-w3 | Clean unstage of the same PV for comparison: `Unmounting Filesystem` logged as soon as `umount` ran |
 
 Volumes moved off w3 during the 20:59 drain also needed recovery when mounted on w2 at 20:59:45 and 20:59:52. That was before w3 rebooted, so the power-cycle didn't cause this.
+
+**tuppr was ruled out.** The data was lost at the 20:59:52 logout, about 10 minutes before the reboot. The scale-to-0 at 21:27 reproduced it with no tuppr involved. tuppr only moves the most pods at once, and every pod move is an unstage. `policy.waitForVolumeDetach` (which tuppr already applied here) waits for detaches to finish, but can't make one safe.
+
+**The PDB stall made it worse.** The first drain evicted pods (and unstaged their volumes) for 10 minutes, then gave up on the authentik Postgres PDB and uncordoned the node, so the second drain moved pods again. That doubled the unstages without making progress. The TalosUpgrade now has a CNPG health check that waits until every cluster is healthy and spread across nodes before moving on (#1838).
 
 ### Second Incident: vmsingle (2026-11-25)
 
@@ -64,7 +72,15 @@ In the same minute w2 shows the same signature on other volumes: `sdb` and `sdo`
 
 ### How Common
 
-Since the workers' last boot, 13 of 53 PVC mounts needed XFS log recovery (`XFS (...): Starting recovery`). Each of those volumes was cut off while still mounted. Apps that `fsync` (Postgres, SQLite) survive this. Apps that don't, like the zigbee2mqtt backup, can lose writes from the last 30 seconds.
+Each mount that needs XFS log recovery (`XFS (...): Starting recovery`) is a volume that was cut off while still mounted.
+
+| When | Event | Mounts needing recovery |
+| --- | --- | --- |
+| 2026-11-24 | Talos v1.14.7 rollout (since the workers' last boot) | 13 of 53 |
+| 2026-11-25 | Worker drains for the RAM upgrade | 19 of 34 (4/12 and 15/22) |
+| 2026-11-25 | Rollout of resource requests (#1839) | 12 of 31 (w2: 9 of 9) |
+
+Roughly a third of all pod moves cut a volume off while it was still mounted. Apps that `fsync` (Postgres, SQLite) survive this. Apps that don't, like the zigbee2mqtt backup, lose whatever was still unwritten: up to about 35 seconds of writes with the kernel defaults, about 6 seconds with the sysctls below.
 
 To check a node:
 
@@ -93,6 +109,34 @@ The byte limits are sized for the current 1GbE storage link: 64Mi is about 0.6s 
 - XFS `wsync` forces metadata such as renames to disk, not file contents.
 - TrueNAS zvol settings only protect data TrueNAS has already received.
 - Switching to [truenas-csi](truenas-csi-migration.md): its iSCSI unstage also unmounts and logs out straight away, with no flush.
+
+### Follow-ups
+
+**SELinux labels on CSI volumes (needs more testing).** SELinux is permissive, so nothing is blocked. But pods writing to PVs log a denial for every directory write: `pod_t` → `unlabeled_t` on iSCSI volumes, and `network_fs_t` on NFS. On the workers that is roughly 0.4–25 denials per second, enough to overflow the kernel audit backlog (`audit: rate limit exceeded`, about 52k records lost on w1). The plan is to mount volumes with a fixed label, which needs no relabeling or PV migration:
+
+```
+context=system_u:object_r:kubelet_state_t:s0
+```
+
+`kubelet_state_t` is the label Talos gives emptyDir volumes, and pods write to those without denials. Tested on `grafana/grafana-pvc` on 2026-11-25. democratic-csi passed the option to `mount`, but libmount in the driver container stripped it before calling `mount(2)`. libmount drops SELinux options when libselinux reports SELinux as disabled, and libselinux requires `/etc/selinux/config` to exist. The democratic-csi image has only `semanage.conf`, and Talos has no config file either. The option was removed from the PV again afterwards.
+
+Next attempt:
+
+1. Mount a ConfigMap containing `SELINUX=permissive` and `SELINUXTYPE=targeted` at `/etc/selinux/config` in the `csi-driver` container of all four democratic-csi releases (`node.extraVolumes` plus `node.driver.extraVolumeMounts`).
+2. Check with a dry run in the container (`LIBMOUNT_DEBUG=all mount -f -t xfs -o context=... <dev> <dir>`): the "fixed options" line should keep `context=`.
+3. Re-add the option to the Grafana PV, remount it, and confirm the mount shows `kubelet_state_t` and Grafana's denials stop.
+4. Add the option to the StorageClasses (their `mountOptions` can't be changed in place, so each StorageClass is deleted and recreated) and to existing PVs. Existing PVs pick it up on their next mount, so let that happen during a planned drain instead of forcing remounts. Every remount is an unstage.
+
+The chart also renders `csiDriver.seLinuxMount`, but it is undocumented and relies on the kubelet working out a label from each pod's `seLinuxOptions` and the OS's `lxc_contexts`. Talos doesn't ship `lxc_contexts`, so it isn't a fit here.
+
+**Older PVs without `noatime`.** 27 of the 47 democratic-csi PVs (all `freenas-api-iscsi`, created up to 2026-05-31) have no `mountOptions`. They were provisioned before the StorageClass got `noatime`. Review whether to patch it in. A PV's `spec.mountOptions` can be changed in place and applies on the next mount. To list them:
+
+```sh
+kubectl get pv -o json | jq -r '.items[]
+  | select(.spec.csi.driver // "" | startswith("freenas"))
+  | select((.spec.mountOptions // []) | index("noatime") | not)
+  | [.metadata.creationTimestamp[:10], .spec.storageClassName, .spec.claimRef.namespace + "/" + .spec.claimRef.name] | @tsv'
+```
 
 ### Open Questions
 
