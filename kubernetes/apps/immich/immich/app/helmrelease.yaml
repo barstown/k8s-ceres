@@ -123,7 +123,7 @@ spec:
                 IMMICH_PORT: &server-port 2283
               resources:
                 requests:
-                  cpu: 100m
+                  cpu: 15m
                   memory: 1Gi
           pod:
             labels:
@@ -183,8 +183,8 @@ spec:
                 TRANSFORMERS_CACHE: /cache
               resources:
                 requests:
-                  cpu: 50m
-                  memory: 512Mi
+                  cpu: 10m
+                  memory: 640Mi
       persistence:
         cache:
           accessMode: ReadWriteOnce

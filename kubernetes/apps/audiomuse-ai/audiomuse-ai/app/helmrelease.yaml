@@ -94,8 +94,8 @@ spec:
               seccompProfile: { type: RuntimeDefault }
             resources:
               requests:
-                cpu: 100m
-                memory: 1Gi
+                cpu: 10m
+                memory: 480Mi
               limits:
                 cpu: 2000m
                 memory: 3Gi
@@ -121,8 +121,8 @@ spec:
             securityContext: *securityContext
             resources:
               requests:
-                cpu: 500m
-                memory: 2Gi
+                cpu: 100m
+                memory: 1152Mi
               limits:
                 cpu: 3000m
                 memory: 6Gi

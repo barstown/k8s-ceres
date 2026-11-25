@@ -52,9 +52,23 @@ spec:
           enabled: true
       relay:
         enabled: true
+        resources:
+          requests:
+            cpu: 10m
+            memory: 48Mi
         rollOutPods: true
       ui:
         enabled: true
+        backend:
+          resources:
+            requests:
+              cpu: 40m
+              memory: 112Mi
+        frontend:
+          resources:
+            requests:
+              cpu: 10m
+              memory: 16Mi
         rollOutPods: true
     ipam:
       mode: kubernetes
@@ -82,7 +96,7 @@ spec:
       resources:
         requests:
           cpu: 10m
-          memory: 128Mi
+          memory: 208Mi
       rollOutPods: true
     prometheus:
       enabled: true
@@ -91,7 +105,7 @@ spec:
         trustCRDsExist: true
     resources:
       requests:
-        cpu: 100m
+        cpu: 70m
         memory: 512Mi
     rollOutCiliumPods: true
     routingMode: native

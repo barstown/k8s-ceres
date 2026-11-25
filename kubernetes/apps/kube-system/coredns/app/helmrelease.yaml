@@ -21,6 +21,12 @@ spec:
       name: kube-dns
       clusterIP: "10.43.0.10"
     replicaCount: 2
+    resources:
+      requests:
+        cpu: 10m
+        memory: 96Mi
+      limits:
+        memory: 192Mi
     servers:
       - zones:
           - zone: .

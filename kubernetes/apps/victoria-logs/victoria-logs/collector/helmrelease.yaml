@@ -25,7 +25,7 @@ spec:
       - url: http://victoria-logs.victoria-logs.svc.cluster.local:9428
     resources:
       requests:
-        cpu: 25m
+        cpu: 15m
         memory: 64Mi
       limits:
         memory: 256Mi

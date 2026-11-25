@@ -21,3 +21,8 @@ spec:
     wal:
       compression: zstd
   retentionPolicy: 4w
+  instanceSidecarConfiguration:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 96Mi

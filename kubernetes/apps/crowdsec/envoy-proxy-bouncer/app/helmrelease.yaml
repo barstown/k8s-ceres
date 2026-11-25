@@ -12,6 +12,13 @@ spec:
   values:
     podAnnotations:
       reloader.stakater.com/auto: "true"
+    resources:
+      requests:
+        cpu: 10m
+        memory: 48Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
     podSecurityContext:
       runAsGroup: 65532
       runAsNonRoot: true

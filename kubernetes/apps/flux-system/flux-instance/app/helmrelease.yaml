@@ -128,6 +128,38 @@ spec:
             target:
               kind: Deployment
               name: kustomize-controller
+          - # Size requests to 30-day p95 usage (defaults are 100m/64Mi)
+            patch: |
+              - op: add
+                path: /spec/template/spec/containers/0/resources/requests
+                value: { cpu: 40m, memory: 128Mi }
+            target:
+              kind: Deployment
+              name: kustomize-controller
+          - patch: |
+              - op: add
+                path: /spec/template/spec/containers/0/resources/requests
+                value: { cpu: 10m, memory: 112Mi }
+            target:
+              kind: Deployment
+              name: helm-controller
+          - patch: |
+              - op: add
+                path: /spec/template/spec/containers/0/resources/requests
+                value: { cpu: 10m, memory: 80Mi }
+            target:
+              kind: Deployment
+              name: source-controller
+          - patch: |
+              - op: add
+                path: /spec/template/spec/containers/0/resources/requests
+                value: { cpu: 10m, memory: 48Mi }
+              - op: add
+                path: /spec/template/spec/priorityClassName
+                value: system-cluster-critical
+            target:
+              kind: Deployment
+              name: notification-controller
           - # Enable in-memory kustomize builds
             patch: |
               - op: add

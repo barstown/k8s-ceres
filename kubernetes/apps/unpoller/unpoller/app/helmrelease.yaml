@@ -49,8 +49,8 @@ spec:
                 cpu: 250m
                 memory: 128Mi
               requests:
-                cpu: 100m
-                memory: 64Mi
+                cpu: 10m
+                memory: 32Mi
     defaultPodOptions:
       securityContext:
         fsGroup: 1000

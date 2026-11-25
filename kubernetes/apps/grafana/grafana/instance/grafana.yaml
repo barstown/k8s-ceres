@@ -55,10 +55,10 @@ spec:
                       key: GF_SECURITY_ADMIN_USER
               resources:
                 requests:
-                  cpu: 100m
-                  memory: 512Mi
+                  cpu: 35m
+                  memory: 768Mi
                 limits:
-                  memory: 1Gi
+                  memory: 1536Mi
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities: { drop: ["ALL"] }
