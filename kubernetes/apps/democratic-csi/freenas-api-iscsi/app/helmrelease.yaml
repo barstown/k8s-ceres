@@ -39,8 +39,8 @@ spec:
         iscsiDirHostPathType: ""
         resources:
           requests:
-            cpu: 10m
-            memory: 96Mi
+            cpu: 40m
+            memory: 128Mi
       hostPID: true
     storageClasses:
       - name: freenas-api-iscsi

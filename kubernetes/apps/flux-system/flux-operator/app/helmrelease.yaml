@@ -10,6 +10,14 @@ spec:
     name: flux-operator
   interval: 1h
   values:
+    priorityClassName: system-cluster-critical
+    resources:
+      requests:
+        cpu: 15m
+        memory: 208Mi
+      limits:
+        cpu: 2000m
+        memory: 1Gi
     serviceMonitor:
       create: true
     web:

@@ -12,6 +12,15 @@ spec:
   values:
     global:
       imageRegistry: mirror.gcr.io
+    deployment:
+      priorityClassName: system-cluster-critical
+      envoyGateway:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 160Mi
+          limits:
+            memory: 1Gi
     config:
       envoyGateway:
         extensionApis:

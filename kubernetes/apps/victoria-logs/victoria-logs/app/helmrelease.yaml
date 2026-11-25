@@ -39,8 +39,8 @@ spec:
             useLocalTimestamp: true
       resources:
         requests:
-          cpu: 50m
-          memory: 512Mi
+          cpu: 15m
+          memory: 240Mi
         limits:
           memory: 3Gi
       podSecurityContext:

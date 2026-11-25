@@ -13,12 +13,14 @@ spec:
     kubernetes:
       envoyDeployment:
         replicas: 2
+        pod:
+          priorityClassName: system-cluster-critical
         container:
           imageRepository: mirror.gcr.io/envoyproxy/envoy
           resources:
             requests:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 20m
+              memory: 96Mi
             limits:
               memory: 2Gi
       envoyService:

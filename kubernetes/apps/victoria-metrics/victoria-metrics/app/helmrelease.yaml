@@ -34,7 +34,7 @@ spec:
       resources:
         requests:
           cpu: 10m
-          memory: 96Mi
+          memory: 128Mi
       securityContext: &securityContext
         allowPrivilegeEscalation: false
         capabilities: { drop: ["ALL"] }
@@ -97,8 +97,8 @@ spec:
         retentionPeriod: 90d
         resources:
           requests:
-            cpu: 250m
-            memory: 1Gi
+            cpu: 130m
+            memory: 1408Mi
           limits:
             cpu: 1200m
             memory: 2500Mi
@@ -122,6 +122,13 @@ spec:
         externalURL: https://vmalertmanager.${SECRET_DOMAIN}
         image:
           repository: quay.io/prometheus/alertmanager
+        resources:
+          requests:
+            cpu: 10m
+            memory: 48Mi
+          limits:
+            cpu: 100m
+            memory: 256Mi
         storage:
           volumeClaimTemplate:
             spec:
@@ -187,6 +194,13 @@ spec:
           external.url: https://vmalert.${SECRET_DOMAIN}
         datasource:
           url: http://vmauth-victoria-metrics.victoria-metrics.svc.cluster.local:8427
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 500Mi
         useStrictSecurity: true
       route:
         enabled: true
@@ -208,6 +222,13 @@ spec:
             - src_paths:
                 - /select/logsql/.*
               url_prefix: http://victoria-logs.victoria-logs.svc.cluster.local:9428
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            cpu: 200m
+            memory: 300Mi
         useStrictSecurity: true
     vmagent:
       enabled: true
@@ -219,7 +240,7 @@ spec:
         resources:
           requests:
             cpu: 100m
-            memory: 200Mi
+            memory: 112Mi
           limits:
             cpu: 1000m
             memory: 750Mi

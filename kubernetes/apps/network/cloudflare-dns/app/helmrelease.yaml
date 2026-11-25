@@ -36,6 +36,6 @@ spec:
     resources:
       requests:
         cpu: 10m
-        memory: 64Mi
+        memory: 96Mi
     podAnnotations:
       secret.reloader.stakater.com/reload: *secret

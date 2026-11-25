@@ -32,7 +32,7 @@ spec:
   smartShutdownTimeout: 15
   resources:
     requests:
-      cpu: 50m
+      cpu: 15m
       memory: 256Mi
   storage:
     size: 10Gi

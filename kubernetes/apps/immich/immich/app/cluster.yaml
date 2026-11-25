@@ -48,8 +48,8 @@ spec:
   smartShutdownTimeout: 15
   resources:
     requests:
-      cpu: 50m
-      memory: 256Mi
+      cpu: 10m
+      memory: 320Mi
   storage:
     size: 20Gi
     storageClass: freenas-api-iscsi-postgresql

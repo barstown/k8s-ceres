@@ -104,8 +104,8 @@ spec:
             securityContext: *securityContext
             resources:
               requests:
-                cpu: 100m
-                memory: 250Mi
+                cpu: 10m
+                memory: 176Mi
               limits:
                 cpu: 2000m
                 memory: 3Gi
