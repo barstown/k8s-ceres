@@ -9,6 +9,29 @@ spec:
     kind: OCIRepository
     name: freenas-api-iscsi-postgresql
   interval: 1h
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: DaemonSet
+              name: freenas-api-iscsi-postgresql-democratic-csi-node
+            patch: |
+              apiVersion: apps/v1
+              kind: DaemonSet
+              metadata:
+                name: freenas-api-iscsi-postgresql-democratic-csi-node
+              spec:
+                template:
+                  spec:
+                    containers:
+                      - name: driver-registrar
+                        volumeMounts:
+                          - mountPath: /var/lib/kubelet
+                            mountPropagation: HostToContainer
+                      - name: cleanup
+                        volumeMounts:
+                          - mountPath: /plugins
+                            mountPropagation: HostToContainer
   values:
     csiDriver:
       name: freenas-api-iscsi-postgresql
