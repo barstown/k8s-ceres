@@ -1,6 +1,6 @@
 # iSCSI Volumes Losing Recent Writes on Unstage
 
-Investigated 2026-11-24, during the Talos v1.14.6 ➔ v1.14.7 rollout, and updated 2026-11-25. Root cause found on 2026-11-26 during a drain of ceres-w1 (see [Root Cause: Private Mount Copies](#root-cause-private-mount-copies)).
+Investigated 2026-11-24, during the Talos v1.14.6 ➔ v1.14.7 rollout, and updated 2026-11-25. Root cause found on 2026-11-26 during a drain of ceres-w1 (see [Root Cause: Private Mount Copies](#root-cause-private-mount-copies)). Fixed in #1850 and confirmed the same day by a drain of ceres-w2 (see [Fix Verified](#fix-verified-drain-of-ceres-w2)).
 
 ### What Happened
 
@@ -119,8 +119,9 @@ Each mount that needs XFS log recovery (`XFS (...): Starting recovery`) is a vol
 | 2026-11-25 | Worker drains for the RAM upgrade | 19 of 34 (4/12 and 15/22) |
 | 2026-11-25 | Rollout of resource requests (#1839) | 12 of 31 (w2: 9 of 9) |
 | 2026-11-26 | Drain of ceres-w1 (unstage watcher running) | 10 of 16 (15 of 16 logged out while alive) |
+| 2026-11-26 | Drain of ceres-w2 after the fix (#1850) | 0 of 22 |
 
-Roughly a third of all pod moves cut a volume off while it was still mounted. The share depends on how many volumes were staged before the holding containers last started (see [Root Cause](#root-cause-private-mount-copies)). Apps that `fsync` (Postgres, SQLite) survive this. Apps that don't, like the zigbee2mqtt backup, lose whatever was still unwritten: up to about 35 seconds of writes with the kernel defaults, about 6 seconds with the sysctls below.
+Before the fix, roughly a third of all pod moves cut a volume off while it was still mounted. The share depended on how many volumes were staged before the holding containers last started (see [Root Cause](#root-cause-private-mount-copies)). Apps that `fsync` (Postgres, SQLite) survive this. Apps that don't, like the zigbee2mqtt backup, lose whatever was still unwritten: up to about 35 seconds of writes with the kernel defaults, about 6 seconds with the sysctls below.
 
 To check a node:
 
@@ -132,20 +133,23 @@ A healthy unstage logs `Unmounting Filesystem` with no `Block device removal` li
 
 ### Mitigations
 
-**Stop the private copies (prepared 2026-11-26).** This removes the cause:
+**Stop the private copies (applied 2026-11-26, #1850).** This removes the cause:
 
 - `kubernetes/apps/victoria-logs/victoria-logs/collector/helmrelease.yaml` overrides `defaultVolumes` and `defaultVolumeMounts` to mount only `/var/log`. The chart mounts `/var/lib` for setups where pod logs are symlinks into `/var/lib`, such as Minikube. On Talos the kubelet's `/var/log/containers` symlinks point to `/var/log/pods`, where containerd writes the logs. The collector's own data stays at `/var/lib/vl-collector` on a separate volume.
 - The four democratic-csi HelmReleases add a `postRenderers` patch that sets `mountPropagation: HostToContainer` on the `driver-registrar` (`/var/lib/kubelet`) and `cleanup` (`/plugins`) mounts. The chart (0.15.1) hard-codes these mounts with no value to change them. The patch is a strategic merge keyed on container name and `mountPath`, and targets each release's Linux node DaemonSet by name.
 
 With `HostToContainer`, the container's copy is a slave of the host mount, so an unmount on the host also removes the copy. Rolling this out restarts those containers, which releases the copies they hold now. That is safe: the kubelet's own staging mount still holds every volume in use.
 
-To check a node after the rollout (should print 0 for each):
+To check a node, count private `globalmount` copies, meaning those with no `shared:` or `master:` tag. Every process should print 0. `driver-registrar` and `cleanup` still list every staging mount, but as slave copies (`master:N`), and those go away when the host unmounts. `vlagent` lists none.
 
 ```sh
 for pid in $(talosctl -n <node-ip> processes | awk '/vlagent-prod|csi-node-driver-registrar|while true; do sleep/ {print $2}'); do
-  talosctl -n <node-ip> read /proc/$pid/mountinfo | grep -c 'globalmount '
+  talosctl -n <node-ip> read /proc/$pid/mountinfo \
+    | awk '/globalmount / {opt=""; for (i = 7; $i != "-"; i++) opt = opt $i; if (opt !~ /master:|shared:/) c++} END {print c + 0}'
 done
 ```
+
+Verified 2026-11-26 after the rollout (#1850): 0 private copies across every process on ceres-w2 and ceres-w3 (151 and 146 distinct mount tables), and VictoriaLogs still receiving logs from all six nodes.
 
 The mitigations below stay useful as defence in depth for anything else that holds a copy.
 
@@ -195,6 +199,21 @@ kubectl get pv -o json | jq -r '.items[]
   | [.metadata.creationTimestamp[:10], .spec.storageClassName, .spec.claimRef.namespace + "/" + .spec.claimRef.name] | @tsv'
 ```
 
+### Fix Verified: Drain of ceres-w2
+
+On 2026-11-26, after #1850 rolled out (02:57 to 02:59 UTC), ceres-w2 was drained at 03:05 with the unstage watcher running. Its 22 volumes moved to ceres-w1.
+
+| | Drain of ceres-w1 (before the fix) | Drain of ceres-w2 (after the fix) |
+| --- | --- | --- |
+| Logged out while the filesystem was alive | 15 of 16 | 0 of 22 |
+| Clean unstage (unmount, release, logout) | 1 of 16 | 22 of 22 |
+| `Block device removal` / `log I/O error` on the drained node | 11 / 5 | 0 / 0 |
+| Mounts needing XFS recovery on the receiving node | 10 of 16 | 0 of 22 |
+
+Kernel logs from all three workers (`talosctl dmesg`) match the watcher. ceres-w2 logged `Unmounting Filesystem` and `Synchronizing SCSI cache` for each volume and nothing else. ceres-w1 logged `Ending clean mount` for all 22. zigbee2mqtt, Home Assistant, vmsingle, and lidarr logged no corruption errors after starting on ceres-w1.
+
+Logout came 0.46 to 8.2s after the unmount, and every filesystem was already released by then. 18 filesystems were released by the next watcher scan. Four took longer while the unmount wrote back their dirty data: lidarr 1.1s, navidrome and immich-postgres 1.0s, vmsingle 0.56s. Before the fix that write-back never happened, because the private copies kept the filesystems alive. For lidarr and vmsingle the watcher raised `alive_without_mounts`. Its deep scans found no process using the device and no pinned namespace, so these were false alarms: the 300ms `HIDDEN_GRACE` is too short for a large flush.
+
 ### Unstage Watcher
 
 `kubernetes/troubleshooting/unstage-watch` is a DaemonSet that records what still holds a volume when democratic-csi unstages it. It lives outside `kubernetes/apps`, so Flux doesn't apply it. It runs in the `troubleshooting` namespace (privileged, not managed by Flux) on the workers only.
@@ -233,9 +252,9 @@ What the result would mean:
 - The holders are another pod: that pod's mount propagation copies volume mounts in and keeps them.
 - `deep_scan` finds an fd or nsfs pin: something is holding a dead mount namespace open.
 
-The watcher only observes, and it needs drains or pod moves to have anything to record.
+The watcher only observes, and it needs drains or pod moves to have anything to record. It was removed from the cluster after the [ceres-w2 drain](#fix-verified-drain-of-ceres-w2). The manifests stay in the repo for future use.
 
-Limitation: it treats any mount at a `globalmount` path as a staging mount, including private copies of that path in other containers. With private copies present, it never logs `staging_unmounted`, and the problem shows up only as `device_removed_while_mounted` with `still_staged: true`. The holders it reports are still correct.
+Limitation: it treats any mount at a `globalmount` path as a staging mount, including private copies of that path in other containers. With private copies present, it never logs `staging_unmounted`, and the problem shows up only as `device_removed_while_mounted` with `still_staged: true`. The holders it reports are still correct. It also raises `alive_without_mounts` when a large volume takes longer than `HIDDEN_GRACE` (300ms) to flush on unmount. Set it to about 2s before running it again.
 
 ### Open Questions
 
