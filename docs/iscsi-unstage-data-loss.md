@@ -1,6 +1,6 @@
 # iSCSI Volumes Losing Recent Writes on Unstage
 
-Investigated 2026-11-24, during the Talos v1.14.6 ➔ v1.14.7 rollout, and updated 2026-11-25. Root cause not fully found (see Open Questions).
+Investigated 2026-11-24, during the Talos v1.14.6 ➔ v1.14.7 rollout, and updated 2026-11-25. Root cause found on 2026-11-26 during a drain of ceres-w1 (see [Root Cause: Private Mount Copies](#root-cause-private-mount-copies)).
 
 ### What Happened
 
@@ -17,7 +17,7 @@ After the rollout, zigbee2mqtt crash-looped on start:
 Three things combined:
 
 1. **The app wrote without `fsync`.** zigbee-herdsman writes the backup to a `.tmp` file and renames it over the real one. It never calls `fsync`, so the new data sits in the node's page cache for up to about 30 seconds before reaching disk. `database.db` is written with `fsync` and survived.
-2. **democratic-csi logged out while XFS was still mounted.** `NodeUnstageVolume` (v1.9.5) runs plain `umount` on the staging path, then `iscsiadm ... -u` (logout). The gap between the two has been between 0.14s (vmsingle) and 3.2s (zigbee2mqtt). It doesn't flush the filesystem or check that the device is unused. Sometimes `umount` returns while something still holds the filesystem open in the kernel. The logout then removes the disk under a live XFS, and any data not yet written back is lost.
+2. **democratic-csi logged out while XFS was still mounted.** `NodeUnstageVolume` (v1.9.5) runs plain `umount` on the staging path, then `iscsiadm ... -u` (logout). The gap between the two has been between 0.14s (vmsingle) and 3.2s (zigbee2mqtt). It doesn't flush the filesystem or check that the device is unused. Three containers in other pods held private copies of the staging mount, so `umount` removed only the kubelet's copy, and XFS stayed alive without being flushed. The logout then removed the disk under a live XFS, and any data not yet written back was lost.
 3. **XFS kept the rename but not the data.** The rename reached the XFS journal, but the file contents were still in the page cache. On the next mount XFS replayed its log, which left the renamed file at 0 bytes.
 
 TrueNAS was not at fault. The lost data never left the Kubernetes node, so zvol settings like `sync=always` can't help.
@@ -70,6 +70,45 @@ This is the strongest evidence so far. Unlike the zigbee2mqtt case, the kernel i
 
 In the same minute w2 shows the same signature on other volumes: `sdb` and `sdo` hit `log I/O error -19`, and `sds` logged `Block device removal`.
 
+### Root Cause: Private Mount Copies
+
+Found 2026-11-26 with the [unstage watcher](#unstage-watcher) during a drain of ceres-w1 (02:38:04 to 02:38:13 UTC).
+
+Three containers mount a kubelet directory from the host with `mountPropagation: None`:
+
+| Pod | Container | Host path | Mounted at |
+| --- | --- | --- | --- |
+| `victoria-logs/victoria-logs-collector` | `vlagent` | `/var/lib` | `/var/lib` |
+| `democratic-csi/<release>-democratic-csi-node` | `driver-registrar` | `/var/lib/kubelet` | `/var/lib/kubelet` |
+| `democratic-csi/<release>-democratic-csi-node` | `cleanup` | `/var/lib/kubelet/plugins` | `/plugins` |
+
+A `hostPath` mount with propagation `None` is a recursive, private bind. When the container starts, it gets its own copy of every mount under that path, including the `globalmount` of every CSI volume already staged on the node. Unmounts on the host don't propagate into a private copy. So when democratic-csi unmounts the staging path, the copies in those containers keep the XFS filesystem alive. Nothing is flushed, because a filesystem is only synced when its last mount goes away. The logout then removes the disk, and XFS logs `Block device removal` or `log I/O error`.
+
+What the watcher recorded on ceres-w1:
+
+| Result | Volumes |
+| --- | --- |
+| Logged out while the filesystem was alive (`device_removed_while_mounted`) | 15 of 16 |
+| Holders at logout | Only private copies: `vlagent` (5 volumes), the `freenas-api-iscsi` node pod's `driver-registrar` and `cleanup` (10 volumes, including `freenas-api-iscsi-sqlite` volumes) |
+| Clean unstage | 1: `victoria-logs-0`, staged after all three containers had started |
+| Kernel on w1 | 11 `Block device removal`, 5 `log I/O error` |
+| Mounts on w2 and w3 needing XFS recovery | 10 of 16 |
+
+This explains the earlier findings:
+
+- Only volumes staged before the holding containers last started are affected, so the rate depends on when those containers were restarted. That is why it has been about a third of moves, and nearly all of them on w1.
+- `victoria-logs-collector` was added on 2026-11-19, five days before the first incident.
+- The `freenas-api-iscsi` node pods and all `victoria-logs-collector` pods were restarted at 16:40 to 16:42 UTC on 2026-11-25 by the #1839 rollout, so they copied every volume staged on their node at that time. The other three democratic-csi node pods started at boot, before any volume was staged, so they held no copies.
+
+After the drain, these containers still held copies (counted from `/proc/<pid>/mountinfo` with `talosctl read`):
+
+| Node | `vlagent` | `freenas-api-iscsi` node pod (`driver-registrar` and `cleanup`) |
+| --- | --- | --- |
+| ceres-w2 | 15 | 6 |
+| ceres-w3 | 14 | 14 |
+
+Neither Talos nor TrueNAS is at fault. democratic-csi still logs out without checking that the disk is free, which is why private copies turn into data loss. A driver that checked would have failed the unstage and retried instead.
+
 ### How Common
 
 Each mount that needs XFS log recovery (`XFS (...): Starting recovery`) is a volume that was cut off while still mounted.
@@ -79,8 +118,9 @@ Each mount that needs XFS log recovery (`XFS (...): Starting recovery`) is a vol
 | 2026-11-24 | Talos v1.14.7 rollout (since the workers' last boot) | 13 of 53 |
 | 2026-11-25 | Worker drains for the RAM upgrade | 19 of 34 (4/12 and 15/22) |
 | 2026-11-25 | Rollout of resource requests (#1839) | 12 of 31 (w2: 9 of 9) |
+| 2026-11-26 | Drain of ceres-w1 (unstage watcher running) | 10 of 16 (15 of 16 logged out while alive) |
 
-Roughly a third of all pod moves cut a volume off while it was still mounted. Apps that `fsync` (Postgres, SQLite) survive this. Apps that don't, like the zigbee2mqtt backup, lose whatever was still unwritten: up to about 35 seconds of writes with the kernel defaults, about 6 seconds with the sysctls below.
+Roughly a third of all pod moves cut a volume off while it was still mounted. The share depends on how many volumes were staged before the holding containers last started (see [Root Cause](#root-cause-private-mount-copies)). Apps that `fsync` (Postgres, SQLite) survive this. Apps that don't, like the zigbee2mqtt backup, lose whatever was still unwritten: up to about 35 seconds of writes with the kernel defaults, about 6 seconds with the sysctls below.
 
 To check a node:
 
@@ -91,6 +131,23 @@ talosctl -n <node-ip> dmesg | grep -E 'XFS.*(Starting recovery|Block device remo
 A healthy unstage logs `Unmounting Filesystem` with no `Block device removal` line before it.
 
 ### Mitigations
+
+**Stop the private copies (prepared 2026-11-26).** This removes the cause:
+
+- `kubernetes/apps/victoria-logs/victoria-logs/collector/helmrelease.yaml` overrides `defaultVolumes` and `defaultVolumeMounts` to mount only `/var/log`. The chart mounts `/var/lib` for setups where pod logs are symlinks into `/var/lib`, such as Minikube. On Talos the kubelet's `/var/log/containers` symlinks point to `/var/log/pods`, where containerd writes the logs. The collector's own data stays at `/var/lib/vl-collector` on a separate volume.
+- The four democratic-csi HelmReleases add a `postRenderers` patch that sets `mountPropagation: HostToContainer` on the `driver-registrar` (`/var/lib/kubelet`) and `cleanup` (`/plugins`) mounts. The chart (0.15.1) hard-codes these mounts with no value to change them. The patch is a strategic merge keyed on container name and `mountPath`, and targets each release's Linux node DaemonSet by name.
+
+With `HostToContainer`, the container's copy is a slave of the host mount, so an unmount on the host also removes the copy. Rolling this out restarts those containers, which releases the copies they hold now. That is safe: the kubelet's own staging mount still holds every volume in use.
+
+To check a node after the rollout (should print 0 for each):
+
+```sh
+for pid in $(talosctl -n <node-ip> processes | awk '/vlagent-prod|csi-node-driver-registrar|while true; do sleep/ {print $2}'); do
+  talosctl -n <node-ip> read /proc/$pid/mountinfo | grep -c 'globalmount '
+done
+```
+
+The mitigations below stay useful as defence in depth for anything else that holds a copy.
 
 **Write data back to disk sooner (applied 2026-11-25, `talos/all/40-sysctls.yaml`).** Linux holds written data in memory for up to about 35s by default. Shortening that shrinks the loss window for every volume, with no PVC changes:
 
@@ -138,7 +195,50 @@ kubectl get pv -o json | jq -r '.items[]
   | [.metadata.creationTimestamp[:10], .spec.storageClassName, .spec.claimRef.namespace + "/" + .spec.claimRef.name] | @tsv'
 ```
 
+### Unstage Watcher
+
+`kubernetes/troubleshooting/unstage-watch` is a DaemonSet that records what still holds a volume when democratic-csi unstages it. It lives outside `kubernetes/apps`, so Flux doesn't apply it. It runs in the `troubleshooting` namespace (privileged, not managed by Flux) on the workers only.
+
+It reads the host's `/proc` and `/sys` and follows kernel messages from `/dev/kmsg`. It doesn't mount `/var/lib/kubelet`, so it can't become a holder itself. While idle, it rescans every 2s and checks the kubelet's mount table every 50ms. When a staging or publish mount changes, it rescans every mount namespace every 100ms for 20s.
+
+```sh
+kubectl apply -k kubernetes/troubleshooting/unstage-watch
+kubectl -n troubleshooting get pods -l app.kubernetes.io/name=unstage-watch -o wide
+# remove once enough unstages have been captured
+kubectl delete -k kubernetes/troubleshooting/unstage-watch
+```
+
+Each line is a JSON object with `event`, `dev`, `pv`, `consumer_pods`, and event-specific fields:
+
+| Event | Level | Meaning |
+| --- | --- | --- |
+| `staging_unmounted`, `filesystem_released`, `device_removed` | info | A clean unstage. `ms_since_unstage` gives the timing |
+| `still_mounted_after_unstage` | warn | The staging mount is gone but other namespaces still have the filesystem. `holders` lists each namespace with its mounts, propagation (`shared:N`, `master:N`, `private`), and processes (state, cgroup, pod). `consumer_pod: true` marks the pod that was using the volume |
+| `alive_without_mounts` then `deep_scan` | warn | The superblock is still alive (`/sys/fs/xfs/sdX` exists) with no mount anywhere. The deep scan checks open files, cwd and root, memory maps, and mount namespaces pinned by an fd or nsfs mount with no process left in them |
+| `device_removed_while_mounted` | error | The iSCSI disk was logged out while the filesystem was still alive. This is the data-loss event. It carries the last-known holders |
+| `kernel` | info or error | Kernel lines for the device (`Block device removal`, `writeback error`, `log I/O error`, iSCSI connection errors), with the device's tracked state attached |
+
+To read it:
+
+```sh
+kubectl -n troubleshooting logs -l app.kubernetes.io/name=unstage-watch --prefix --tail=-1 \
+  | grep -E '"level":"(warn|error)"'
+```
+
+In VictoriaLogs, filter on `kubernetes.pod_namespace:troubleshooting` plus the event name, for example `"device_removed_while_mounted"`.
+
+What the result would mean:
+
+- The holders are the consumer pod's own processes (state `Z` or `D`, or still running): the container hadn't finished exiting when the kubelet unstaged the volume.
+- The holders are another pod: that pod's mount propagation copies volume mounts in and keeps them.
+- `deep_scan` finds an fd or nsfs pin: something is holding a dead mount namespace open.
+
+The watcher only observes, and it needs drains or pod moves to have anything to record.
+
+Limitation: it treats any mount at a `globalmount` path as a staging mount, including private copies of that path in other containers. With private copies present, it never logs `staging_unmounted`, and the problem shows up only as `device_removed_while_mounted` with `still_staged: true`. The holders it reports are still correct.
+
 ### Open Questions
 
-- **What keeps XFS alive after `umount`?** Every current process on w3 sees the volume through shared or slave mounts (none hold a private copy), so a dying container's mount namespace is the leading suspect. To catch it, look for `/dev/sdX` in `/proc/*/mountinfo` at the moment of unstage.
-- **Upstream fix.** Worth reporting to democratic-csi with the 21:27 vs 21:31 evidence. The fix is to run `sync -f` on the staging path before `umount`, and to refuse to log out while the block device still has a live filesystem.
+- **What keeps XFS alive after `umount`?** Answered: private copies of the staging mount in `vlagent`, `driver-registrar`, and `cleanup` (see [Root Cause](#root-cause-private-mount-copies)).
+- **Upstream reports.** democratic-csi chart: `driver-registrar` and `cleanup` should mount kubelet paths with `HostToContainer`. victoria-logs-collector chart: mounting `/var/lib` privately pins every CSI volume on the node.
+- **Upstream driver fix.** Worth reporting to democratic-csi with the 21:27 vs 21:31 evidence and the drain results. The fix is to run `sync -f` on the staging path before `umount`, and to refuse to log out while the block device still has a live filesystem.
