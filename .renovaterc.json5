@@ -181,7 +181,34 @@
       matchDatasources: ["github-releases"],
       addLabels: ["renovate/github-release"],
     },
+    {
+      description: "Grafana plugins resolve from the Grafana.com catalog, which Grafana installs from",
+      matchDatasources: ["custom.grafana-plugins"],
+      addLabels: ["renovate/grafana-plugin"],
+      semanticCommitScope: "grafana-plugin",
+      commitMessageTopic: "Grafana plugin {{depName}}",
+    },
+    {
+      description: "Link VictoriaLogs Grafana plugin repository for changelogs",
+      matchDatasources: ["custom.grafana-plugins"],
+      matchPackageNames: ["victoriametrics-logs-datasource"],
+      sourceUrl: "https://github.com/VictoriaMetrics/victorialogs-datasource",
+    },
+    {
+      description: "Link VictoriaMetrics Grafana plugin repository for changelogs",
+      matchDatasources: ["custom.grafana-plugins"],
+      matchPackageNames: ["victoriametrics-metrics-datasource"],
+      sourceUrl: "https://github.com/VictoriaMetrics/victoriametrics-datasource",
+    },
   ],
+  customDatasources: {
+    "grafana-plugins": {
+      defaultRegistryUrlTemplate: "https://grafana.com/api/plugins/{{packageName}}/versions",
+      transformTemplates: [
+        '{"releases": [items.{"version": version, "releaseTimestamp": createdAt}]}',
+      ],
+    },
+  },
   customManagers: [
     {
       customType: "regex",
