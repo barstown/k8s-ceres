@@ -264,7 +264,7 @@ spec:
             type: victoriametrics-metrics-datasource
             plugin: true
             # renovate: datasource=custom.grafana-plugins depName=victoriametrics-metrics-datasource
-            version: 0.26.1
+            version: 1.0.1
     grafana:
       enabled: false
       forceDeployDatasource: true
