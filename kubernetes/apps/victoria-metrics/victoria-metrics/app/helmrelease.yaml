@@ -250,6 +250,21 @@ spec:
         enabled: true
         spec:
           allowCrossNamespaceImport: true
+      victoriametrics:
+        datasources:
+          - name: VictoriaMetrics
+            type: prometheus
+            access: proxy
+            uid: VictoriaMetrics
+            isDefault: true
+          - name: VictoriaMetrics (DS)
+            isDefault: false
+            access: proxy
+            uid: VictoriaMetricsDS
+            type: victoriametrics-metrics-datasource
+            plugin: true
+            # renovate: datasource=custom.grafana-plugins depName=victoriametrics-metrics-datasource
+            version: 0.26.1
     grafana:
       enabled: false
       forceDeployDatasource: true

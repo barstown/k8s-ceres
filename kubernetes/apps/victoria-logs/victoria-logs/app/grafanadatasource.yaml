@@ -17,5 +17,5 @@ spec:
     url: http://victoria-logs.victoria-logs.svc.cluster.local:9428
   plugins:
     - name: victoriametrics-logs-datasource
-      # renovate: datasource=github-releases depName=VictoriaMetrics/victorialogs-datasource
-      version: 0.35.0
+      # renovate: datasource=custom.grafana-plugins depName=victoriametrics-logs-datasource
+      version: 0.34.0
